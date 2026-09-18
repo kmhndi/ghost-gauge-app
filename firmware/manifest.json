@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "stable": {
+    "version": "1.0.24",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.24.bin",
+    "bytes": 1540936,
+    "sha256": "0eb0f06c9ac108f66a039e85ffdff0ea45e9e0c6a9d65b5b948eb9b41a9fe5cd",
+    "minApp": "0.16",
+    "hw": 1,
+    "notes": "The gauge only runs firmware we signed.",
+    "published": "2026-09-19"
+  }
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Gauge — Support</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<main>
+<nav>
+  <a href="index.html">GHOST GAUGE</a>
+  <a href="support.html">SUPPORT</a>
+  <a href="privacy.html">PRIVACY</a>
+</nav>
+
+<h1>Support</h1>
+<p class="lede">Ghost Gauge for iPhone and iPad</p>
+
+<div class="card">
+  <p>Ghost Gauge is the companion app for the Ghost Gauge dash cluster, a custom gauge for the
+  Can-Am Maverick X3. It shows the gauge's readings, keeps alarms on your Lock Screen, records
+  rides, changes every setting on the panel, and installs new firmware.</p>
+  <p><strong>No gauge?</strong> Turn on <strong>Demo mode</strong> in Settings › This iPhone — or
+  wait a few seconds on the connect screen and tap <em>Try demo mode</em>. The app then runs against
+  a simulated gauge so you can see everything it does.</p>
+</div>
+
+<h2>Requirements</h2>
+<ul>
+  <li>iPhone or iPad running iOS or iPadOS 26 or later</li>
+  <li>A Ghost Gauge cluster, powered on and running Bluetooth (its Telemetry screen shows
+      <code>BLUETOOTH NAME — GHOST-GAUGE</code>)</li>
+</ul>
+
+<h2>Connecting for the first time</h2>
+<ol>
+  <li>Power the gauge and keep the phone near it.</li>
+  <li>Open the app. It finds the gauge by itself.</li>
+  <li>The first time you change a setting, the gauge shows a six-digit code and iOS asks for it.
+      Type it in. After that the phone is remembered and reconnects without asking.</li>
+</ol>
+
+<h2>Common problems</h2>
+
+<h3>The app says it is looking for the gauge and never finds it</h3>
+<ul>
+  <li>Check the gauge's Telemetry screen. If it shows Wi-Fi rather than Bluetooth, it is mid-update:
+      it returns to Bluetooth by itself within five minutes, or you can power it off and on.</li>
+  <li>Check Bluetooth is on, and that Ghost Gauge is allowed to use it in iOS Settings › Ghost Gauge.</li>
+  <li>Don't swipe the app away in the app switcher — that stops it reconnecting on its own.</li>
+</ul>
+
+<h3>It asks for a pairing code that the gauge never shows</h3>
+<p>The gauge has probably forgotten this phone while the phone still remembers the gauge. Forget
+<code>GHOST-GAUGE</code> in iOS Settings › Bluetooth, then open the app and pair again.</p>
+
+<h3>Settings won't save</h3>
+<p>Changes need a paired phone. If the status bar at the bottom of Settings says the gauge didn't
+answer, tap Retry once the gauge is back in range.</p>
+
+<h3>A firmware update stopped part way</h3>
+<p>The app puts the gauge back on Bluetooth when an update fails. If it somehow stays on Wi-Fi, the
+gauge gives up and returns to Bluetooth by itself after five minutes — or power it off and on. The
+gauge keeps running the firmware it already had; a failed update cannot leave it without one.</p>
+
+<h3>Rides aren't being recorded</h3>
+<p>Check Settings › Ride log shows the log running. Recording starts when readings arrive and a
+break longer than five minutes begins a new ride; rides under a minute are discarded.</p>
+
+<h2>On the gauge itself</h2>
+<ul>
+  <li><strong>Tap</strong> the right half of the panel for the next screen, the left half for the previous.</li>
+  <li><strong>Hold the left half</strong> until the bar fills, then let go, to step the colours:
+      dark → light → automatic. The screen tells you which one it is about to switch to, and
+      letting go before the bar fills cancels.</li>
+  <li><strong>Hold the right half</strong> the same way to reboot it.</li>
+</ul>
+
+<h2>Contact</h2>
+<p>Questions, problems or suggestions: <a href="mailto:SUPPORT_EMAIL_HERE">SUPPORT_EMAIL_HERE</a></p>
+<p>Please include your app version and the gauge's firmware version — both are in Settings.</p>
+
+<footer>
+  Ghost Gauge is an independent project and is not affiliated with, endorsed by or connected to
+  BRP, Can-Am or Apple.
+</footer>
+</main>
+</body>
+</html>

@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.29",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.29.bin",
-    "bytes": 1550440,
-    "sha256": "e30558ca9a1e23a484891028decd1eee300a919e705840b91ccba418b81e0381",
+    "version": "1.0.30",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.30.bin",
+    "bytes": 1550456,
+    "sha256": "aad5b4911f4b68d0f9d8370166e956fd573ea7e2ed914704aee7d4167b9281ed",
     "minApp": "0.16",
     "hw": 1,
-    "notes": "Finding out whether a car has a bus at all.",
+    "notes": "Vacuum is a reading, not a zero.",
     "published": "2026-09-19"
   }
 }

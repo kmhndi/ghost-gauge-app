@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.25",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.25.bin",
-    "bytes": 1540984,
-    "sha256": "fc863316aae9b635a47d8dea9e8361e266f864295f17529307daeec3db70892d",
+    "version": "1.0.26",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.26.bin",
+    "bytes": 1541144,
+    "sha256": "c80f0d33b606de0fc82f72b29712ce5f052da2a45d149bd5daaceeab9263ac0f",
     "minApp": "0.16",
     "hw": 1,
-    "notes": "A gauge can say what it is running.",
+    "notes": "Every gauge answers to its own name.",
     "published": "2026-09-19"
   }
 }

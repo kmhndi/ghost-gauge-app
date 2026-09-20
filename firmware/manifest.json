@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.30",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.30.bin",
-    "bytes": 1550456,
-    "sha256": "aad5b4911f4b68d0f9d8370166e956fd573ea7e2ed914704aee7d4167b9281ed",
+    "version": "1.0.31",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.31.bin",
+    "bytes": 1552952,
+    "sha256": "cef6e554501e0f7a90d6770cb940b73a4c8577b9206e76d1e7ed776ef7e92d72",
     "minApp": "0.16",
     "hw": 1,
-    "notes": "Vacuum is a reading, not a zero.",
-    "published": "2026-09-19"
+    "notes": "A sixth screen, and it is the truck's.",
+    "published": "2026-09-20"
   }
 }

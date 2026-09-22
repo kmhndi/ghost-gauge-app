@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.33",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.33.bin",
-    "bytes": 1554296,
-    "sha256": "76a910a3fbf4f240eca3d5f69c7f59f584e9ab14390514d55578b0c6b9663245",
+    "version": "1.0.35",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.35.bin",
+    "bytes": 1563832,
+    "sha256": "42c0f21e9f946e96d68c3df32e732d271c9003133718160b0385e4ef75b6e0d2",
     "minApp": "1.3",
     "hw": 1,
-    "notes": "Nothing on the gauge can be seen without the code, and boost comes off the car up to about seventeen times as often.",
+    "notes": "Redline plays on a new gauge, and shows the version.",
     "published": "2026-09-22"
   },
   "beta": {

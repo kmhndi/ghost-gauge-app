@@ -19,5 +19,20 @@
     "hw": 1,
     "notes": "Nothing on the gauge can be seen without the code, and boost comes off the car up to about seventeen times as often.",
     "published": "2026-09-22"
+  },
+  "products": {
+    "nano": {
+      "stable": {
+        "version": "1.0.37",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.37.bin",
+        "bytes": 1144024,
+        "sha256": "1cf3d2748bb08565d23a5baf486f77385437f253fe3ad462cccf62eabf5d1b5a",
+        "minApp": "1.5",
+        "hw": 1,
+        "product": "nano",
+        "notes": "The Ghost Gauge Nano, from the same code as the gauge.",
+        "published": "2026-09-28"
+      }
+    }
   }
 }

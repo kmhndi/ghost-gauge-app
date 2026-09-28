@@ -1,13 +1,14 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.36",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.36.bin",
-    "bytes": 1567224,
-    "sha256": "6c554dc1996ae22469f87eb896d5937b73835efe09108e2cebc3b7cbee2b9a2c",
+    "version": "1.0.39",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.39.bin",
+    "bytes": 1570584,
+    "sha256": "1933a25ce7243f958b5c3e081a369aeb318568ddbcff6c128b3d43a2af038396",
     "minApp": "1.3",
     "hw": 1,
-    "notes": "Serial numbers from the factory, and firmware signed for one product.",
+    "product": "gauge",
+    "notes": "What the factory's new checks need (Ghost Factory's Phase 2, FACTORY.md).",
     "published": "2026-09-28"
   },
   "beta": {

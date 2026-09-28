@@ -23,14 +23,14 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.37",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.37.bin",
-        "bytes": 1144024,
-        "sha256": "1cf3d2748bb08565d23a5baf486f77385437f253fe3ad462cccf62eabf5d1b5a",
+        "version": "1.0.38",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.38.bin",
+        "bytes": 1144072,
+        "sha256": "4e0aa0c821958554f1cb34417daeb501c74aa911f4ab3885d8d61890e1c3ed1f",
         "minApp": "1.5",
         "hw": 1,
         "product": "nano",
-        "notes": "The Ghost Gauge Nano, from the same code as the gauge.",
+        "notes": "The Nano's startup animation takes its time.",
         "published": "2026-09-28"
       }
     }

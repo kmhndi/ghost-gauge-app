@@ -24,14 +24,14 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.38",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.38.bin",
-        "bytes": 1144072,
-        "sha256": "4e0aa0c821958554f1cb34417daeb501c74aa911f4ab3885d8d61890e1c3ed1f",
+        "version": "1.0.39",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.39.bin",
+        "bytes": 1145400,
+        "sha256": "7deca926abe1f49513fb6dfa152eb7f06ff14ebb795e4ebe9ee1a199a5672b51",
         "minApp": "1.5",
         "hw": 1,
         "product": "nano",
-        "notes": "The Nano's startup animation takes its time.",
+        "notes": "What the factory's new checks need (Ghost Factory's Phase 2, FACTORY.md).",
         "published": "2026-09-28"
       }
     }

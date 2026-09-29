@@ -24,15 +24,15 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.39",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.39.bin",
-        "bytes": 1145400,
-        "sha256": "7deca926abe1f49513fb6dfa152eb7f06ff14ebb795e4ebe9ee1a199a5672b51",
+        "version": "1.0.40",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.40.bin",
+        "bytes": 1145896,
+        "sha256": "8ac68ff519192f9418bf06bd3c1ac2c90e0819237306af6d046dda8683b048e9",
         "minApp": "1.5",
         "hw": 1,
         "product": "nano",
-        "notes": "What the factory's new checks need (Ghost Factory's Phase 2, FACTORY.md).",
-        "published": "2026-09-28"
+        "notes": "The Nano's reading, smoother.",
+        "published": "2026-09-29"
       }
     }
   }

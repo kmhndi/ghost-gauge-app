@@ -24,15 +24,15 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.40",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.40.bin",
-        "bytes": 1145896,
-        "sha256": "8ac68ff519192f9418bf06bd3c1ac2c90e0819237306af6d046dda8683b048e9",
-        "minApp": "1.5",
+        "version": "1.0.41",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.41.bin",
+        "bytes": 1146920,
+        "sha256": "4a0b1c2bca4eecaf312a4a085a5340a0b605b6a3c836f9c8bba9addd064b830f",
+        "minApp": "1.6",
         "hw": 1,
         "product": "nano",
-        "notes": "The Nano's reading, smoother.",
-        "published": "2026-09-29"
+        "notes": "Readings only ever come from your car, with CAR NOT CONNECTED when none answers, and a new release that doesn't start properly rolls itself back. Needs app 1.6.",
+        "published": "2026-09-30"
       }
     }
   }

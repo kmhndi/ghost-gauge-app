@@ -18,9 +18,9 @@
 <p class="lede">Ghost Gauge for iPhone and iPad</p>
 
 <div class="card">
-  <p>Ghost Gauge is the companion app for the Ghost Gauge dash cluster, a custom gauge for the
-  Can-Am Maverick X3. It shows the gauge's readings, keeps alarms on your Lock Screen, records
-  rides, changes every setting on the panel, and installs new firmware.</p>
+  <p>Ghost Gauge is the companion app for the Ghost Gauge and the Ghost Gauge Nano, which plug into
+  your car's OBD-II port. It shows the readings your car reports, keeps alarms on your Lock Screen,
+  records rides, changes the gauge's settings, and installs new firmware.</p>
   <p><strong>No gauge?</strong> Turn on <strong>Demo mode</strong> in Settings › This iPhone — or
   wait a few seconds on the connect screen and tap <em>Try demo mode</em>. The app then runs against
   a simulated gauge so you can see everything it does.</p>
@@ -29,16 +29,17 @@
 <h2>Requirements</h2>
 <ul>
   <li>iPhone or iPad running iOS or iPadOS 26 or later</li>
-  <li>A Ghost Gauge cluster, powered on and running Bluetooth (its Telemetry screen shows
-      <code>BLUETOOTH NAME — GHOST-GAUGE</code>)</li>
+  <li>A Ghost Gauge or Ghost Gauge Nano, plugged into a car that answers OBD-II (most cars sold
+      since the mid-2000s), with the ignition on</li>
 </ul>
 
 <h2>Connecting for the first time</h2>
 <ol>
-  <li>Power the gauge and keep the phone near it.</li>
-  <li>Open the app. It finds the gauge by itself.</li>
-  <li>The first time you change a setting, the gauge shows a six-digit code and iOS asks for it.
-      Type it in. After that the phone is remembered and reconnects without asking.</li>
+  <li>Plug the gauge in, turn the ignition on, and keep the phone near it.</li>
+  <li>Open the app and pick your gauge from the list. Its name ends in the gauge's own
+      four-character code, which a Ghost Gauge shows on its Telemetry screen under THIS GAUGE.</li>
+  <li>The gauge shows a six-digit code and iOS asks for it. Type it in. After that the phone is
+      remembered and reconnects without asking.</li>
 </ol>
 
 <h2>Common problems</h2>
@@ -53,20 +54,29 @@
 
 <h3>It asks for a pairing code that the gauge never shows</h3>
 <p>The gauge has probably forgotten this phone while the phone still remembers the gauge. Forget
-<code>GHOST-GAUGE</code> in iOS Settings › Bluetooth, then open the app and pair again.</p>
+your gauge (<code>GHOST-GAUGE-</code> and its code) in iOS Settings › Bluetooth, then open the app
+and tap PAIR AGAIN.</p>
+
+<h3>The app says CAR NOT CONNECTED</h3>
+<p>The gauge is on and talking to your phone, but no car is answering it. Check it is pushed fully
+into the OBD-II port (usually under the dash by the driver's knees) and that the ignition is on —
+most cars only answer with it on. A reading your car doesn't report shows as <code>--</code>.</p>
 
 <h3>Settings won't save</h3>
 <p>Changes need a paired phone. If the status bar at the bottom of Settings says the gauge didn't
 answer, tap Retry once the gauge is back in range.</p>
 
 <h3>A firmware update stopped part way</h3>
-<p>The app puts the gauge back on Bluetooth when an update fails. If it somehow stays on Wi-Fi, the
+<p>Keep the app open on the update screen until it finishes. If it says it couldn't reach the gauge,
+check that Local Network is on for Ghost Gauge in iOS Settings › Privacy &amp; Security › Local
+Network. The app puts the gauge back on Bluetooth when an update fails. If it somehow stays on Wi-Fi, the
 gauge gives up and returns to Bluetooth by itself after five minutes — or power it off and on. The
 gauge keeps running the firmware it already had; a failed update cannot leave it without one.</p>
 
 <h3>Rides aren't being recorded</h3>
-<p>Check Settings › Ride log shows the log running. Recording starts when readings arrive and a
-break longer than five minutes begins a new ride; rides under a minute are discarded.</p>
+<p>Check the log button at the bottom of the dash says <em>End log</em>, which means logging is
+on. A ride is recorded while the engine is running; five minutes with the engine off or the gauge
+out of reach ends it, and rides under a minute are discarded.</p>
 
 <h2>On the gauge itself</h2>
 <ul>

@@ -24,14 +24,14 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.42",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.42.bin",
-        "bytes": 1147064,
-        "sha256": "da84e722097cd92f292af189a2296b89b8019db12a29beadd93fe8e76e2035ea",
+        "version": "1.0.43",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.43.bin",
+        "bytes": 1149224,
+        "sha256": "c04fa21ba4a1a6398f20603b381decdfc4946ddd7223474b0dfbf1a9cfacd450",
         "minApp": "1.6",
         "hw": 1,
         "product": "nano",
-        "notes": "The phone can show engine load, throttle, AFR and the outside air, for the app's custom dash.",
+        "notes": "Rpm pulls: the gauge times the engine from one rpm to another, for the app's new Timing screen. Needs app 1.8.",
         "published": "2026-10-05"
       }
     }

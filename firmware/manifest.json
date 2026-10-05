@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.41",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.41.bin",
-    "bytes": 1571880,
-    "sha256": "315094ea579a342207e30af6ab283b0c613c8a4799e41168c6abe4a44ec8fac0",
+    "version": "1.0.42",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.42.bin",
+    "bytes": 1572024,
+    "sha256": "27cedad588ee9fba538887d146a50634e66c2eeef078d8e91090f85dd575d72b",
     "minApp": "1.6",
     "hw": 1,
     "product": "gauge",
-    "notes": "Readings only ever come from your car, with CAR NOT CONNECTED when none answers, and a new release that doesn't start properly rolls itself back. Needs app 1.6.",
-    "published": "2026-09-30"
+    "notes": "The phone can show engine load, throttle, AFR and the outside air, for the app's custom dash.",
+    "published": "2026-10-05"
   },
   "beta": {
     "version": "1.0.33",

@@ -24,15 +24,15 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.41",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.41.bin",
-        "bytes": 1146920,
-        "sha256": "4a0b1c2bca4eecaf312a4a085a5340a0b605b6a3c836f9c8bba9addd064b830f",
+        "version": "1.0.42",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.42.bin",
+        "bytes": 1147064,
+        "sha256": "da84e722097cd92f292af189a2296b89b8019db12a29beadd93fe8e76e2035ea",
         "minApp": "1.6",
         "hw": 1,
         "product": "nano",
-        "notes": "Readings only ever come from your car, with CAR NOT CONNECTED when none answers, and a new release that doesn't start properly rolls itself back. Needs app 1.6.",
-        "published": "2026-09-30"
+        "notes": "The phone can show engine load, throttle, AFR and the outside air, for the app's custom dash.",
+        "published": "2026-10-05"
       }
     }
   }

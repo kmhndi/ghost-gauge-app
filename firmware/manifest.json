@@ -12,14 +12,15 @@
     "published": "2026-10-05"
   },
   "beta": {
-    "version": "1.0.33",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.33.bin",
-    "bytes": 1554296,
-    "sha256": "76a910a3fbf4f240eca3d5f69c7f59f584e9ab14390514d55578b0c6b9663245",
+    "version": "1.0.44",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.44.bin",
+    "bytes": 1575384,
+    "sha256": "62dfe2e0060c71302e66205705b2d78fbd622ffa0a9569d92037b602cf39eb09",
     "minApp": "1.3",
     "hw": 1,
-    "notes": "Nothing on the gauge can be seen without the code, and boost comes off the car up to about seventeen times as often.",
-    "published": "2026-09-22"
+    "product": "gauge",
+    "notes": "The gauge reads a Can-Am Maverick X3: rpm, boost, coolant, intake air, battery, speed, gear and pedal",
+    "published": "2026-10-06"
   },
   "products": {
     "nano": {

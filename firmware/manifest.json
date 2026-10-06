@@ -12,14 +12,14 @@
     "published": "2026-10-05"
   },
   "beta": {
-    "version": "1.0.45",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.45.bin",
-    "bytes": 1575640,
-    "sha256": "b5d17c506f3d0ab4f364432bf8beeaaef58e4f448e1ab6b71bb72d2003ed32e6",
+    "version": "1.0.46",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.46.bin",
+    "bytes": 1576136,
+    "sha256": "6821b4854a15493d6f0c832d2d56f4d4dedc043e4db7ac9865fe18f286ce0d60",
     "minApp": "1.3",
     "hw": 1,
     "product": "gauge",
-    "notes": "The X3's odometer and engine hours go to the app, for its service log (app 1.9).",
+    "notes": "The engine hours the app's service log counts from are the dash's, and the gauge can be watched from the Mac",
     "published": "2026-10-06"
   },
   "products": {

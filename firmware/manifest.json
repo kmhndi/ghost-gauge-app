@@ -12,14 +12,14 @@
     "published": "2026-10-05"
   },
   "beta": {
-    "version": "1.0.47",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.47.bin",
-    "bytes": 1551608,
-    "sha256": "d5056924b855aa25dda080545a6404af648ab48bbbb2dead7883ac5f1c37c109",
+    "version": "1.0.48",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.48.bin",
+    "bytes": 1551864,
+    "sha256": "a3275c4b2c9b2edb4c8f0e4c62811c4de672dada2266269fe2f59e7c1993041f",
     "minApp": "1.3",
     "hw": 1,
     "product": "gauge",
-    "notes": "The panel shows only what the X3 actually reports: Ring Meters is gone, the belt is off every screen until a",
+    "notes": "A 2021-on Maverick X3 (the MG1 Turbo RR) reads its gear. Its bus is laid out like the 2019's except for the",
     "published": "2026-10-07"
   },
   "products": {

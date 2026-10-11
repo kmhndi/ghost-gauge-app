@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Studio</title>
+<meta name="description" content="Ghost Studio, the screen designer for the Ghost Gauge Pro: download for Mac and Windows.">
+<link rel="stylesheet" href="../_style.css">
+<style>
+/* The download page for garages. The buttons start on the release page and the script below points
+   them at the newest files, so publishing a new version (tools/studio/publish_studio.sh) never needs
+   an edit here. English and Arabic: [data-l] blocks, one shown at a time. */
+[hidden] { display: none !important; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.top nav { margin: 0; padding: 0; border: 0; }
+.lang { font: 600 13px/1 inherit; font-family: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px; cursor: pointer; }
+.shot { width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--line); margin: 22px 0 6px; }
+.dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 26px 0 8px; }
+.btn { display: grid; gap: 4px; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; color: var(--ink); }
+.btn b { font-size: 17px; }
+.btn span { color: var(--dim); font-size: 13px; }
+.btn.main { background: var(--gold); border-color: var(--gold); color: #17130a; }
+.btn.main span { color: #4a3a08; }
+.btn:hover { border-color: #3d444e; }
+.btn.main:hover { filter: brightness(1.05); }
+.ver { color: var(--dim); font-size: 13px; margin-bottom: 0; }
+ol.steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 12px; margin-top: 14px; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 0; }
+ol.steps > li::before { content: counter(s); width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--gold); font-weight: 700; }
+ol.steps h3 { margin: 4px 0 6px; }
+ol.steps p { margin-bottom: 6px; color: var(--dim); }
+ol.steps p:last-child { margin-bottom: 0; }
+html[dir=rtl] ul { padding-left: 0; padding-right: 22px; }
+html[dir=rtl] .top nav a { margin-right: 0; margin-left: 18px; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+@media (max-width: 560px) { .dl { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+  <nav><a href="../index.html">GHOST GAUGE</a><a href="../support.html">SUPPORT</a></nav>
+  <button class="lang" id="lang" type="button" lang="ar">العربية</button>
+</div>
+
+<section data-l="en">
+  <h1>Ghost Studio</h1>
+  <p class="lede">The screen designer for the Ghost Gauge Pro, for garages. Design your customers’ dash screens, try them on a simulated drive, and hand them an approval sheet to sign.</p>
+</section>
+<section data-l="ar" hidden>
+  <h1>Ghost Studio</h1>
+  <p class="lede">مصمّم الشاشات لعدّاد Ghost Gauge Pro، للورش. صمّم شاشات عملائك، وجرّبها على قيادة محاكاة، وسلّمهم ورقة موافقة للتوقيع.</p>
+</section>
+
+<img class="shot" src="studio.jpg" alt="Ghost Studio" width="1600" height="986">
+
+<div class="dl">
+  <a class="btn" id="mac" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
+    <b data-l="en">Download for Mac</b><b data-l="ar" hidden>تنزيل لنظام Mac</b>
+    <span data-l="en">Apple silicon and Intel</span><span data-l="ar" hidden>Apple silicon و Intel</span>
+  </a>
+  <a class="btn" id="win" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
+    <b data-l="en">Download for Windows</b><b data-l="ar" hidden>تنزيل لنظام Windows</b>
+    <span data-l="en">Windows 10 and 11, 64-bit and Arm</span><span data-l="ar" hidden>Windows 10 و 11، <span class="ltr">64-bit</span> و Arm</span>
+  </a>
+</div>
+<p class="ver" id="ver"></p>
+
+<section data-l="en">
+  <h2>Getting started</h2>
+  <ol class="steps">
+    <li><div><h3>Install it</h3>
+      <p><b>Mac:</b> open the file you downloaded and drag Ghost Studio into Applications.</p>
+      <p><b>Windows:</b> run the installer. Windows may show a blue “Windows protected your PC” box: click <b>More info</b>, then <b>Run anyway</b>.</p></div></li>
+    <li><div><h3>Send your request</h3>
+      <p>Ghost Studio opens on a page asking for a licence. Type your garage’s name, click <b>Copy the request</b> and send it to Ghost Electronics on WhatsApp or by email. It holds only your computer’s code, its name and your garage’s name.</p></div></li>
+    <li><div><h3>Open your licence</h3>
+      <p>You get a <span class="ltr">.ghostlicence</span> file back. Double-click it, and Ghost Studio opens ready to use. A licence works on that computer only.</p></div></li>
+  </ol>
+  <h2>After that</h2>
+  <ul>
+    <li>Ghost Studio updates itself: when a new version is out it downloads in the background and asks you to restart.</li>
+    <li>It works in English and Arabic; the button at the top switches.</li>
+    <li>Your customers’ projects are kept in <b>Documents › Ghost Studio › Customers</b>. Back that folder up with the rest of your work.</li>
+  </ul>
+</section>
+
+<section data-l="ar" hidden>
+  <h2>البدء</h2>
+  <ol class="steps">
+    <li><div><h3>ثبّته</h3>
+      <p><b>Mac:</b> افتح الملف الذي نزّلته واسحب Ghost Studio إلى مجلد التطبيقات.</p>
+      <p><b>Windows:</b> شغّل المثبّت. قد يظهر مربع أزرق «Windows protected your PC»: انقر <b>More info</b> ثم <b>Run anyway</b>.</p></div></li>
+    <li><div><h3>أرسل طلبك</h3>
+      <p>يفتح Ghost Studio على صفحة تطلب ترخيصًا. اكتب اسم ورشتك، وانقر <b>نسخ الطلب</b>، وأرسله إلى Ghost Electronics عبر واتساب أو البريد الإلكتروني. يحتوي فقط على رمز جهازك واسمه واسم ورشتك.</p></div></li>
+    <li><div><h3>افتح ترخيصك</h3>
+      <p>يصلك ملف الترخيص. انقر عليه مرتين ليفتح Ghost Studio جاهزًا للاستخدام. يعمل الترخيص على ذلك الجهاز فقط.</p></div></li>
+  </ol>
+  <h2>بعد ذلك</h2>
+  <ul>
+    <li>يحدّث Ghost Studio نفسه: عند صدور إصدار جديد يُنزَّل في الخلفية ويطلب منك إعادة التشغيل.</li>
+    <li>يعمل بالعربية والإنجليزية؛ والزر في الأعلى يبدّل بينهما.</li>
+    <li>تُحفظ مشاريع عملائك في <b>المستندات › Ghost Studio › Customers</b>. انسخ هذا المجلد احتياطيًا مع بقية عملك.</li>
+  </ul>
+</section>
+
+<footer>
+  <span data-l="en">Ghost Studio is made by Ghost Electronics. It needs a licence for each computer it runs on.</span>
+  <span data-l="ar" hidden>Ghost Studio من صنع Ghost Electronics، ويحتاج إلى ترخيص لكل جهاز يعمل عليه.</span>
+</footer>
+</main>
+<script>
+(() => {
+  // the language: Arabic on an Arabic computer unless picked otherwise
+  let lang = 'en';
+  try { lang = localStorage.getItem('ghost-studio-site-lang') || ((navigator.language || '').startsWith('ar') ? 'ar' : 'en'); } catch {}
+  const btn = document.getElementById('lang');
+  const show = () => {
+    document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-l]').forEach(el => { el.hidden = el.dataset.l !== lang; });
+    btn.textContent = lang === 'ar' ? 'English' : 'العربية'; btn.lang = lang === 'ar' ? 'en' : 'ar';
+    document.title = lang === 'ar' ? 'Ghost Studio · تنزيل' : 'Ghost Studio';
+    if (ver.dataset.v) ver.textContent = lang === 'ar' ? `الإصدار ${ver.dataset.v}` : `Version ${ver.dataset.v}`;
+  };
+  const ver = document.getElementById('ver');
+  btn.addEventListener('click', () => { lang = lang === 'ar' ? 'en' : 'ar'; try { localStorage.setItem('ghost-studio-site-lang', lang); } catch {} show(); });
+
+  // the visitor's own system first, in gold
+  const ua = navigator.userAgent, mine = /Windows/.test(ua) ? 'win' : /Mac/.test(ua) ? 'mac' : '';
+  if (mine) document.getElementById(mine).classList.add('main');
+  if (mine === 'win') document.querySelector('.dl').prepend(document.getElementById('win'));
+
+  // point the buttons at the newest files on the release (GitHub's API allows this page to ask)
+  fetch('https://api.github.com/repos/kmhndi/ghost-gauge-app/releases/tags/studio')
+    .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then(rel => {
+      const find = rx => (rel.assets || []).find(a => rx.test(a.name));
+      const mac = find(/-mac\.dmg$/), win = find(/-windows-setup\.exe$/);
+      if (mac) document.getElementById('mac').href = mac.browser_download_url;
+      if (win) document.getElementById('win').href = win.browser_download_url;
+      const m = (mac || win)?.name.match(/Ghost-Studio-([\d.]+)-/);
+      if (m) ver.dataset.v = m[1];
+      show();
+    })
+    .catch(() => {}); // the buttons still go to the release page
+  show();
+})();
+</script>
+</body>
+</html>

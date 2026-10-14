@@ -97,6 +97,11 @@ ol.timeline time { color: var(--dim); font-size: 12.5px; }
 ol.timeline .what { overflow-wrap: anywhere; }
 ol.timeline .what b { font-weight: 600; }
 .back { color: var(--dim); text-decoration: none; font-size: 13px; }
+.count { display: inline-block; min-width: 18px; padding: 1px 6px; border-radius: 9px; background: var(--gold); color: #111; font-size: 11px; font-weight: 700; text-align: center; }
+.badge.revoked { color: var(--bad); }
+.req { display: grid; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.req:last-child { border-bottom: 0; }
+.req .tools { gap: 6px; }
 .empty { color: var(--dim); padding: 18px; text-align: center; }
 .toast { position: fixed; inset-inline: 0; bottom: 18px; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px); background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 14px; opacity: 0; transform: translateY(8px); transition: .2s; pointer-events: none; }
 .toast.show { opacity: 1; transform: none; }
@@ -141,6 +146,8 @@ ol.timeline .what b { font-weight: 600; }
 // The project and its public key: safe to publish. Without a signed-in admin the database answers nothing.
 const PROJECT = 'https://rkjkxoecchzsucqtmawg.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJramt4b2VjY2h6c3VjcXRtYXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5Njg3MjcsImV4cCI6MjEwNzU0NDcyN30.DZInBj8R0l1VX8lwFiviBlse39x3-xmAEo0Wfp4q_8A';
+// Ghost Electronics' licence keys, public halves (tools/studio/licence_keys.js): an uploaded licence is checked against them.
+const LICENCE_KEYS = [{"id":0,"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEu42LvxMSsX7GwowozduZtXLKc7THAh10nSokwkBP+fhwrZi0IyDMVl6e/M8k93UA1KfvAy29kFGSbDyctwVZ3Q=="},{"id":1,"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyVYbuK6HRwXo3BnGls7zzXStJXAlSJxcTnk6t9y2XcpaS025ihZ6N4iM7RwbyJe/UMdkvQl2KyRmo1CNMxq8Iw=="}];
 const sb = supabase.createClient(PROJECT, ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
 
 const $ = s => document.querySelector(s);
@@ -191,6 +198,7 @@ $('#reload').addEventListener('click', () => load().then(render));
 sb.auth.onAuthStateChange((_e, session) => { setTimeout(() => show(session), 0); });
 let shownFor;                 // undefined until the first answer, so "nobody signed in" is shown too
 async function show(session) {
+  if (window.__previewData) return;           // the preview has no session and needs none
   const email = session?.user?.email || null;
   if (email === shownFor) return;
   shownFor = email;
@@ -208,7 +216,7 @@ let D = null;
 async function q(p) { const { data, error } = await p; if (error) throw error; return data; }
 async function load() {
   try {
-    const [units, history, garages, licences, ledger, pros, prices, payments, counters] = await Promise.all([
+    const [units, history, garages, licences, ledger, pros, prices, payments, counters, requests] = await Promise.all([
       q(sb.from('units_full').select('*').order('allocated_at', { ascending:false })),
       q(sb.from('unit_history').select('*').order('at', { ascending:false }).limit(5000)),
       q(sb.from('garages_summary').select('*').order('name')),
@@ -218,13 +226,14 @@ async function load() {
       q(sb.from('prices').select('*').order('sort')),
       q(sb.from('payments').select('*').order('created_at', { ascending:false }).limit(500)),
       q(sb.from('counters').select('*')),
+      q(sb.from('licence_requests').select('*').order('created_at', { ascending:false }).limit(300)),
     ]);
-    D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters });
+    D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests });
   } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
 }
 
 function prep(r) {
-  return { ...r, counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
+  return { ...r, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
 }
 
 // ---------- the views, by the address's #part ----------
@@ -234,6 +243,8 @@ function render() {
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
   document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
+  const waiting = D.requests.filter(r => r.status === 'pending').length;
+  $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
   const views = { overview, units, unit, garages, garage, credits, pros, licences };
   v.innerHTML = (views[page] || overview)(arg);
@@ -257,6 +268,7 @@ function overview() {
     <a class="tile" href="#garages" style="text-decoration:none;color:inherit"><span>Garages</span><b>${D.garages.length}</b><i>${D.licences.filter(l => l.status === 'active' || l.status === 'runs out soon').length} licences in date</i></a>
     <a class="tile" href="#pros" style="text-decoration:none;color:inherit"><span>Pros set up</span><b>${prosUp}</b><i>${D.pros.filter(p => !p.cancelled_at && !p.used_at).length} not sent to yet</i></a>
     <a class="tile" href="#credits" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>
+    <a class="tile" href="#licences" style="text-decoration:none;color:inherit"><span>Licence requests</span><b>${D.requests.filter(r => r.status === 'pending').length}</b><i>waiting for you</i></a>
     <div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>
   </div>
   <section class="panel"><h2>Latest</h2>${events.length ? `<ol class="timeline">${events.map(e => `<li><time>${when(e.at)}</time><div class="what">${e.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing yet.</p>'}</section>`;
@@ -428,16 +440,93 @@ function licenceTable(rows, withGarage) {
     if (error) return toast(error.message, true);
     toast('Note saved'); await load();
   })));
-  const cls = s => (s === 'active' ? 'active' : s === 'runs out soon' ? 'soon' : s === 'ran out' ? 'ran' : '');
-  return `<div class="tablewrap"><table><thead><tr><th>Licence</th>${withGarage ? '<th>Garage</th>' : ''}<th>Laptop</th><th>Computer</th><th>Issued</th><th>Expires</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+  const cls = s => (s === 'active' ? 'active' : s === 'runs out soon' ? 'soon' : s === 'ran out' ? 'ran' : s === 'revoked' ? 'revoked' : '');
+  setTimeout(() => document.querySelectorAll('[data-revoke],[data-restore]').forEach(b => b.addEventListener('click', async () => {
+    const id = b.dataset.revoke || b.dataset.restore;
+    if (b.dataset.revoke) {
+      const why = prompt(`Revoke ${id}? Studio on that laptop locks when it next checks (it checks when it opens and every 6 hours), and the credits server refuses it now.\n\nThe reason the garage sees (optional):`);
+      if (why === null) return;
+      const { error } = await sb.rpc('admin_revoke_licence', { p_id:id, p_reason:why });
+      if (error) return toast(error.message, true);
+      toast(`${id} revoked`);
+    } else {
+      if (!confirm(`Restore ${id}? Studio on that laptop opens again when it next checks.`)) return;
+      const { error } = await sb.rpc('admin_restore_licence', { p_id:id });
+      if (error) return toast(error.message, true);
+      toast(`${id} restored`);
+    }
+    await load(); render();
+  })));
+  return `<div class="tablewrap"><table><thead><tr><th>Licence</th>${withGarage ? '<th>Garage</th>' : ''}<th>Laptop</th><th>Computer</th><th>Issued</th><th>Expires</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>
   ${rows.map(l => `<tr><td class="mono">${esc(l.id)}</td>${withGarage ? `<td><a href="#garage/${esc(l.gid)}">${esc(D.gname[l.gid])}</a></td>` : ''}<td class="mono dim">${esc(l.code)}</td><td>${esc(l.host)}</td>
     <td>${day(l.issued)}</td><td>${day(l.expires)}</td><td>${l.status ? `<span class="badge ${cls(l.status)}">${esc(l.status.toUpperCase())}</span>` : ''}</td>
-    <td><input data-licnote="${esc(l.id)}" value="${esc(l.notes)}" placeholder="—" aria-label="Notes for ${esc(l.id)}" style="width:180px;padding:5px 8px"></td></tr>`).join('')}
+    <td><input data-licnote="${esc(l.id)}" value="${esc(l.notes)}" placeholder="—" aria-label="Notes for ${esc(l.id)}" style="width:180px;padding:5px 8px"></td>
+    <td>${l.revoked_at ? `<span class="dim" style="font-size:12px">${esc(l.revoked_reason || '')}</span> <button class="btn sm" type="button" data-restore="${esc(l.id)}">Restore</button>` : `<button class="btn sm danger" type="button" data-revoke="${esc(l.id)}">Revoke</button>`}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
+// An uploaded .ghostlicence, checked here before it goes up: made with Ghost Electronics' key, for this
+// request's laptop. (The database checks the laptop again; Studio checks everything again before using it.)
+const unb64 = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - String(s).length % 4) % 4)), c => c.charCodeAt(0));
+function derToRaw(der) {
+  let i = der[1] & 0x80 ? 2 + (der[1] & 0x7f) : 2; const out = new Uint8Array(64);
+  for (const at of [0, 32]) { let len = der[i + 1], p = i + 2; i = p + len; while (len > 32 && der[p] === 0) { p++; len--; } out.set(der.subarray(p, p + len), at + 32 - len); }
+  return out;
+}
+async function checkLicenceFile(file, req) {
+  if (!file || file.format !== 'ghost-studio-licence' || typeof file.payload !== 'string') throw new Error('That isn’t a .ghostlicence file.');
+  const bytes = unb64(file.payload), p = JSON.parse(new TextDecoder().decode(bytes));
+  if (p.machine !== req.machine || p.pub !== req.pub) throw new Error(`That licence is for another laptop (${p.code}), not ${req.code}.`);
+  const key = LICENCE_KEYS.find(k => k.id === file.key);
+  if (!key) throw new Error('That licence names a key Ghost Electronics doesn’t have.');
+  const hex = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const pub = await crypto.subtle.importKey('spki', unb64(key.spki.replace(/\+/g, '-').replace(/\//g, '_')), { name:'ECDSA', namedCurve:'P-256' }, false, ['verify']);
+  const ok = await crypto.subtle.verify({ name:'ECDSA', hash:'SHA-256' }, pub, derToRaw(unb64(file.sig)), new TextEncoder().encode('GGLC1|' + hex));
+  if (!ok) throw new Error('That licence wasn’t made with Ghost Electronics’ key, or it was changed.');
+  return p;
+}
 function licences() {
-  return `<h1>Licences</h1>${D.licences.length ? licenceTable(D.licences, true) : '<p class="panel empty">No licences yet.</p>'}
-  <p class="msg">Issued on Ghost Electronics’ Mac with <span class="mono">licence_tool.js issue</span>; each one lands here as it is made.</p>`;
+  const waiting = D.requests.filter(r => r.status === 'pending'), decided = D.requests.filter(r => r.status !== 'pending').slice(0, 30);
+  setTimeout(() => {
+    document.querySelectorAll('[data-copyreq]').forEach(b => b.addEventListener('click', async () => {
+      const r = D.requests.find(x => x.id === b.dataset.copyreq);
+      try { await navigator.clipboard.writeText(r.request); toast('Copied. On the Mac: node tools/studio/licence_tool.js issue'); } catch { prompt('Copy the request:', r.request); }
+    }));
+    document.querySelectorAll('[data-refuse]').forEach(b => b.addEventListener('click', async () => {
+      const why = prompt('Refuse this request? The reason the garage sees in Studio:');
+      if (why === null) return;
+      const { error } = await sb.rpc('admin_refuse_request', { p_id:b.dataset.refuse, p_reason:why });
+      if (error) return toast(error.message, true);
+      toast('Refused'); await load(); render();
+    }));
+    document.querySelectorAll('[data-upload]').forEach(inp => inp.addEventListener('change', async () => {
+      const r = D.requests.find(x => x.id === inp.dataset.upload), f = inp.files[0]; inp.value = '';
+      if (!f) return;
+      try {
+        const file = JSON.parse(await f.text());
+        const p = await checkLicenceFile(file, r);
+        const { error } = await sb.rpc('admin_issue_request', { p_id:r.id, p_file:file });
+        if (error) throw error;
+        toast(`${p.id} for ${p.garage}: Studio on that laptop opens by itself.`); await load(); render();
+      } catch (e) { toast(e.message, true); }
+    }));
+  });
+  return `<h1>Licences</h1>
+  <section class="panel"><h2>Requests waiting${waiting.length ? ` · ${waiting.length}` : ''}</h2>
+    ${waiting.length ? waiting.map(r => `<div class="req">
+      <div><b>${esc(r.garage)}</b> <span class="mono">${esc(r.phone)}</span> <span class="dim">· asked ${when(r.created_at)}</span></div>
+      <div class="dim" style="font-size:12.5px">Laptop <span class="mono">${esc(r.code)}</span> · ${esc(r.host || '?')} (${esc(r.platform || '?')}) · Studio ${esc(r.app || '?')}</div>
+      <div class="tools"><button class="btn sm" type="button" data-copyreq="${esc(r.id)}">Copy request</button>
+        <label class="btn sm gold" style="display:inline-block">Upload licence…<input type="file" accept=".ghostlicence,application/json" data-upload="${esc(r.id)}" hidden></label>
+        <button class="btn sm danger" type="button" data-refuse="${esc(r.id)}">Refuse</button></div></div>`).join('')
+      : '<p class="empty">Nothing waiting. A garage asks from Ghost Studio’s first screen.</p>'}
+    <p class="msg">To approve one: Copy request, run <span class="mono">node tools/studio/licence_tool.js issue</span> on the Mac (it reads the clipboard), then Upload licence with the file it makes. Studio on that laptop opens by itself.</p>
+  </section>
+  <section class="panel"><h2>Licences</h2>${D.licences.length ? licenceTable(D.licences, true) : '<p class="empty">No licences yet.</p>'}
+    <p class="msg">Revoke locks Studio on that laptop when it next checks (when it opens and every 6 hours; a laptop offline for 7 days locks anyway), and the credits server refuses it at once.</p></section>
+  ${decided.length ? `<section class="panel"><h2>Answered requests</h2><div class="tablewrap"><table><thead><tr><th>Asked</th><th>Garage</th><th>Phone</th><th>Laptop</th><th>Answer</th><th>Licence / reason</th></tr></thead><tbody>
+    ${decided.map(r => `<tr><td>${when(r.created_at)}</td><td>${esc(r.garage)}</td><td class="mono">${esc(r.phone)}</td><td class="mono dim">${esc(r.code)}</td>
+      <td><span class="badge ${r.status === 'issued' ? 'PASS' : 'FAIL'}">${esc(r.status.toUpperCase())}</span></td><td class="wrap">${r.status === 'issued' ? `<span class="mono">${esc(r.licence_id)}</span>` : esc(r.reason || '')}</td></tr>`).join('')}
+  </tbody></table></div></section>` : ''}`;
 }
 
 // tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in

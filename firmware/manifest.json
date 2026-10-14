@@ -35,6 +35,19 @@
         "notes": "Rpm pulls: the gauge times the engine from one rpm to another, for the app's new Timing screen. Needs app 1.8.",
         "published": "2026-10-05"
       }
+    },
+    "pro": {
+      "stable": {
+        "version": "1.0.48",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.48.bin",
+        "bytes": 739512,
+        "sha256": "95defbbdd6dbcf9ba7076af80643d60cec4c55effedf94d954005bd0d551386a",
+        "minApp": "1.5",
+        "hw": 1,
+        "product": "pro",
+        "notes": "The Ghost Gauge Pro's first firmware: the bench build (an ESP32 with no screen), for Ghost Studio's USB link and Pro credits.",
+        "published": "2026-10-14"
+      }
     }
   }
 }

@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ghost Electronics</title>
+<!-- Ghost Electronics' own page (tools/admin/README.md): the production log, garages, licences, credits and
+     Pros on Supabase. The page is public; what it shows comes only to a signed-in admin, and the database
+     enforces that (migrations/20261014150000_admin_page.sql), not this page. -->
+<style>
+@font-face { font-family: "Orbitron"; src: url("Orbitron.ttf") format("truetype"); font-weight: 400 900; font-display: swap; }
+:root {
+  --bg: #0A0B0D; --panel: #121418; --panel2: #171a1f; --line: #23272E; --line2: #2f343c;
+  --ink: #EDEFF2; --dim: #8A9099; --gold: #FFC20E; --ok: #35D07F; --bad: #FF5A4E; --warn: #FFA23A; --cool: #5AB8FF;
+  --readout: "Orbitron", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--gold); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--cool); outline-offset: 2px; }
+
+/* sign in */
+.gate { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.gate form { width: min(380px, 100%); display: grid; gap: 14px; }
+.brand { font: 700 15px/1 var(--readout); letter-spacing: 6px; text-align: center; margin: 0 0 6px; }
+.brand small { display: block; font: 600 10px/1 var(--readout); letter-spacing: 4px; color: var(--dim); margin-top: 10px; }
+label { display: grid; gap: 6px; color: var(--dim); font-size: 12.5px; }
+input, select, textarea { background: var(--panel); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; min-width: 0; color: var(--ink); }
+input::placeholder, textarea::placeholder { color: #5b616a; }
+textarea { resize: vertical; min-height: 64px; }
+input.code { font: 700 26px/1 var(--readout); letter-spacing: 10px; text-align: center; }
+.btn { background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px; padding: 9px 14px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+.btn:hover:not(:disabled) { border-color: var(--dim); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: #111; }
+.btn.sm { padding: 5px 10px; font-size: 12.5px; border-radius: 8px; }
+.btn.danger { color: var(--bad); }
+.msg { min-height: 20px; color: var(--dim); font-size: 13px; margin: 0; }
+.msg.bad { color: var(--bad); }
+.msg.ok { color: var(--ok); }
+
+/* the page */
+header.top { position: sticky; top: 0; z-index: 5; background: rgba(10,11,13,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.bar { max-width: 1200px; margin: 0 auto; padding: 12px 16px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bar .brand { text-align: start; margin: 0; font-size: 13px; letter-spacing: 5px; }
+.bar .who { margin-inline-start: auto; color: var(--dim); font-size: 12.5px; display: flex; gap: 10px; align-items: center; }
+nav.tabs { max-width: 1200px; margin: 0 auto; padding: 8px 12px 0; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs a { color: var(--dim); text-decoration: none; padding: 9px 12px 11px; border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 600; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--gold); }
+main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 64px; display: grid; gap: 18px; }
+h1 { font: 700 18px/1.2 var(--readout); letter-spacing: 2px; margin: 4px 0 0; }
+h2 { font: 700 11px/1 var(--readout); letter-spacing: 2.5px; color: var(--dim); margin: 0 0 12px; text-transform: uppercase; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+.grid { display: grid; gap: 12px; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+.tile b { font: 800 30px/1.1 var(--readout); }
+.tile span { color: var(--dim); font-size: 12.5px; }
+.tile i { font-style: normal; color: var(--dim); font-size: 12px; }
+.two { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tools input[type=search] { flex: 1 1 220px; }
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 10px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 8px 12px; cursor: pointer; color: var(--dim); font-weight: 600; }
+.seg button[aria-pressed="true"] { background: var(--panel2); color: var(--ink); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: start; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
+th { color: var(--dim); font-weight: 600; font-size: 11.5px; letter-spacing: .4px; position: sticky; top: 0; background: var(--panel); }
+tr:last-child td { border-bottom: 0; }
+tbody tr.go { cursor: pointer; }
+tbody tr.go:hover td { background: var(--panel2); }
+td.wrap { white-space: normal; min-width: 200px; }
+.ser { font: 700 12.5px/1 var(--readout); letter-spacing: 1px; color: var(--gold); }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.dim { color: var(--dim); }
+.badge { display: inline-block; font: 700 10.5px/1 var(--readout); letter-spacing: 1px; padding: 4px 7px; border-radius: 6px; border: 1px solid currentColor; }
+.badge.PASS, .badge.active { color: var(--ok); } .badge.FAIL, .badge.cancelled, .badge.ran { color: var(--bad); }
+.badge.allocated, .badge.soon { color: var(--warn); } .badge.demo { color: var(--gold); }
+.plus { color: var(--ok); } .minus { color: var(--bad); }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; }
+dl.kv dt { color: var(--dim); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.form { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); align-items: end; }
+.form .full { grid-column: 1 / -1; }
+ol.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+ol.timeline li { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+ol.timeline li:last-child { border-bottom: 0; }
+ol.timeline time { color: var(--dim); font-size: 12.5px; }
+ol.timeline .what { overflow-wrap: anywhere; }
+ol.timeline .what b { font-weight: 600; }
+.back { color: var(--dim); text-decoration: none; font-size: 13px; }
+.empty { color: var(--dim); padding: 18px; text-align: center; }
+.toast { position: fixed; inset-inline: 0; bottom: 18px; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px); background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 14px; opacity: 0; transform: translateY(8px); transition: .2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: none; }
+.toast.bad { border-color: var(--bad); }
+@media (max-width: 560px) { ol.timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .tile b { font-size: 24px; } }
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate" hidden>
+  <form id="gateForm" autocomplete="on">
+    <p class="brand">GHOST ELECTRONICS<small>PRODUCTION · GARAGES · CREDITS</small></p>
+    <label id="emailField">Email
+      <input type="email" id="email" name="email" autocomplete="username" required placeholder="you@example.com">
+    </label>
+    <label id="codeField" hidden>The 6-digit code we emailed you
+      <input class="code" id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000">
+    </label>
+    <button class="btn gold" id="gateBtn" type="submit">Email me a code</button>
+    <button class="btn" id="gateBack" type="button" hidden>Use another address</button>
+    <p class="msg" id="gateMsg" role="status"></p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="bar">
+      <p class="brand">GHOST ELECTRONICS</p>
+      <div class="who"><span id="whoEmail"></span><button class="btn sm" id="reload" type="button">Refresh</button><button class="btn sm" id="signOut" type="button">Sign out</button></div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#overview">Overview</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(() => {
+// The project and its public key: safe to publish. Without a signed-in admin the database answers nothing.
+const PROJECT = 'https://rkjkxoecchzsucqtmawg.supabase.co';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJramt4b2VjY2h6c3VjcXRtYXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5Njg3MjcsImV4cCI6MjEwNzU0NDcyN30.DZInBj8R0l1VX8lwFiviBlse39x3-xmAEo0Wfp4q_8A';
+const sb = supabase.createClient(PROJECT, ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const PRODUCT = { gauge:'Ghost Gauge', pro:'Ghost Gauge Pro', nano:'Ghost Gauge Nano' };
+// times as the Sheet showed them: Doha, yyyy-mm-dd hh:mm
+const fmt = new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Qatar', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+const when = v => { if (!v) return ''; const p = Object.fromEntries(fmt.formatToParts(new Date(v)).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`; };
+const day = v => (v ? when(v).slice(0, 10) : '');
+const money = (m, cur) => (m == null ? 'not set' : `${(m / 100).toFixed(2)} ${cur || 'QAR'}`);
+const signed = n => `<span class="${n > 0 ? 'plus' : 'minus'}">${n > 0 ? '+' : ''}${n}</span>`;
+function toast(t, bad) { const el = $('#toast'); el.textContent = t; el.className = 'toast show' + (bad ? ' bad' : ''); clearTimeout(toast.t); toast.t = setTimeout(() => { el.className = 'toast'; }, 3200); }
+
+// ---------- signing in: a code by email, nothing else ----------
+let pendingEmail = '';
+function gateStep(code) {
+  $('#emailField').hidden = code; $('#codeField').hidden = !code; $('#gateBack').hidden = !code;
+  $('#gateBtn').textContent = code ? 'Sign in' : 'Email me a code';
+  $('#email').required = !code; $('#code').required = code;
+  (code ? $('#code') : $('#email')).focus();
+}
+$('#gateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('#gateMsg'), btn = $('#gateBtn');
+  btn.disabled = true; msg.className = 'msg'; msg.textContent = '';
+  try {
+    if ($('#codeField').hidden) {
+      pendingEmail = $('#email').value.trim().toLowerCase();
+      const { error } = await sb.auth.signInWithOtp({ email:pendingEmail, options:{ shouldCreateUser:true } });
+      if (error) throw error;
+      msg.textContent = `A code is on its way to ${pendingEmail}. It works for 10 minutes.`;
+      gateStep(true);
+    } else {
+      const { error } = await sb.auth.verifyOtp({ email:pendingEmail, token:$('#code').value.trim(), type:'email' });
+      if (error) throw error;
+      $('#code').value = '';
+    }
+  } catch (err) {
+    msg.className = 'msg bad';
+    msg.textContent = /only/i.test(err.message) ? 'This page is for Ghost Electronics only.' : /rate|seconds/i.test(err.message) ? 'Too many codes asked for. Wait a few minutes, then try again.'
+      : /expired|invalid/i.test(err.message) ? 'That code is wrong or has run out. Ask for a new one.' : err.message;
+  } finally { btn.disabled = false; }
+});
+$('#gateBack').addEventListener('click', () => { $('#gateMsg').textContent = ''; gateStep(false); });
+$('#signOut').addEventListener('click', () => sb.auth.signOut());
+$('#reload').addEventListener('click', () => load().then(render));
+
+sb.auth.onAuthStateChange((_e, session) => { setTimeout(() => show(session), 0); });
+let shownFor;                 // undefined until the first answer, so "nobody signed in" is shown too
+async function show(session) {
+  const email = session?.user?.email || null;
+  if (email === shownFor) return;
+  shownFor = email;
+  $('#gate').hidden = !!email; $('#app').hidden = !email;
+  if (!email) { gateStep(false); return; }
+  $('#whoEmail').textContent = email;
+  const { data:admin } = await sb.rpc('is_admin');
+  if (!admin) { $('#view').innerHTML = '<p class="panel">This address isn’t one of Ghost Electronics’ admins.</p>'; return; }
+  $('#view').innerHTML = '<p class="dim">Loading…</p>';
+  await load(); render();
+}
+
+// ---------- the data: small enough to fetch whole ----------
+let D = null;
+async function q(p) { const { data, error } = await p; if (error) throw error; return data; }
+async function load() {
+  try {
+    const [units, history, garages, licences, ledger, pros, prices, payments, counters] = await Promise.all([
+      q(sb.from('units_full').select('*').order('allocated_at', { ascending:false })),
+      q(sb.from('unit_history').select('*').order('at', { ascending:false }).limit(5000)),
+      q(sb.from('garages_summary').select('*').order('name')),
+      q(sb.from('licences_status').select('*').order('issued', { ascending:false, nullsFirst:false })),
+      q(sb.from('ledger').select('*').order('id', { ascending:false }).limit(2000)),
+      q(sb.from('pros').select('*').order('created_at', { ascending:false })),
+      q(sb.from('prices').select('*').order('sort')),
+      q(sb.from('payments').select('*').order('created_at', { ascending:false }).limit(500)),
+      q(sb.from('counters').select('*')),
+    ]);
+    D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters });
+  } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
+}
+
+function prep(r) {
+  return { ...r, counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
+}
+
+// ---------- the views, by the address's #part ----------
+window.addEventListener('hashchange', render);
+function render() {
+  if (!D) return;
+  const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page)));
+  document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
+  const v = $('#view');
+  const views = { overview, units, unit, garages, garage, credits, pros, licences };
+  v.innerHTML = (views[page] || overview)(arg);
+  window.scrollTo(0, 0);
+}
+
+function overview() {
+  const u = D.units, by = p => u.filter(x => x.product === p).length;
+  const pass = u.filter(x => x.result === 'PASS').length, fail = u.filter(x => x.result === 'FAIL').length;
+  const credPro = D.garages.reduce((n, g) => n + Math.max(0, g.pro), 0), credScr = D.garages.reduce((n, g) => n + Math.max(0, g.screen), 0);
+  const prosUp = D.pros.filter(p => !p.cancelled_at).length;
+  const next = p => `GE-${p[0].toUpperCase()}-${String(D.counters['next_serial_' + p] || 1).padStart(6, '0')}`;
+  const events = [
+    ...D.history.slice(0, 40).map(h => ({ at:h.at, html:`<a class="ser" href="#unit/${esc(h.serial)}">${esc(h.serial)}</a> ${esc(h.event)}${h.result ? ` <span class="badge ${esc(h.result)}">${esc(h.result)}</span>` : ''}${h.detail ? ` <span class="dim">· ${esc(h.detail)}</span>` : ''}` })),
+    ...D.ledger.slice(0, 40).map(l => ({ at:l.at, html:`<a href="#garage/${esc(l.gid)}">${esc(D.gname[l.gid])}</a> ${signed(l.delta)} ${esc(l.kind)} credit${Math.abs(l.delta) === 1 ? '' : 's'} <span class="dim">· ${esc(l.reason)}${l.serial ? ' · ' + esc(l.serial) : ''}${l.note ? ' · ' + esc(l.note) : ''}</span>` })),
+  ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 25);
+  return `<h1>Overview</h1>
+  <div class="tiles">
+    <a class="tile" href="#units" style="text-decoration:none;color:inherit"><span>Units made</span><b>${u.length}</b><i>${by('gauge')} Gauge · ${by('pro')} Pro · ${by('nano')} Nano</i></a>
+    <div class="tile"><span>Passed / failed</span><b>${pass} <span class="dim" style="font-size:18px">/ ${fail}</span></b><i>their last test</i></div>
+    <a class="tile" href="#garages" style="text-decoration:none;color:inherit"><span>Garages</span><b>${D.garages.length}</b><i>${D.licences.filter(l => l.status === 'active' || l.status === 'runs out soon').length} licences in date</i></a>
+    <a class="tile" href="#pros" style="text-decoration:none;color:inherit"><span>Pros set up</span><b>${prosUp}</b><i>${D.pros.filter(p => !p.cancelled_at && !p.used_at).length} not sent to yet</i></a>
+    <a class="tile" href="#credits" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>
+    <div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>
+  </div>
+  <section class="panel"><h2>Latest</h2>${events.length ? `<ol class="timeline">${events.map(e => `<li><time>${when(e.at)}</time><div class="what">${e.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing yet.</p>'}</section>`;
+}
+
+let uFilter = { text:'', product:'', result:'' };
+function units() {
+  const t = uFilter.text.toLowerCase();
+  const rows = D.units.filter(u => (!uFilter.product || u.product === uFilter.product) && (!uFilter.result || u.result === uFilter.result)
+    && (!t || [u.serial, u.code, u.mac, u.garage, u.customer, u.notes].some(x => String(x || '').toLowerCase().includes(t))));
+  const seg = (k, opts) => `<div class="seg" role="group">${opts.map(([v, n]) => `<button type="button" data-f="${k}" data-v="${v}" aria-pressed="${uFilter[k] === v}">${n}</button>`).join('')}</div>`;
+  setTimeout(() => {
+    const s = $('#uSearch'); if (s) { s.value = uFilter.text; s.addEventListener('input', () => { uFilter.text = s.value; const c = s.selectionStart; render(); const n = $('#uSearch'); n.focus(); n.setSelectionRange(c, c); }); }
+    document.querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', () => { uFilter[b.dataset.f] = b.dataset.v; render(); }));
+  });
+  return `<h1>Units</h1>
+  <div class="tools"><input type="search" id="uSearch" placeholder="Serial, code, chip MAC, garage, customer, note" aria-label="Search units">
+    ${seg('product', [['', 'All'], ['gauge', 'Gauge'], ['pro', 'Pro'], ['nano', 'Nano']])}${seg('result', [['', 'Any'], ['PASS', 'Passed'], ['FAIL', 'Failed'], ['allocated', 'Not tested']])}</div>
+  <div class="tablewrap"><table><thead><tr><th>Serial</th><th>Code</th><th>Product</th><th>Result</th><th>Firmware</th><th>Last tested</th><th>Garage</th><th>Notes</th></tr></thead><tbody>
+  ${rows.map(u => `<tr class="go" data-href="#unit/${esc(u.serial)}"><td><a class="ser" href="#unit/${esc(u.serial)}">${esc(u.serial)}</a></td><td class="mono">${esc(u.code)}</td><td>${esc(PRODUCT[u.product])}</td>
+    <td>${u.result ? `<span class="badge ${esc(u.result)}">${esc(u.result)}</span>` : ''}</td><td class="mono">${esc(u.firmware)}</td><td>${when(u.finished_at)}</td><td>${esc(u.garage)}</td><td class="dim">${esc(String(u.notes || '').slice(0, 60))}</td></tr>`).join('')
+    || '<tr><td colspan="8" class="empty">No units match.</td></tr>'}
+  </tbody></table></div>`;
+}
+document.addEventListener('click', e => { const r = e.target.closest('tr.go[data-href]'); if (r && !e.target.closest('a,button,input')) location.hash = r.dataset.href; });
+
+function unit(serial) {
+  const u = D.units.find(x => x.serial === serial);
+  if (!u) return '<a class="back" href="#units">‹ Units</a><p class="panel">No unit with that serial.</p>';
+  const hist = D.history.filter(h => h.serial === serial);
+  const pro = D.pros.find(p => p.serial === serial);
+  setTimeout(() => {
+    $('#uSave').addEventListener('click', async () => {
+      const patch = { notes:$('#uNotes').value, customer:$('#uCustomer').value || null };
+      if (!pro) Object.assign(patch, { garage:$('#uGarage').value || null, fitted:$('#uFitted').value || null, screens:$('#uScreens').value || null });
+      const { error } = await sb.from('units').update(patch).eq('serial', serial);
+      if (error) return toast(error.message, true);
+      toast('Saved'); await load(); render();
+    });
+    $('#uNoteAdd').addEventListener('click', async () => {
+      const text = $('#uNote').value.trim(); if (!text) return;
+      const { error } = await sb.rpc('admin_note', { p_serial:serial, p_text:text });
+      if (error) return toast(error.message, true);
+      toast('Added to its history'); await load(); render();
+    });
+  });
+  return `<a class="back" href="#units">‹ Units</a>
+  <h1><span class="ser" style="font-size:18px">${esc(u.serial)}</span> <span class="dim" style="font-size:14px">· ${esc(u.code)} · ${esc(PRODUCT[u.product])}</span></h1>
+  <div class="two">
+    <section class="panel"><h2>The board</h2><dl class="kv">
+      <dt>Last result</dt><dd>${u.result ? `<span class="badge ${esc(u.result)}">${esc(u.result)}</span>` : ''} ${esc(u.tests)}</dd>
+      <dt>Firmware</dt><dd class="mono">${esc(u.firmware)}</dd><dt>Chip MAC</dt><dd class="mono">${esc(u.mac)}</dd><dt>Board</dt><dd>${esc(u.hw)}</dd>
+      <dt>Serial given</dt><dd>${when(u.allocated_at)}</dd><dt>Last tested</dt><dd>${when(u.finished_at)}</dd><dt>Station</dt><dd>${esc(u.station)}</dd>
+      <dt>Bluetooth name</dt><dd class="mono">GHOST-${u.product === 'gauge' ? 'GAUGE' : u.product.toUpperCase()}-${esc(u.code)}</dd>
+      ${pro ? `<dt>Pro credits</dt><dd>${pro.cancelled_at ? '<span class="badge cancelled">CANCELLED</span>' : `${pro.slots} screens paid${pro.demo ? ' <span class="badge demo">DEMO</span>' : ''}, set up ${day(pro.created_at)} by <a href="#garage/${esc(pro.gid)}">${esc(D.gname[pro.gid])}</a>${pro.used_at ? '' : ', not sent to yet'}`}</dd>` : ''}
+    </dl></section>
+    <section class="panel"><h2>Yours</h2><div class="form">
+      <label class="full">Notes<textarea id="uNotes">${esc(u.notes)}</textarea></label>
+      ${pro ? '' : `<label>Garage<input id="uGarage" value="${esc(u.garage)}"></label><label>Fitted<input id="uFitted" type="date" value="${esc(u.fitted || '')}"></label><label>Screens<input id="uScreens" value="${esc(u.screens)}"></label>`}
+      <label>Customer<input id="uCustomer" value="${esc(u.customer)}"></label>
+      <div><button class="btn gold" id="uSave" type="button">Save</button></div>
+    </div>${pro ? '<p class="msg">A Pro’s garage, set-up date and screens come from its credits.</p>' : ''}</section>
+  </div>
+  <section class="panel"><h2>History</h2>
+    <div class="tools" style="margin-bottom:10px"><input id="uNote" placeholder="A note for its history: a return, a repair, where it went" aria-label="New note" style="flex:1 1 260px"><button class="btn" id="uNoteAdd" type="button">Add note</button></div>
+    ${hist.length ? `<ol class="timeline">${hist.map(h => `<li><time>${when(h.at)}</time><div class="what"><b>${esc(h.event)}</b>${h.result ? ` <span class="badge ${esc(h.result)}">${esc(h.result)}</span>` : ''}${h.firmware ? ` <span class="mono dim">${esc(h.firmware)}</span>` : ''}${h.detail ? `<div class="dim">${esc(h.detail)}</div>` : ''}${h.station ? `<div class="dim" style="font-size:12px">${esc(h.station)}</div>` : ''}</div></li>`).join('')}</ol>` : '<p class="empty">No history.</p>'}
+  </section>`;
+}
+
+function garages() {
+  return `<h1>Garages</h1>
+  <div class="tablewrap"><table><thead><tr><th>Garage</th><th>Contact</th><th>Phone</th><th>Licences</th><th>Latest expiry</th><th>Pro credits</th><th>Screen credits</th><th>Pros set up</th></tr></thead><tbody>
+  ${D.garages.map(g => `<tr class="go" data-href="#garage/${esc(g.gid)}"><td><a href="#garage/${esc(g.gid)}">${esc(g.name)}</a></td><td>${esc(g.contact)}</td><td class="mono">${esc(g.phone)}</td>
+    <td>${g.active} of ${g.licences}</td><td>${day(g.latest_expiry)}</td><td>${g.pro}</td><td>${g.screen}</td><td>${g.pros_set_up}</td></tr>`).join('') || '<tr><td colspan="8" class="empty">No garages yet.</td></tr>'}
+  </tbody></table></div>`;
+}
+
+function garage(gid) {
+  const g = D.garages.find(x => x.gid === gid);
+  if (!g) return '<a class="back" href="#garages">‹ Garages</a><p class="panel">No such garage.</p>';
+  const lic = D.licences.filter(l => l.gid === gid), pros = D.pros.filter(p => p.gid === gid), led = D.ledger.filter(l => l.gid === gid);
+  setTimeout(() => {
+    $('#gSave').addEventListener('click', async () => {
+      const { error } = await sb.from('garages').update({ contact:$('#gContact').value || null, phone:$('#gPhone').value || null, email:$('#gEmail').value || null, notes:$('#gNotes').value || null }).eq('gid', gid);
+      if (error) return toast(error.message, true);
+      toast('Saved'); await load(); render();
+    });
+    const grant = async sign => {
+      const qty = parseInt($('#gQty').value, 10), kind = $('#gKind').value;
+      if (!(qty > 0)) return toast('How many?', true);
+      if (!confirm(`${sign > 0 ? 'Give' : 'Take back'} ${qty} ${kind} credit${qty === 1 ? '' : 's'} ${sign > 0 ? 'to' : 'from'} ${g.name}?`)) return;
+      const { error } = await sb.rpc('admin_grant', { p_gid:gid, p_kind:kind, p_qty:sign * qty, p_note:$('#gNote').value });
+      if (error) return toast(error.message, true);
+      toast(sign > 0 ? 'Given' : 'Taken back'); await load(); render();
+    };
+    $('#gGive').addEventListener('click', () => grant(1));
+    $('#gTake').addEventListener('click', () => grant(-1));
+  });
+  return `<a class="back" href="#garages">‹ Garages</a><h1>${esc(g.name)}</h1>
+  <div class="two">
+    <section class="panel"><h2>Contact</h2><div class="form">
+      <label>Contact<input id="gContact" value="${esc(g.contact)}"></label><label>Phone<input id="gPhone" value="${esc(g.phone)}" inputmode="tel"></label>
+      <label class="full">Email<input id="gEmail" type="email" value="${esc(g.email)}"></label>
+      <label class="full">Notes<textarea id="gNotes">${esc(g.notes)}</textarea></label>
+      <div><button class="btn gold" id="gSave" type="button">Save</button></div></div></section>
+    <section class="panel"><h2>Credits</h2>
+      <div class="tiles" style="grid-template-columns:1fr 1fr;margin-bottom:14px"><div class="tile"><span>Pro credits</span><b>${g.pro}</b></div><div class="tile"><span>Screen credits</span><b>${g.screen}</b></div></div>
+      <div class="form"><label>Credits<select id="gKind"><option value="pro">Pro</option><option value="screen">Screen</option></select></label>
+        <label>How many<input id="gQty" type="number" min="1" max="1000" value="1"></label>
+        <label class="full">Why (in the ledger)<input id="gNote" placeholder="Paid by bank transfer, 10 Pro pack"></label>
+        <div class="tools"><button class="btn gold" id="gGive" type="button">Give</button><button class="btn danger" id="gTake" type="button">Take back</button></div></div></section>
+  </div>
+  <section class="panel"><h2>Licences</h2>${lic.length ? licenceTable(lic, false) : '<p class="empty">None.</p>'}</section>
+  <section class="panel"><h2>Pros</h2>${pros.length ? proTable(pros, false) : '<p class="empty">None set up yet.</p>'}</section>
+  <section class="panel"><h2>Credit history</h2>${led.length ? ledgerTable(led, false) : '<p class="empty">No changes yet.</p>'}</section>`;
+}
+
+function ledgerTable(rows, withGarage) {
+  return `<div class="tablewrap"><table><thead><tr><th>When</th>${withGarage ? '<th>Garage</th>' : ''}<th>Change</th><th>Why</th><th>Pro</th><th>Payment</th><th>Note</th><th>Pro / screen after</th></tr></thead><tbody>
+  ${rows.map(l => `<tr><td>${when(l.at)}</td>${withGarage ? `<td><a href="#garage/${esc(l.gid)}">${esc(D.gname[l.gid])}</a></td>` : ''}<td>${signed(l.delta)} ${esc(l.kind)}</td><td>${esc(l.reason)}</td>
+    <td>${l.serial ? `<a class="ser" href="#unit/${esc(l.serial)}">${esc(l.serial)}</a>` : ''}</td><td class="mono dim">${esc(l.ref)}</td><td class="wrap dim">${esc(l.note)}</td><td>${l.pro_after} / ${l.screen_after}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+function credits() {
+  setTimeout(() => document.querySelectorAll('[data-price]').forEach(b => b.addEventListener('click', async () => {
+    const sku = b.dataset.price, v = $(`#price-${sku}`).value.trim();
+    const amount = v === '' ? null : Math.round(parseFloat(v) * 100);
+    if (v !== '' && !(amount >= 0)) return toast('A price in QAR, or empty for not set', true);
+    const { error } = await sb.from('prices').update({ amount_minor:amount }).eq('sku', sku);
+    if (error) return toast(error.message, true);
+    toast('Price saved'); await load(); render();
+  })));
+  return `<h1>Credits</h1>
+  <section class="panel"><h2>Packs and prices</h2><div class="tablewrap" style="border:0"><table><thead><tr><th>Pack</th><th>Price (QAR)</th><th></th></tr></thead><tbody>
+  ${D.prices.map(p => `<tr><td>${p.qty} ${p.kind === 'pro' ? 'Pro' : 'screen'} credit${p.qty === 1 ? '' : 's'}</td>
+    <td><input id="price-${esc(p.sku)}" type="number" min="0" step="0.01" value="${p.amount_minor == null ? '' : (p.amount_minor / 100).toFixed(2)}" placeholder="not set" style="width:130px"></td>
+    <td><button class="btn sm" type="button" data-price="${esc(p.sku)}">Save</button></td></tr>`).join('')}
+  </tbody></table></div><p class="msg">Studio’s Buy credits shows these. Payments are in test mode until a card provider is chosen.</p></section>
+  <section class="panel"><h2>Every change</h2>${D.ledger.length ? ledgerTable(D.ledger, true) : '<p class="empty">No credits have moved yet.</p>'}</section>
+  <section class="panel"><h2>Payments</h2>${D.payments.length ? `<div class="tablewrap"><table><thead><tr><th>When</th><th>Garage</th><th>Buys</th><th>Amount</th><th>How</th><th>Status</th></tr></thead><tbody>
+    ${D.payments.map(p => `<tr><td>${when(p.created_at)}</td><td><a href="#garage/${esc(p.gid)}">${esc(D.gname[p.gid])}</a></td><td>${p.pro ? `${p.pro} Pro ` : ''}${p.screen ? `${p.screen} screen` : ''}</td>
+      <td>${esc(money(p.amount_minor, p.currency))}</td><td>${esc(p.provider)}</td><td><span class="badge ${p.status === 'paid' ? 'PASS' : p.status === 'pending' ? 'allocated' : 'FAIL'}">${esc(p.status.toUpperCase())}</span></td></tr>`).join('')}
+  </tbody></table></div>` : '<p class="empty">None yet.</p>'}</section>`;
+}
+
+function proTable(rows, withGarage) {
+  const canCancel = p => !p.cancelled_at && !p.used_at && !p.demo && Date.now() - new Date(p.created_at) < 7 * 864e5;
+  setTimeout(() => document.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', async () => {
+    const s = b.dataset.cancel;
+    if (!confirm(`Cancel ${s}? Its garage gets its credits back and the serial is free to set up again.`)) return;
+    const { data, error } = await sb.rpc('admin_cancel', { p_serial:s });
+    if (error || !data?.ok) return toast(error?.message || data?.error || 'That didn’t work.', true);
+    toast(`${s} cancelled, credits returned`); await load(); render();
+  })));
+  return `<div class="tablewrap"><table><thead><tr><th>Pro</th>${withGarage ? '<th>Garage</th>' : ''}<th>Screens paid</th><th>Set up</th><th>Sent to</th><th>Activation</th><th></th></tr></thead><tbody>
+  ${rows.map(p => `<tr><td><a class="ser" href="#unit/${esc(p.serial)}">${esc(p.serial)}</a></td>${withGarage ? `<td><a href="#garage/${esc(p.gid)}">${esc(D.gname[p.gid])}</a></td>` : ''}
+    <td>${p.slots}${p.demo ? ' <span class="badge demo">DEMO</span>' : ''}${p.cancelled_at ? ' <span class="badge cancelled">CANCELLED</span>' : ''}</td><td>${when(p.created_at)}</td><td>${p.used_at ? when(p.used_at) : '<span class="dim">not yet</span>'}</td>
+    <td class="mono dim">#${p.seq}</td><td>${canCancel(p) ? `<button class="btn sm danger" type="button" data-cancel="${esc(p.serial)}" title="A wrong serial: within 7 days, never sent to">Cancel</button>` : ''}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+function pros() {
+  return `<h1>Pros</h1>${D.pros.length ? proTable(D.pros, true) : '<p class="panel empty">No Pro has been set up yet.</p>'}
+  <p class="msg">Cancel is for a wrong serial: within 7 days of setting it up, and only if Studio never sent screens to it.</p>`;
+}
+
+function licenceTable(rows, withGarage) {
+  setTimeout(() => document.querySelectorAll('[data-licnote]').forEach(i => i.addEventListener('change', async () => {
+    const { error } = await sb.from('licences').update({ notes:i.value || null }).eq('id', i.dataset.licnote);
+    if (error) return toast(error.message, true);
+    toast('Note saved'); await load();
+  })));
+  const cls = s => (s === 'active' ? 'active' : s === 'runs out soon' ? 'soon' : s === 'ran out' ? 'ran' : '');
+  return `<div class="tablewrap"><table><thead><tr><th>Licence</th>${withGarage ? '<th>Garage</th>' : ''}<th>Laptop</th><th>Computer</th><th>Issued</th><th>Expires</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+  ${rows.map(l => `<tr><td class="mono">${esc(l.id)}</td>${withGarage ? `<td><a href="#garage/${esc(l.gid)}">${esc(D.gname[l.gid])}</a></td>` : ''}<td class="mono dim">${esc(l.code)}</td><td>${esc(l.host)}</td>
+    <td>${day(l.issued)}</td><td>${day(l.expires)}</td><td>${l.status ? `<span class="badge ${cls(l.status)}">${esc(l.status.toUpperCase())}</span>` : ''}</td>
+    <td><input data-licnote="${esc(l.id)}" value="${esc(l.notes)}" placeholder="—" aria-label="Notes for ${esc(l.id)}" style="width:180px;padding:5px 8px"></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+function licences() {
+  return `<h1>Licences</h1>${D.licences.length ? licenceTable(D.licences, true) : '<p class="panel empty">No licences yet.</p>'}
+  <p class="msg">Issued on Ghost Electronics’ Mac with <span class="mono">licence_tool.js issue</span>; each one lands here as it is made.</p>`;
+}
+
+// tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in
+if (window.__previewData) { D = prep(window.__previewData); $('#gate').hidden = true; $('#app').hidden = false; $('#whoEmail').textContent = 'preview'; render(); }
+else sb.auth.getSession().then(({ data }) => show(data.session));
+})();
+</script>
+</body>
+</html>

@@ -34,6 +34,21 @@
         "product": "nano",
         "notes": "Rpm pulls: the gauge times the engine from one rpm to another, for the app's new Timing screen. Needs app 1.8.",
         "published": "2026-10-05"
+      },
+      "boards": {
+        "2": {
+          "stable": {
+            "version": "1.0.51",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.51-b2.bin",
+            "bytes": 1114424,
+            "sha256": "57bf345392c9aa72e3254b162a7d6ed0861adaae58d59ca1382f89f6c8f2ebc1",
+            "minApp": "1.11",
+            "hw": 2,
+            "product": "nano",
+            "notes": "The Ghost Gauge Nano on its own Nano rev A board.",
+            "published": "2026-10-19"
+          }
+        }
       }
     },
     "pro": {

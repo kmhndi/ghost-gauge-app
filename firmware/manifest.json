@@ -68,15 +68,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.52",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.52-b2.bin",
-            "bytes": 1459240,
-            "sha256": "3475abaab35490c12ec242db8415abe250e9aec6d764b3d91526273655082a8d",
+            "version": "1.0.53",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.53-b2.bin",
+            "bytes": 1464728,
+            "sha256": "1d85e77e7087fed1f9615ceca290a4ea880c96f95ce3aa5b6ce975c1e6bdec36",
             "minApp": "1.11",
             "hw": 2,
             "product": "gauge",
-            "notes": "Rev B reads its GPS and its belt probe, shows both in the screens' headers, and its CAN self-test no longer",
-            "published": "2026-10-22"
+            "notes": "GPS runs timed on the gauge at 25 fixes a second, the gauge's GPS sent to the app, and the screens switched from the app.",
+            "published": "2026-10-23"
           }
         }
       }

@@ -68,15 +68,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.51",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.51-b2.bin",
-            "bytes": 1429720,
-            "sha256": "b930f2357b96afeec80a3fcf481354dfa1a04d267d85b914c9962c5e0cd47581",
+            "version": "1.0.52",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.52-b2.bin",
+            "bytes": 1459240,
+            "sha256": "3475abaab35490c12ec242db8415abe250e9aec6d764b3d91526273655082a8d",
             "minApp": "1.11",
             "hw": 2,
             "product": "gauge",
-            "notes": "The Ghost Gauge on its rev B board, with CAN on the ESP32-S3's own controller.",
-            "published": "2026-10-19"
+            "notes": "Rev B reads its GPS and its belt probe, shows both in the screens' headers, and its CAN self-test no longer",
+            "published": "2026-10-22"
           }
         }
       }

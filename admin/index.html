@@ -107,6 +107,61 @@ ol.timeline .what b { font-weight: 600; }
 .toast.show { opacity: 1; transform: none; }
 .toast.bad { border-color: var(--bad); }
 @media (max-width: 560px) { ol.timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .tile b { font-size: 24px; } }
+
+/* the board: workstreams by stage, their steps as rev blocks */
+.kanban { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(210px, 1fr)); overflow-x: auto; align-items: start; padding-bottom: 4px; }
+@media (max-width: 900px) { .kanban { grid-template-columns: minmax(0, 1fr); } }
+.col { display: grid; gap: 8px; align-content: start; min-height: 90px; border-radius: 14px; padding: 2px; }
+.col.over { background: var(--panel2); outline: 1px dashed var(--dim); }
+.col > header { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 6px 8px; border-bottom: 1px solid var(--line); }
+.col > header b { font: 700 11px/1 var(--readout); letter-spacing: 2px; text-transform: uppercase; }
+.card { display: grid; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; color: inherit; text-decoration: none; cursor: grab; min-width: 0; }
+.card:hover { border-color: var(--line2); }
+.card .t { font-weight: 600; line-height: 1.3; }
+.card .m { color: var(--dim); font-size: 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.card .n { color: var(--dim); font-size: 12.5px; line-height: 1.4; }
+.card .n b { color: var(--ink); font-weight: 600; }
+.card .w { font-size: 12.5px; line-height: 1.4; color: var(--warn); }
+.blocks { display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; vertical-align: middle; }
+.blocks i { width: 9px; height: 7px; border-radius: 2px; background: var(--line2); }
+.blocks i.Done { background: var(--ok); } .blocks i.Doing { background: var(--ink); } .blocks i.Blocked { background: var(--bad); }
+.stage { display: inline-block; font: 700 10px/1 var(--readout); letter-spacing: 1px; padding: 4px 7px; border-radius: 6px; border: 1px solid currentColor; text-transform: uppercase; white-space: nowrap; }
+.stage.Idea { color: var(--dim); } .stage.Designed { color: var(--cool); } .stage.Building { color: var(--gold); } .stage.Testing { color: var(--warn); } .stage.Done { color: var(--ok); }
+.by { font-size: 11.5px; color: var(--dim); overflow-wrap: anywhere; }
+.by b, .you { color: var(--gold); font-weight: 600; }
+ol.steps { list-style: none; margin: 0; padding: 0; }
+ol.steps li { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ol.steps li:last-child { border-bottom: 0; }
+ol.steps .f { display: grid; gap: 6px; min-width: 0; }
+ol.steps .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+ol.steps select, ol.steps input, .tablewrap select { padding: 6px 8px; border-radius: 8px; font-size: 13px; }
+ol.steps li.Done input.txt { color: var(--dim); }
+ol.steps li.Blocked > select { border-color: var(--bad); } ol.steps li.Doing > select { border-color: var(--ink); } ol.steps li.Done > select { border-color: var(--ok); }
+.check { display: flex; gap: 6px; align-items: center; color: var(--dim); font-size: 12.5px; }
+.check input { width: auto; }
+@media (max-width: 560px) { ol.steps li { grid-template-columns: minmax(0, 1fr) auto; } ol.steps li > select { grid-column: 1 / -1; } }
+
+/* the calendar: Sunday first, as the week runs in Qatar */
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .dow { color: var(--dim); font: 600 10.5px/1 var(--readout); letter-spacing: 1px; text-align: center; padding: 6px 0; }
+.cal button.d { min-height: 96px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px; text-align: start; display: grid; align-content: start; gap: 3px; cursor: pointer; min-width: 0; overflow: hidden; }
+.cal button.d.out { opacity: .4; }
+.cal button.d.today { border-color: var(--gold); }
+.cal button.d.sel { background: var(--panel2); border-color: var(--ink); }
+.cal .num { font: 700 12px/1 var(--readout); }
+.cal .e { font-size: 11px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-inline-start: 3px solid var(--line2); padding-inline-start: 4px; }
+.cal .e.note { border-color: var(--gold); } .cal .e.release { border-color: var(--cool); } .cal .e.done { border-color: var(--ok); } .cal .e.due { border-color: var(--warn); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--dim); font-size: 12px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 6px; vertical-align: -1px; background: var(--line2); }
+.legend .note::before { background: var(--gold); } .legend .release::before { background: var(--cool); } .legend .done::before { background: var(--ok); } .legend .due::before { background: var(--warn); }
+ul.day { list-style: none; margin: 0; padding: 0; }
+ul.day li { padding: 10px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+ul.day li:last-child { border-bottom: 0; }
+@media (max-width: 640px) {
+  .cal button.d { min-height: 58px; padding: 5px; }
+  .cal .e { font-size: 0; height: 4px; padding: 0; border: 0; border-radius: 2px; background: var(--line2); }
+  .cal .e.note { background: var(--gold); } .cal .e.release { background: var(--cool); } .cal .e.done { background: var(--ok); } .cal .e.due { background: var(--warn); }
+}
 </style>
 </head>
 <body>
@@ -133,7 +188,7 @@ ol.timeline .what b { font-weight: 600; }
       <div class="who"><span id="whoEmail"></span><button class="btn sm" id="reload" type="button">Refresh</button><button class="btn sm" id="signOut" type="button">Sign out</button></div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#overview">Overview</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
+      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
     </nav>
   </header>
   <main id="view"></main>
@@ -205,6 +260,7 @@ async function show(session) {
   $('#gate').hidden = !!email; $('#app').hidden = !email;
   if (!email) { gateStep(false); return; }
   $('#whoEmail').textContent = email;
+  me = email.toLowerCase();
   const { data:admin } = await sb.rpc('is_admin');
   if (!admin) { $('#view').innerHTML = '<p class="panel">This address isn’t one of Ghost Electronics’ admins.</p>'; return; }
   $('#view').innerHTML = '<p class="dim">Loading…</p>';
@@ -229,11 +285,12 @@ async function load() {
       q(sb.from('licence_requests').select('*').order('created_at', { ascending:false }).limit(300)),
     ]);
     D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests });
+    D.board = await loadBoard();
   } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
 }
 
 function prep(r) {
-  return { ...r, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
+  return { ...r, board:r.board || null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
 }
 
 // ---------- the views, by the address's #part ----------
@@ -241,12 +298,12 @@ window.addEventListener('hashchange', render);
 function render() {
   if (!D) return;
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
-  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page)));
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences };
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar };
   v.innerHTML = (views[page] || overview)(arg);
   window.scrollTo(0, 0);
 }
@@ -270,6 +327,7 @@ function overview() {
     <a class="tile" href="#credits" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>
     <a class="tile" href="#licences" style="text-decoration:none;color:inherit"><span>Licence requests</span><b>${D.requests.filter(r => r.status === 'pending').length}</b><i>waiting for you</i></a>
     <div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>
+    ${D.board ? `<a class="tile" href="#board/todo" style="text-decoration:none;color:inherit"><span>Board steps that need you</span><b style="color:var(--gold)">${D.board.steps.filter(s => s.state !== 'Done' && s.needs_you).length}</b><i>${D.board.items.filter(i => i.stage !== 'Done').length} workstreams under way</i></a>` : ''}
   </div>
   <section class="panel"><h2>Latest</h2>${events.length ? `<ol class="timeline">${events.map(e => `<li><time>${when(e.at)}</time><div class="what">${e.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing yet.</p>'}</section>`;
 }
@@ -529,8 +587,372 @@ function licences() {
   </tbody></table></div></section>` : ''}`;
 }
 
+// ---------- the board: workstreams, their steps, the calendar (migrations/20261024120409_board.sql) ----------
+// Every change is stamped and logged by the database with who made it: the signed-in admin, or Claude (the
+// daily refresh at 5 in the morning, with nobody signed in). The page never says who; it only shows it.
+const STAGES = ['Idea', 'Designed', 'Building', 'Testing', 'Done'];
+const STATES = ['To do', 'Doing', 'Done', 'Blocked'];
+const KINDS = ['Build', 'Design', 'Test', 'Order', 'Release', 'Decide', 'Fix', 'Docs'];
+let me = '';                                   // the signed-in address, so your own changes read "you"
+const who = (v, cap) => (!v || v === 'Claude' ? 'Claude' : v === me ? `<b>${cap ? 'You' : 'you'}</b>` : esc(v));
+const changedLine = r => `Added ${day(r.created_at)}${new Date(r.updated_at) - new Date(r.created_at) > 60e3 ? ` · changed by ${who(r.updated_by)} ${when(r.updated_at)}` : ` by ${who(r.updated_by)}`}`;
+const today = () => day(new Date());
+const opts = (list, cur, blank) => (blank !== undefined ? `<option value="">${esc(blank)}</option>` : '') + list.map(v => `<option ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join('');
+
+async function all(table, order) {           // the API hands out 1000 rows at a time
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const rows = await q(sb.from(table).select('*').order(order).range(from, from + 999));
+    out.push(...rows);
+    if (rows.length < 1000) return out;
+  }
+}
+async function loadBoard() {
+  try {
+    const [items, steps, notes, changes] = await Promise.all([all('board_items', 'id'), all('board_steps', 'id'), all('board_notes', 'id'),
+      q(sb.from('board_changes').select('*').order('at', { ascending:false }).limit(1000))]);
+    return { items, steps, notes, changes };
+  } catch (e) { toast(`Couldn’t load the board: ${e.message}`, true); return null; }
+}
+// A redraw after a save keeps whatever is still being typed elsewhere on the page: each field that differs from
+// what it was drawn with, and the focus and caret.
+const FIELDS = '#view input, #view textarea, #view select', FOCUSABLE = FIELDS + ', #view button';
+const fieldKey = el => el.id ? '#' + el.id : el.dataset.sf ? `s${el.closest('[data-step]')?.dataset.step}:${el.dataset.sf}`
+  : el.dataset.nf ? `n${el.closest('[data-note]')?.dataset.note}:${el.dataset.nf}` : el.dataset.stepstate ? 'ss' + el.dataset.stepstate
+  : el.dataset.sdel ? 'sd' + el.dataset.sdel : el.dataset.ndel ? 'nd' + el.dataset.ndel : '';
+const drawnIndex = el => Math.max(0, [...el.options].findIndex(o => o.defaultSelected));
+const unsaved = el => (el.type === 'checkbox' ? el.checked !== el.defaultChecked
+  : el.tagName === 'SELECT' ? el.selectedIndex !== drawnIndex(el) : el.value !== el.defaultValue);
+const resetField = el => { el.value = el.defaultValue; el.checked = el.defaultChecked; if (el.tagName === 'SELECT') el.selectedIndex = drawnIndex(el); };
+let pressing = false;
+document.addEventListener('pointerdown', () => { pressing = true; }, true);
+['pointerup', 'pointercancel', 'dragend', 'drop'].forEach(t => document.addEventListener(t, () => setTimeout(() => { pressing = false; }), true));
+function afterPress(fn) {
+  if (!pressing) return setTimeout(fn);
+  let done = false; const go = () => { if (done) return; done = true; document.removeEventListener('click', go, true); setTimeout(fn); };
+  document.addEventListener('click', go, true); setTimeout(go, 1500);
+}
+function rerender() {
+  const a = document.activeElement;
+  if (pressing) return afterPress(rerender);
+  if (a?.type === 'date' && a.closest('#view')) { a.addEventListener('blur', () => afterPress(rerender), { once:true }); return; }
+  const y = window.scrollY, keep = new Map();
+  document.querySelectorAll(FIELDS).forEach(el => { const k = fieldKey(el); if (k && unsaved(el)) keep.set(k, el.type === 'checkbox' ? el.checked : el.value); });
+  const focus = a && a.closest?.('#view') ? { k:fieldKey(a), s:a.selectionStart, e:a.selectionEnd } : null;
+  render(); window.scrollTo(0, y);
+  document.querySelectorAll(FIELDS).forEach(el => { const k = fieldKey(el); if (keep.has(k)) { if (el.type === 'checkbox') el.checked = keep.get(k); else el.value = keep.get(k); } });
+  if (focus?.k) { const el = [...document.querySelectorAll(FOCUSABLE)].find(x => fieldKey(x) === focus.k); if (el) { el.focus({ preventScroll:true }); try { if (focus.s != null) el.setSelectionRange(focus.s, focus.e); } catch {} } }
+}
+async function write(p, msg, reset) {    // reset: the add form's fields, back to how they were drawn once it's in
+  const { error } = await p;
+  if (error) { toast(error.message, true); return false; }
+  (reset || []).forEach(r => { const [sel, sent] = Array.isArray(r) ? r : [r]; const el = $(sel);
+    if (el && (sent === undefined || (el.type === 'checkbox' ? el.checked : el.value) === sent)) resetField(el); });
+  D.board = await loadBoard(); if (msg) toast(msg); rerender();
+  return true;
+}
+const stepsOf = id => D.board.steps.filter(s => s.item_id === id).sort((a, b) => a.seq - b.seq || a.id - b.id);
+const blocks = st => `<span class="blocks" aria-hidden="true">${st.map(s => `<i class="${s.state.replace(' ', '')}" title="${esc(s.step)}"></i>`).join('')}</span>`;
+const stateSelect = s => `<select data-stepstate="${s.id}" aria-label="State">${opts(STATES, s.state)}</select>`;
+const noBoard = '<h1>Board</h1><p class="panel">The board didn’t load. Try Refresh.</p>';
+function bindStepState() {
+  document.querySelectorAll('[data-stepstate]').forEach(el => el.addEventListener('change', () => {
+    const s = D.board.steps.find(x => String(x.id) === el.dataset.stepstate);
+    const patch = { state:el.value };
+    if (el.value === 'Done' && s.state !== 'Done') patch.day = today();     // a step done now lands on today in the calendar
+    write(sb.from('board_steps').update(patch).eq('id', s.id), `${el.value}: ${s.step}`);
+  }));
+}
+
+let bView = { product:'', text:'', todo:'open', who:'' };
+function board(sub) {
+  if (!D.board) return noBoard;
+  const b = D.board, view = ['list', 'todo', 'changes'].includes(sub) ? sub : 'stages';
+  const products = [...new Set(b.items.map(i => i.product))].sort();
+  if (bView.product && !products.includes(bView.product)) bView.product = '';
+  const items = b.items.filter(i => !bView.product || i.product === bView.product);
+  const at = s => items.filter(i => i.stage === s).length;
+  const open = b.steps.filter(s => s.state !== 'Done' && items.some(i => i.id === s.item_id));
+  const recent = b.changes.filter(c => Date.now() - new Date(c.at) < 864e5 && c.what !== 'refresh');
+  setTimeout(() => {
+    document.querySelectorAll('[data-bview]').forEach(x => x.addEventListener('click', () => { location.hash = '#board' + (x.dataset.bview === 'stages' ? '' : '/' + x.dataset.bview); }));
+    $('#bProduct').addEventListener('change', e => { bView.product = e.target.value; rerender(); });
+    $('#bNew').addEventListener('click', () => { $('#bNewForm').hidden = !$('#bNewForm').hidden; $('#nwName').focus(); });
+    $('#nwAdd').addEventListener('click', async () => {
+      const name = $('#nwName').value.trim(), product = $('#nwProduct').value.trim();
+      if (!name || !product) return toast('A name and a product', true);
+      const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 56) || 'item';
+      let id = base, n = 2; while (D.board.items.some(i => i.id === id)) id = `${base}-${n++}`;
+      const { error } = await sb.from('board_items').insert({ id, name, product, area:$('#nwArea').value.trim(), stage:$('#nwStage').value });
+      D.board = await loadBoard();
+      if (error) { toast(error.code === '23505' ? 'That name was just taken on the board. Press Add again for a new one.' : error.message, true); rerender(); $('#bNewForm').hidden = false; $('#nwAdd').focus(); return; }
+      toast('Added to the board'); location.hash = '#item/' + id;
+    });
+  });
+  return `<h1>Board</h1>
+  <div class="tiles">
+    <div class="tile"><span>Being built or tested</span><b>${at('Building') + at('Testing')}</b><i>${at('Building')} building · ${at('Testing')} testing</i></div>
+    <div class="tile"><span>Designed or an idea</span><b>${at('Designed') + at('Idea')}</b><i>${at('Designed')} designed · ${at('Idea')} not started</i></div>
+    <div class="tile"><span>Done</span><b>${at('Done')}</b><i>of ${items.length} workstreams</i></div>
+    <div class="tile"><span>Waiting on something</span><b style="color:var(--warn)">${items.filter(i => i.blocked && i.stage !== 'Done').length}</b><i>can’t move yet</i></div>
+    <a class="tile" href="#board/todo" style="text-decoration:none;color:inherit"><span>Steps that need you</span><b style="color:var(--gold)">${open.filter(s => s.needs_you).length}</b><i>of ${open.length} open steps</i></a>
+    <a class="tile" href="#board/changes" style="text-decoration:none;color:inherit"><span>Changed in the last day</span><b>${recent.length}</b><i>${recent.filter(c => c.by === me).length} by you · ${recent.filter(c => c.by === 'Claude').length} by Claude</i></a>
+  </div>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="View">${[['stages', 'Stages'], ['list', 'List'], ['todo', 'To do'], ['changes', 'Changes']].map(([v, n]) => `<button type="button" data-bview="${v}" aria-pressed="${view === v}">${n}</button>`).join('')}</div>
+    <select id="bProduct" aria-label="Product">${opts(products, bView.product, 'All products')}</select>
+    <button class="btn" id="bNew" type="button">New workstream</button>
+  </div>
+  <section class="panel" id="bNewForm" hidden><h2>New workstream</h2><div class="form">
+    <label>Name<input id="nwName" placeholder="Belt sensor in the X3"></label>
+    <label>Product<input id="nwProduct" list="nwProducts" value="${esc(bView.product || 'Ghost Gauge')}"><datalist id="nwProducts">${products.map(p => `<option value="${esc(p)}">`).join('')}</datalist></label>
+    <label>Area<input id="nwArea" placeholder="Firmware"></label>
+    <label>Stage<select id="nwStage">${opts(STAGES, 'Idea')}</select></label>
+    <div><button class="btn gold" id="nwAdd" type="button">Add</button></div></div></section>
+  ${view === 'list' ? boardList(items) : view === 'todo' ? boardTodo(items) : view === 'changes' ? boardChanges() : boardStages(items)}`;
+}
+
+function card(i) {
+  const st = stepsOf(i.id);
+  return `<a class="card" href="#item/${esc(i.id)}" draggable="true" data-id="${esc(i.id)}">
+    <span class="m"><span>${esc(i.product)}</span><span>${esc(i.area)}</span></span>
+    <span class="t">${esc(i.name)}</span>
+    <span class="m">${blocks(st)}<span>${st.filter(s => s.state === 'Done').length} of ${st.length}</span></span>
+    ${i.stage !== 'Done' && i.next_step ? `<span class="n"><b>Next</b> ${esc(i.next_step)}</span>` : ''}
+    ${i.blocked && i.stage !== 'Done' && i.waiting_on ? `<span class="w">● ${esc(i.waiting_on)}</span>` : ''}
+    <span class="by">${changedLine(i)}</span></a>`;
+}
+function boardStages(items) {
+  setTimeout(() => {          // drag a card onto another stage (on a computer; on a phone, open it)
+    document.querySelectorAll('.card[draggable]').forEach(c => c.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', c.dataset.id); e.dataTransfer.effectAllowed = 'move'; }));
+    document.querySelectorAll('.col[data-stage]').forEach(col => {
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
+      col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('over'); });
+      col.addEventListener('drop', e => {
+        e.preventDefault(); col.classList.remove('over');
+        const it = D.board.items.find(i => i.id === e.dataTransfer.getData('text/plain'));
+        if (it && it.stage !== col.dataset.stage) write(sb.from('board_items').update({ stage:col.dataset.stage }).eq('id', it.id), `${it.name}: ${col.dataset.stage}`);
+      });
+    });
+  });
+  return `<p class="msg">Drag a card to another stage, or open it to change its steps. Each block is a step: green done, white under way, red blocked.</p>
+  <div class="kanban">${STAGES.map(s => {
+    const list = items.filter(i => i.stage === s).sort((a, b) => (b.blocked - a.blocked) || a.product.localeCompare(b.product) || a.name.localeCompare(b.name));
+    return `<section class="col" data-stage="${s}"><header><b>${s}</b><span class="dim">${list.length}</span></header>${list.map(card).join('') || '<p class="empty">Nothing here</p>'}</section>`;
+  }).join('')}</div>`;
+}
+function boardList(items) {
+  const t = bView.text.toLowerCase();
+  const rows = items.filter(i => !t || [i.name, i.product, i.area, i.summary, i.next_step, i.waiting_on].join(' ').toLowerCase().includes(t))
+    .sort((a, b) => STAGES.indexOf(a.stage) - STAGES.indexOf(b.stage) || a.name.localeCompare(b.name));
+  setTimeout(() => { const s = $('#bSearch'); s.value = bView.text; s.addEventListener('input', () => { bView.text = s.value; const c = s.selectionStart; rerender(); const n = $('#bSearch'); n.focus(); n.setSelectionRange(c, c); }); });
+  return `<div class="tools"><input type="search" id="bSearch" placeholder="Search names, next steps, what it waits on" aria-label="Search workstreams"></div>
+  <div class="tablewrap"><table><thead><tr><th>Workstream</th><th>Product</th><th>Stage</th><th>Steps</th><th>Next step</th><th>Waiting on</th><th>Planned</th><th>Last change</th></tr></thead><tbody>
+  ${rows.map(i => { const st = stepsOf(i.id); return `<tr class="go" data-href="#item/${esc(i.id)}"><td class="wrap"><a href="#item/${esc(i.id)}">${esc(i.name)}</a></td><td>${esc(i.product)}</td>
+    <td><span class="stage ${i.stage}">${i.stage}</span></td><td>${blocks(st)} <span class="dim">${st.filter(s => s.state === 'Done').length}/${st.length}</span></td>
+    <td class="wrap">${esc(i.next_step)}</td><td class="wrap dim">${i.blocked ? esc(i.waiting_on) : ''}</td><td class="wrap dim">${esc(i.planned)}</td><td>${who(i.updated_by)} <span class="dim">${when(i.updated_at)}</span></td></tr>`; }).join('')
+    || '<tr><td colspan="8" class="empty">No workstreams match.</td></tr>'}
+  </tbody></table></div>`;
+}
+function boardTodo(items) {
+  const name = Object.fromEntries(D.board.items.map(i => [i.id, i.name])), ids = new Set(items.map(i => i.id)), f = bView.todo;
+  const rank = { Blocked:0, Doing:1, 'To do':2, Done:3 };
+  const rows = D.board.steps.filter(s => ids.has(s.item_id) && (f === 'done' ? s.state === 'Done' : s.state !== 'Done' && (f === 'open' || (f === 'you' && s.needs_you) || (f === 'blocked' && s.state === 'Blocked'))))
+    .sort((a, b) => f === 'done' ? String(b.day || '').localeCompare(String(a.day || '')) : rank[a.state] - rank[b.state] || (b.needs_you - a.needs_you) || name[a.item_id].localeCompare(name[b.item_id]) || a.seq - b.seq);
+  setTimeout(() => { document.querySelectorAll('[data-todo]').forEach(x => x.addEventListener('click', () => { bView.todo = x.dataset.todo; rerender(); })); bindStepState(); });
+  return `<div class="tools"><div class="seg" role="group" aria-label="Steps">${[['open', 'Open'], ['you', 'Need you'], ['blocked', 'Blocked'], ['done', 'Done']].map(([v, n]) => `<button type="button" data-todo="${v}" aria-pressed="${f === v}">${n}</button>`).join('')}</div>
+    <span class="dim">${rows.length} step${rows.length === 1 ? '' : 's'}</span></div>
+  <div class="tablewrap"><table><thead><tr><th>State</th><th>Step</th><th>Workstream</th><th>Needs you</th><th>Date</th><th>Last change</th></tr></thead><tbody>
+  ${rows.map(s => `<tr><td>${stateSelect(s)}</td><td class="wrap">${esc(s.step)}${s.note ? `<div class="dim" style="font-size:12px">${esc(s.note)}</div>` : ''}</td>
+    <td class="wrap"><a href="#item/${esc(s.item_id)}">${esc(name[s.item_id])}</a></td><td>${s.needs_you ? '<span class="you">Yes</span>' : ''}</td><td>${esc(s.day || '')}</td>
+    <td>${who(s.updated_by)} <span class="dim">${when(s.updated_at)}</span></td></tr>`).join('') || '<tr><td colspan="6" class="empty">Nothing here.</td></tr>'}
+  </tbody></table></div>`;
+}
+function changeLine(c, name) {
+  const target = c.what === 'refresh' ? esc(c.title)
+    : `${esc(c.action)} ${esc(c.what)} <b>${c.what === 'workstream' && c.action !== 'removed' ? `<a href="#item/${esc(c.item_id)}">${esc(c.title)}</a>` : esc(c.title)}</b>`
+      + (c.what !== 'workstream' && c.item_id && name[c.item_id] ? ` <span class="dim">in</span> <a href="#item/${esc(c.item_id)}">${esc(name[c.item_id])}</a>` : '');
+  return `${who(c.by, true)} ${target}${c.detail ? `<div class="dim">${esc(c.detail)}</div>` : ''}`;
+}
+function boardChanges() {
+  const name = Object.fromEntries(D.board.items.map(i => [i.id, i.name])), f = bView.who;
+  const rows = D.board.changes.filter(c => !f || (f === 'you' ? c.by === me : c.by === 'Claude'));
+  setTimeout(() => document.querySelectorAll('[data-who]').forEach(x => x.addEventListener('click', () => { bView.who = x.dataset.who; rerender(); })));
+  return `<div class="tools"><div class="seg" role="group" aria-label="Who">${[['', 'Everyone'], ['you', 'You'], ['claude', 'Claude']].map(([v, n]) => `<button type="button" data-who="${v}" aria-pressed="${f === v}">${n}</button>`).join('')}</div></div>
+  <section class="panel">${rows.length ? `<ol class="timeline">${rows.map(c => `<li><time>${when(c.at)}</time><div class="what">${changeLine(c, name)}</div></li>`).join('')}</ol>` : '<p class="empty">No changes yet.</p>'}</section>
+  <p class="msg">Every change to the board, with who made it: you, or Claude’s daily refresh at 5 in the morning, which brings in what changed in the repo and never undoes yours.</p>`;
+}
+
+function item(id) {
+  const i = D.board?.items.find(x => x.id === id);
+  if (!D.board) return noBoard;
+  if (!i) return '<a class="back" href="#board">‹ Board</a><p class="panel">No such workstream.</p>';
+  const st = stepsOf(id), notes = D.board.notes.filter(n => n.item_id === id).sort((a, b) => String(a.day).localeCompare(String(b.day)));
+  const products = [...new Set(D.board.items.map(x => x.product))].sort();
+  setTimeout(() => {
+    document.querySelectorAll('[data-setstage]').forEach(x => x.addEventListener('click', () => { if (x.dataset.setstage !== i.stage) write(sb.from('board_items').update({ stage:x.dataset.setstage }).eq('id', id), `Stage: ${x.dataset.setstage}`); }));
+    $('#iSave').addEventListener('click', () => {   // only the boxes you edited, so it never puts back an older value
+      const boxes = { name:'#iName', product:'#iProduct', area:'#iArea', summary:'#iSummary', next_step:'#iNext', waiting_on:'#iWait', blocked:'#iBlocked', planned:'#iPlanned' };
+      ['#iName', '#iProduct'].forEach(sel => { if (!$(sel).value.trim()) resetField($(sel)); });   // a workstream keeps its name
+      const edited = Object.entries(boxes).filter(([, sel]) => unsaved($(sel)));
+      const raw = sel => ($(sel).type === 'checkbox' ? $(sel).checked : $(sel).value);
+      const patch = Object.fromEntries(edited.map(([k, sel]) => [k, k === 'blocked' ? raw(sel) : k === 'summary' ? raw(sel) : k === 'planned' ? raw(sel).trim() || 'Not scheduled' : raw(sel).trim()]));
+      if (!edited.length) return toast('Nothing changed');
+      write(sb.from('board_items').update(patch).eq('id', id), 'Saved', edited.map(([, sel]) => [sel, raw(sel)]));
+    });
+    $('#iDelete').addEventListener('click', async () => {
+      if (!confirm(`Remove “${i.name}” and its ${st.length} step${st.length === 1 ? '' : 's'} from the board? Its calendar notes stay.`)) return;
+      if (await write(sb.from('board_items').delete().eq('id', id), 'Removed')) location.hash = '#board';
+    });
+    bindStepState();
+    document.querySelectorAll('[data-sf]').forEach(el => el.addEventListener(el.type === 'date' ? 'blur' : 'change', () => {
+      if (el.type === 'date' && el.validity.badInput) { resetField(el); return toast('That date isn’t finished, so it wasn’t saved', true); }
+      if (el.type === 'date' && el.value === el.defaultValue) return;
+      const sid = el.closest('[data-step]').dataset.step, f = el.dataset.sf;
+      let v = el.type === 'checkbox' ? el.checked : el.value;
+      if (f === 'day') v = v || null;
+      if (f === 'step' && !v.trim()) { resetField(el); return toast('A step needs words', true); }
+      write(sb.from('board_steps').update({ [f]:v }).eq('id', sid), 'Saved');
+    }));
+    document.querySelectorAll('[data-sdel]').forEach(x => x.addEventListener('click', () => {
+      const s = st.find(y => String(y.id) === x.dataset.sdel);
+      if (confirm(`Remove the step “${s.step}”?`)) write(sb.from('board_steps').delete().eq('id', s.id), 'Step removed');
+    }));
+    $('#sAdd').addEventListener('click', () => {
+      const t = $('#sText').value.trim(); if (!t) return toast('What is the step?', true);
+      write(sb.from('board_steps').insert({ item_id:id, seq:Math.max(0, ...st.map(s => s.seq)) + 1, step:t, kind:$('#sKind').value, needs_you:$('#sYou').checked, day:$('#sDay').value || null }), 'Step added', ['#sText', '#sKind', '#sDay', '#sYou']);
+    });
+    $('#inAdd').addEventListener('click', () => {
+      const d = $('#inDay').value, t = $('#inTitle').value.trim();
+      if (!d || !t) return toast('A day and what it is', true);
+      write(sb.from('board_notes').insert({ day:d, title:t, note:$('#inNote').value.trim(), item_id:id, stage:$('#inStage').value || null }), 'On the calendar', ['#inDay', '#inStage', '#inTitle', '#inNote']);
+    });
+  });
+  return `<a class="back" href="#board">‹ Board</a>
+  <h1>${esc(i.name)}</h1>
+  <div class="tools"><div class="seg" role="group" aria-label="Stage">${STAGES.map(s => `<button type="button" data-setstage="${s}" aria-pressed="${s === i.stage}">${s}</button>`).join('')}</div>
+    <span class="dim">${esc(i.product)}${i.area ? ' · ' + esc(i.area) : ''}</span></div>
+  <div class="two">
+    <section class="panel"><h2>Where it stands</h2><div class="form">
+      <label class="full">Summary<textarea id="iSummary">${esc(i.summary)}</textarea></label>
+      <label class="full">Next step<input id="iNext" value="${esc(i.next_step)}"></label>
+      <label class="full">Waiting on<input id="iWait" value="${esc(i.waiting_on)}" placeholder="Nothing"></label>
+      <label class="check full"><input type="checkbox" id="iBlocked" ${i.blocked ? 'checked' : ''}> It can’t move until that happens</label>
+      <label class="full">Planned<input id="iPlanned" value="${esc(i.planned)}"></label>
+      <label>Name<input id="iName" value="${esc(i.name)}"></label>
+      <label>Product<input id="iProduct" list="iProducts" value="${esc(i.product)}"><datalist id="iProducts">${products.map(p => `<option value="${esc(p)}">`).join('')}</datalist></label>
+      <label>Area<input id="iArea" value="${esc(i.area)}"></label>
+      <div class="tools full"><button class="btn gold" id="iSave" type="button">Save</button><button class="btn danger" id="iDelete" type="button">Remove from the board</button></div>
+    </div></section>
+    <section class="panel"><h2>About it</h2><dl class="kv">
+      <dt>Steps done</dt><dd>${blocks(st)} ${st.filter(s => s.state === 'Done').length} of ${st.length}</dd>
+      <dt>Added</dt><dd>${when(i.created_at)}</dd>
+      <dt>Last change</dt><dd>${who(i.updated_by, true)} · ${when(i.updated_at)}</dd>
+      <dt>Started</dt><dd>${esc(i.started_on || '—')}</dd>
+      <dt>Last activity</dt><dd>${esc(i.last_activity || '—')}</dd>
+      <dt>Sources</dt><dd class="mono" style="font-size:11.5px">${esc(i.sources || '—')}</dd></dl>
+      <h2 style="margin-top:18px">On the calendar</h2>
+      ${notes.length ? `<ul class="day">${notes.map(n => `<li><div><a href="#calendar/${esc(n.day.slice(0, 7))}" data-calday="${esc(n.day)}">${esc(n.day)}</a> ${n.stage ? `<span class="stage ${n.stage}">${n.stage}</span>` : ''} <b>${esc(n.title)}</b></div>${n.note ? `<div class="dim">${esc(n.note)}</div>` : ''}<span class="by">${changedLine(n)}</span></li>`).join('')}</ul>` : '<p class="dim" style="margin:0 0 10px">Nothing yet.</p>'}
+      <div class="form" style="margin-top:10px"><label>Day<input type="date" id="inDay" value="${today()}"></label><label>Stage it should reach<select id="inStage">${opts(STAGES, '', 'No stage')}</select></label>
+        <label class="full">What<input id="inTitle" placeholder="Order the boards"></label><label class="full">Note<input id="inNote" placeholder="Optional"></label>
+        <div><button class="btn" id="inAdd" type="button">Add to the calendar</button></div></div></section>
+  </div>
+  <section class="panel"><h2>Steps</h2>
+    ${st.length ? `<ol class="steps">${st.map(s => `<li class="${s.state.replace(' ', '')}" data-step="${s.id}">${stateSelect(s)}
+      <div class="f"><input class="txt" data-sf="step" value="${esc(s.step)}" aria-label="Step">
+        <div class="row"><input data-sf="note" value="${esc(s.note)}" placeholder="Note" aria-label="Note" style="flex:1 1 200px">
+          <input type="date" data-sf="day" value="${esc(s.day || '')}" aria-label="Date">
+          <select data-sf="kind" aria-label="Kind">${opts(KINDS.includes(s.kind) ? KINDS : [s.kind, ...KINDS], s.kind)}</select>
+          <label class="check"><input type="checkbox" data-sf="needs_you" ${s.needs_you ? 'checked' : ''}> Needs you</label></div>
+        <span class="by">${s.source ? `<span class="mono">${esc(s.source)}</span> · ` : ''}${changedLine(s)}</span></div>
+      <button class="btn sm danger" type="button" data-sdel="${s.id}" aria-label="Remove this step">✕</button></li>`).join('')}</ol>` : '<p class="empty">No steps yet.</p>'}
+    <div class="form" style="margin-top:12px"><label class="full">A new step<input id="sText" placeholder="Fit the probe by the belt and check its reading"></label>
+      <label>Kind<select id="sKind">${opts(KINDS, 'Build')}</select></label><label>Date<input type="date" id="sDay"></label>
+      <label class="check"><input type="checkbox" id="sYou"> Needs you</label><div><button class="btn gold" id="sAdd" type="button">Add step</button></div></div>
+  </section>`;
+}
+
+let calSel = '';
+document.addEventListener('click', e => { const a = e.target.closest('[data-calday]'); if (a) calSel = a.dataset.calday; });
+function calendar(arg) {
+  if (!D.board) return noBoard.replace('Board', 'Calendar');
+  const now = today(), month = /^\d{4}-\d{2}$/.test(arg || '') ? arg : (calSel || now).slice(0, 7);
+  if (!calSel || calSel.slice(0, 7) !== month) calSel = month === now.slice(0, 7) ? now : month + '-01';
+  const [y, m] = month.split('-').map(Number);
+  const iso = d => d.toISOString().slice(0, 10), shift = (k) => { const d = new Date(Date.UTC(y, m - 1 + k, 1)); return iso(d).slice(0, 7); };
+  const first = new Date(Date.UTC(y, m - 1, 1)), start = new Date(Date.UTC(y, m - 1, 1 - first.getUTCDay()));
+  let cells = Array.from({ length:42 }, (_, k) => iso(new Date(start.getTime() + k * 864e5)));
+  if (cells[35].slice(0, 7) !== month) cells = cells.slice(0, 35);
+  const name = Object.fromEntries(D.board.items.map(i => [i.id, i.name]));
+  const notesOn = d => D.board.notes.filter(n => n.day === d), stepsOn = d => D.board.steps.filter(s => s.day === d);
+  const cell = d => {
+    const ns = notesOn(d), ss = stepsOn(d), done = ss.filter(s => s.state === 'Done'), due = ss.filter(s => s.state !== 'Done');
+    const lines = [...ns.map(n => `<span class="e ${n.kind}">${n.stage ? n.stage + ': ' : ''}${esc(n.title)}</span>`),
+      ...(done.length ? [`<span class="e done">${done.length} step${done.length === 1 ? '' : 's'} done</span>`] : []),
+      ...due.map(s => `<span class="e due">${esc(s.step)}</span>`)];
+    return `<button type="button" class="d${d.slice(0, 7) !== month ? ' out' : ''}${d === now ? ' today' : ''}${d === calSel ? ' sel' : ''}" data-day="${d}" aria-label="${d}"><span class="num">${Number(d.slice(8))}</span>${lines.slice(0, 4).join('')}${lines.length > 4 ? `<span class="dim" style="font-size:11px">+${lines.length - 4} more</span>` : ''}</button>`;
+  };
+  const sel = calSel, ns = notesOn(sel), ss = stepsOn(sel);
+  const coming = [...D.board.notes.filter(n => n.day > now).map(n => ({ day:n.day, html:`${n.stage ? `<span class="stage ${n.stage}">${n.stage}</span> ` : ''}<b>${esc(n.title)}</b>${n.item_id && name[n.item_id] ? ` <span class="dim">·</span> <a href="#item/${esc(n.item_id)}">${esc(name[n.item_id])}</a>` : ''}` })),
+    ...D.board.steps.filter(s => s.day && s.day >= now && s.state !== 'Done').map(s => ({ day:s.day, html:`<span class="dim">Step due:</span> ${esc(s.step)} <span class="dim">·</span> <a href="#item/${esc(s.item_id)}">${esc(name[s.item_id])}</a>` }))]
+    .sort((a, b) => a.day.localeCompare(b.day)).slice(0, 30);
+  const itemOpts = cur => `<option value="">No workstream</option>` + [...D.board.items].sort((a, b) => a.name.localeCompare(b.name)).map(i => `<option value="${esc(i.id)}" ${i.id === cur ? 'selected' : ''}>${esc(i.name)}</option>`).join('');
+  setTimeout(() => {
+    document.querySelectorAll('[data-month]').forEach(x => x.addEventListener('click', () => {
+      calSel = x.dataset.month === now.slice(0, 7) ? now : '';
+      const h = '#calendar/' + x.dataset.month;
+      if (location.hash === h) rerender(); else location.hash = h;
+    }));
+    document.querySelectorAll('.cal [data-day]').forEach(x => x.addEventListener('click', () => {
+      calSel = x.dataset.day;
+      if (calSel.slice(0, 7) !== month) { location.hash = '#calendar/' + calSel.slice(0, 7); return; }
+      rerender(); $('#calDay').scrollIntoView({ block:'nearest' });
+    }));
+    document.querySelectorAll('[data-nf]').forEach(el => el.addEventListener(el.type === 'date' ? 'blur' : 'change', () => {
+      if (el.type === 'date' && el.validity.badInput) { resetField(el); return toast('That date isn’t finished, so it wasn’t saved', true); }
+      if (el.type === 'date' && el.value === el.defaultValue) return;
+      const nid = el.closest('[data-note]').dataset.note, f = el.dataset.nf, v = el.value;
+      if ((f === 'title' || f === 'day') && !v.trim()) { resetField(el); return toast(f === 'day' ? 'A note needs a day' : 'A note needs a title', true); }
+      if (f === 'day') calSel = v;
+      write(sb.from('board_notes').update({ [f]:(f === 'item_id' || f === 'stage') ? v || null : v }).eq('id', nid), 'Saved')
+        .then(ok => { if (ok && f === 'day' && v.slice(0, 7) !== month) { calSel = v; location.hash = '#calendar/' + v.slice(0, 7); } });
+    }));
+    document.querySelectorAll('[data-ndel]').forEach(x => x.addEventListener('click', () => { if (confirm('Remove this note from the calendar?')) write(sb.from('board_notes').delete().eq('id', x.dataset.ndel), 'Removed'); }));
+    $('#cnAdd').addEventListener('click', () => {
+      const t = $('#cnTitle').value.trim(); if (!t) return toast('What is it?', true);
+      write(sb.from('board_notes').insert({ day:sel, title:t, note:$('#cnNote').value.trim(), item_id:$('#cnItem').value || null, stage:$('#cnStage').value || null }), 'On the calendar', ['#cnTitle', '#cnNote', '#cnItem', '#cnStage']);
+    });
+  });
+  const title = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('en-GB', { month:'long', year:'numeric', timeZone:'UTC' });
+  const selTitle = new Date(sel + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'UTC' });
+  return `<h1>Calendar</h1>
+  <div class="tools"><button class="btn sm" type="button" data-month="${shift(-1)}" aria-label="Last month">‹</button><b style="min-width:150px;text-align:center">${title}</b>
+    <button class="btn sm" type="button" data-month="${shift(1)}" aria-label="Next month">›</button><button class="btn sm" type="button" data-month="${now.slice(0, 7)}">Today</button>
+    <span class="legend" style="margin-inline-start:auto"><span class="note">Note</span><span class="release">Release</span><span class="done">Steps done</span><span class="due">Step due</span></span></div>
+  <div class="cal">${['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => `<div class="dow">${d}</div>`).join('')}${cells.map(cell).join('')}</div>
+  <div class="two">
+    <section class="panel" id="calDay"><h2>${esc(selTitle)}</h2>
+      ${ns.length || ss.length ? `<ul class="day">
+        ${ns.map(n => `<li data-note="${n.id}"><div class="form">
+          <label class="full">${n.kind === 'release' ? 'Release' : 'Note'}<input data-nf="title" value="${esc(n.title)}"></label>
+          <label class="full">Detail<input data-nf="note" value="${esc(n.note)}" placeholder="Optional"></label>
+          <label>Workstream<select data-nf="item_id">${itemOpts(n.item_id)}</select></label>
+          <label>Stage it should reach<select data-nf="stage">${opts(STAGES, n.stage || '', 'No stage')}</select></label>
+          <label>Day<input type="date" data-nf="day" value="${esc(n.day)}"></label>
+          <div><button class="btn sm danger" type="button" data-ndel="${n.id}">Remove</button></div></div>
+          <span class="by">${changedLine(n)}</span></li>`).join('')}
+        ${ss.map(s => `<li><div>${s.state === 'Done' ? '<span class="badge PASS">DONE</span>' : `<span class="badge allocated">${esc(s.state.toUpperCase())}</span>`} ${esc(s.step)}</div>
+          <div class="dim"><a href="#item/${esc(s.item_id)}">${esc(name[s.item_id])}</a></div></li>`).join('')}</ul>` : '<p class="empty">Nothing on this day yet.</p>'}
+      <h2 style="margin-top:18px">Add a note</h2><div class="form">
+        <label class="full">What<input id="cnTitle" placeholder="Pro board ordered"></label><label class="full">Detail<input id="cnNote" placeholder="Optional"></label>
+        <label>Workstream<select id="cnItem">${itemOpts('')}</select></label><label>Stage it should reach<select id="cnStage">${opts(STAGES, '', 'No stage')}</select></label>
+        <div><button class="btn gold" id="cnAdd" type="button">Add to ${esc(sel)}</button></div></div></section>
+    <section class="panel"><h2>Coming up</h2>${coming.length ? `<ol class="timeline">${coming.map(c => `<li><time>${esc(c.day)}</time><div class="what">${c.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing planned yet. Add a note to a day, or a date to a step.</p>'}</section>
+  </div>`;
+}
+
 // tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in
-if (window.__previewData) { D = prep(window.__previewData); $('#gate').hidden = true; $('#app').hidden = false; $('#whoEmail').textContent = 'preview'; render(); }
+if (window.__previewData) { D = prep(window.__previewData); me = window.__previewData.me || ''; $('#gate').hidden = true; $('#app').hidden = false; $('#whoEmail').textContent = 'preview'; render(); }
 else sb.auth.getSession().then(({ data }) => show(data.session));
 })();
 </script>

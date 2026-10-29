@@ -25,15 +25,15 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.43",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.43.bin",
-        "bytes": 1149224,
-        "sha256": "c04fa21ba4a1a6398f20603b381decdfc4946ddd7223474b0dfbf1a9cfacd450",
+        "version": "1.0.55",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.55.bin",
+        "bytes": 1153160,
+        "sha256": "3c2885d617b13ff6b1a19e9412ddc9d599c07dcf372cb31437a5e9d30fb0e27a",
         "minApp": "1.6",
         "hw": 1,
         "product": "nano",
-        "notes": "Rpm pulls: the gauge times the engine from one rpm to another, for the app's new Timing screen. Needs app 1.8.",
-        "published": "2026-10-05"
+        "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
+        "published": "2026-10-29"
       },
       "boards": {
         "2": {

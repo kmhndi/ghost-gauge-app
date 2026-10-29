@@ -68,15 +68,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.54",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.54-b2.bin",
-            "bytes": 1465912,
-            "sha256": "4674dd0f43cf140936bc3738b4acf3ce59cd57b57ba6d625cdf9f8c47e5895d5",
+            "version": "1.0.55",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.55-b2.bin",
+            "bytes": 1465928,
+            "sha256": "631a13e06dda60b41173b8fd39fbcbee64ebfc699b3f79aaa787b0e37e2744de",
             "minApp": "1.11",
             "hw": 2,
             "product": "gauge",
-            "notes": "Launches: one standing start times every mark the owner picked, Dragy-style.",
-            "published": "2026-10-23"
+            "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
+            "published": "2026-10-29"
           }
         }
       }

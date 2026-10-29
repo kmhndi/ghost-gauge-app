@@ -38,15 +38,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.51",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.51-b2.bin",
-            "bytes": 1114424,
-            "sha256": "57bf345392c9aa72e3254b162a7d6ed0861adaae58d59ca1382f89f6c8f2ebc1",
+            "version": "1.0.55",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.55-b2.bin",
+            "bytes": 1116168,
+            "sha256": "c97269719f0a982c7cbce0d7f570a459e5bc331126dc637eac5f82ff7026d298",
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "The Ghost Gauge Nano on its own Nano rev A board.",
-            "published": "2026-10-19"
+            "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
+            "published": "2026-10-29"
           }
         }
       }

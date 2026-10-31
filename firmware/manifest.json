@@ -47,6 +47,17 @@
             "product": "nano",
             "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
             "published": "2026-10-29"
+          },
+          "beta": {
+            "version": "1.0.56",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.56-b2.bin",
+            "bytes": 1123176,
+            "sha256": "3f47cf688fe6c07dbb37ee30fcf930ede6c3081e9928337f72a6cb559fc7692b",
+            "minApp": "1.11",
+            "hw": 2,
+            "product": "nano",
+            "notes": "The Ghost Gauge Nano's own board sleeps when the vehicle is off, as the board was drawn for.",
+            "published": "2026-10-31"
           }
         }
       }

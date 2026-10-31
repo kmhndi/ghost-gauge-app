@@ -49,14 +49,14 @@
             "published": "2026-10-29"
           },
           "beta": {
-            "version": "1.0.56",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.56-b2.bin",
-            "bytes": 1123176,
-            "sha256": "3f47cf688fe6c07dbb37ee30fcf930ede6c3081e9928337f72a6cb559fc7692b",
+            "version": "1.0.57",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.57-b2.bin",
+            "bytes": 1123000,
+            "sha256": "09417aa09c410f8006bf4f7f3db2dcea8bbb7339320039d453b4100164505aa1",
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "The Ghost Gauge Nano's own board sleeps when the vehicle is off, as the board was drawn for.",
+            "notes": "The Nano rev A sleeps 30 seconds after the bus goes quiet, not five minutes.",
             "published": "2026-10-31"
           }
         }

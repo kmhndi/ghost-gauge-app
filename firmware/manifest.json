@@ -56,8 +56,8 @@
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "",
-            "published": "2026-10-31"
+            "notes": "The Nano sleeps when the vehicle is off, so it doesn't drain the battery, and updates over WiFi work.",
+            "published": "2026-11-01"
           }
         }
       }

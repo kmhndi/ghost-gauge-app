@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Leaderboard</title>
+<meta name="description" content="The fastest Can-Ams, every time verified by a Ghost Gauge.">
+<link rel="stylesheet" href="../_style.css">
+<style>
+  /* the board needs more room than the text pages */
+  main { max-width: 980px; }
+  .hero { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 22px; }
+  .eyebrow { color: var(--dim); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+  .hero h1 { font-size: 30px; line-height: 1.2; margin: 0; }
+  .hero p { color: var(--dim); margin: 6px 0 0; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .tab { font: inherit; font-size: 13px; letter-spacing: .08em; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+         background: var(--panel); color: var(--dim); border: 1px solid var(--line); }
+  .tab[aria-pressed="true"] { background: var(--ink); color: #000; border-color: var(--ink); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  select { font: inherit; font-size: 14px; color: var(--ink); background: var(--panel); border: 1px solid var(--line);
+           border-radius: 8px; padding: 7px 10px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; align-items: start; }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+  .board { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-size: 11px; letter-spacing: .12em; color: var(--dim); font-weight: 500; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 15px; vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  td.rank { width: 44px; color: var(--dim); }
+  tr.top td.rank { color: var(--gold); font-weight: 600; }
+  td.time { text-align: right; font-weight: 600; font-size: 17px; white-space: nowrap; }
+  th.time { text-align: right; }
+  .who { display: flex; align-items: center; gap: 10px; }
+  .badge { width: 30px; height: 30px; border-radius: 50%; background: #1B1E23; border: 1px solid var(--line); flex: none;
+           display: grid; place-items: center; font-size: 11px; letter-spacing: .04em; color: var(--dim); }
+  .name { font-weight: 600; }
+  .sub { color: var(--dim); font-size: 13px; }
+  .hide-sm { }
+  @media (max-width: 560px) { .hide-sm { display: none; } td, th { padding: 10px; } }
+  .side .card { margin: 0 0 14px; }
+  .side h3 { font-size: 11px; letter-spacing: .14em; color: var(--dim); font-weight: 500; margin: 0 0 8px; text-transform: uppercase; }
+  .count { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 2px 0 6px; }
+  .cls { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .cls:first-of-type { border-top: 0; }
+  .cls b { font-size: 12px; letter-spacing: .1em; }
+  .cls .t { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .empty { padding: 36px 16px; text-align: center; color: var(--dim); }
+  .note { color: var(--dim); font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<main>
+<nav>
+  <a href="../index.html">GHOST GAUGE</a>
+  <a href="../support.html">SUPPORT</a>
+  <a href="../privacy.html">PRIVACY</a>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow" id="eyebrow">Every Can-Am</div>
+    <h1>The fastest Can-Ams, timed by the gauge</h1>
+    <p>Every time verified by a Ghost Gauge.</p>
+  </div>
+</section>
+
+<div class="tabs" id="tabs" role="group" aria-label="Run"></div>
+<div class="filters">
+  <select id="model" aria-label="Model"></select>
+  <select id="class" aria-label="Class">
+    <option value="stock">Stock</option><option value="bolt_on">Bolt-on</option>
+    <option value="tuned">Tuned</option><option value="big_turbo">Big turbo</option>
+  </select>
+  <select id="scope" aria-label="Where">
+    <option value="">The world</option>
+    <option value="QA">Qatar</option><option value="SA">Saudi Arabia</option><option value="AE">UAE</option>
+    <option value="KW">Kuwait</option><option value="BH">Bahrain</option><option value="OM">Oman</option>
+  </select>
+</div>
+
+<div class="layout">
+  <div class="board">
+    <table>
+      <thead><tr><th>#</th><th>DRIVER</th><th class="hide-sm">VEHICLE</th><th class="time" id="timeHead">TIME</th><th class="hide-sm">WHEN</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+  <aside class="side">
+    <div class="card" id="shootout" hidden>
+      <h3 id="soTitle">Shootout</h3>
+      <div class="count" id="soLeft"></div>
+      <div class="sub" id="soText"></div>
+    </div>
+    <div class="card">
+      <h3 id="byTitle">Fastest by class</h3>
+      <div id="byClass"></div>
+    </div>
+  </aside>
+</div>
+<p class="note">Times are each driver's best, timed from the gauge's own 25 Hz GPS and timed again by the
+server. 0–100 km/h without rollout; 60 ft, 100 m, ⅛ and ¼ mile with the 1 ft rollout.</p>
+
+<footer>
+  Ghost Gauge is an independent project and is not affiliated with, endorsed by or connected to
+  BRP, Can-Am or Apple.
+</footer>
+</main>
+<script>
+// The leaderboard API (the repo kmhndi/ghost-leaderboard, API.md). A stand-in domain until
+// the real one: change it here when it moves.
+const API = "https://api.alenah.qa";
+
+const MARKS = [["0-100", "0–100 KM/H"], ["60ft", "60 FT"], ["100m", "100 M"], ["eighth", "⅛ MILE"], ["quarter", "¼ MILE"]];
+const CLASSES = [["big_turbo", "BIG TURBO"], ["tuned", "TUNED"], ["bolt_on", "BOLT-ON"], ["stock", "STOCK"]];
+const COUNTRY = { QA: "Qatar", SA: "Saudi Arabia", AE: "UAE", KW: "Kuwait", BH: "Bahrain", OM: "Oman" };
+const MODELS_FALLBACK = [{ id: "x3", name: "Maverick X3" }, { id: "maverick_r", name: "Maverick R" }];
+const $ = id => document.getElementById(id);
+const state = { mark: "0-100", model: "x3", cls: "stock", country: "" };
+let models = MODELS_FALLBACK;
+
+// keep the choice in the address, so a board can be linked to
+const q = new URLSearchParams(location.search);
+for (const k of Object.keys(state)) if (q.get(k)) state[k] = q.get(k);
+
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const secs = ms => (ms / 1000).toFixed(2);
+const modelName = id => (models.find(m => m.id === id) || { name: id }).name;
+const markName = slug => (MARKS.find(m => m[0] === slug) || [slug, slug])[1];
+function ago(iso) {
+  const d = (Date.now() - new Date(iso)) / 86400000;
+  if (d < 1) return "Today"; if (d < 2) return "Yesterday"; if (d < 7) return Math.floor(d) + " days ago";
+  if (d < 14) return "Last week"; if (d < 60) return Math.floor(d / 7) + " weeks ago";
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+}
+async function get(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+function drawTabs() {
+  $("tabs").replaceChildren(...MARKS.map(([slug, label]) => {
+    const b = el("button", "tab", label);
+    b.setAttribute("aria-pressed", String(slug === state.mark));
+    b.onclick = () => { state.mark = slug; update(); };
+    return b;
+  }));
+}
+
+function boardPath(mark, cls, limit) {
+  const p = new URLSearchParams({ model: state.model, class: cls, limit: String(limit) });
+  if (state.country) { p.set("scope", "country"); p.set("country", state.country); }
+  return "/v1/boards/" + mark + "?" + p;
+}
+
+async function drawBoard() {
+  $("timeHead").textContent = markName(state.mark);
+  const rows = $("rows");
+  try {
+    const b = await get(boardPath(state.mark, state.cls, 50));
+    if (!b.rows.length) {
+      rows.replaceChildren(empty("No verified runs here yet."));
+      return;
+    }
+    rows.replaceChildren(...b.rows.map(r => {
+      const tr = el("tr", r.rank <= 3 ? "top" : "");
+      tr.append(el("td", "rank", String(r.rank)));
+      const who = el("div", "who");
+      who.append(el("span", "badge", r.driver_name.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase()));
+      const nm = el("div"); nm.append(el("div", "name", r.driver_name), el("div", "sub", COUNTRY[r.country] || r.country));
+      who.append(nm);
+      const td = el("td"); td.append(who); tr.append(td);
+      tr.append(el("td", "hide-sm", [r.year, modelName(state.model), r.trim].filter(Boolean).join(" ")));
+      tr.append(el("td", "time", secs(r.ms)));
+      tr.append(el("td", "hide-sm sub", ago(r.timed_at)));
+      return tr;
+    }));
+  } catch (e) {
+    rows.replaceChildren(empty("The leaderboard isn't answering right now."));
+  }
+}
+function empty(text) { const tr = el("tr"); const td = el("td", "empty", text); td.colSpan = 5; tr.append(td); return tr; }
+
+async function drawByClass() {
+  $("byTitle").textContent = "Fastest by class · " + markName(state.mark);
+  const out = await Promise.all(CLASSES.map(async ([cls, label]) => {
+    let top = null;
+    try { top = (await get(boardPath(state.mark, cls, 1))).rows[0]; } catch (e) {}
+    const row = el("div", "cls");
+    const left = el("div"); left.append(el("b", null, label));
+    left.append(el("div", "sub", top ? top.driver_name + " · " + (COUNTRY[top.country] || top.country) : "—"));
+    row.append(left, el("div", "t", top ? secs(top.ms) : ""));
+    return row;
+  }));
+  $("byClass").replaceChildren(...out);
+}
+
+async function drawShootout() {
+  try {
+    const s = await get("/v1/events/current");
+    if (!s.event) return;
+    const ev = s.event;
+    const month = new Date(ev.starts_at).toLocaleDateString("en", { month: "long", timeZone: "Asia/Qatar" });
+    const slug = { "1/8": "eighth", "1/4": "quarter" }[ev.mark] || ev.mark;
+    $("soTitle").textContent = month + " shootout · " + markName(slug);
+    const left = new Date(ev.ends_at) - Date.now();
+    if (ev.closed_at || left <= 0) {
+      $("soLeft").textContent = "Finished";
+    } else {
+      const d = Math.floor(left / 86400000), h = Math.floor(left % 86400000 / 3600000);
+      $("soLeft").textContent = d + " D " + h + " H";
+    }
+    const lead = (s.crews || [])[0];
+    $("soText").textContent = "Best verified time of the month, placed in each class." +
+      (ev.prize ? " Winners get " + ev.prize + "." : "") + (lead ? " Leading crew: " + lead.name + "." : "");
+    $("shootout").hidden = false;
+    $("eyebrow").textContent = "Every Can-Am · " + month + " " + new Date(ev.starts_at).getFullYear();
+  } catch (e) {}
+}
+
+function update() {
+  history.replaceState(null, "", "?" + new URLSearchParams(state));
+  drawTabs(); drawBoard(); drawByClass();
+}
+
+for (const [id, key] of [["model", "model"], ["class", "cls"], ["scope", "country"]]) {
+  $(id).onchange = () => { state[key] = $(id).value; update(); };
+}
+(async () => {
+  try { models = (await get("/v1/models")).models; } catch (e) {}
+  $("model").replaceChildren(...models.map(m => { const o = el("option", null, m.name); o.value = m.id; return o; }));
+  $("model").value = state.model; $("class").value = state.cls; $("scope").value = state.country;
+  update(); drawShootout();
+})();
+</script>
+</body>
+</html>

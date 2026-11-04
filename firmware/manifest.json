@@ -25,15 +25,15 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.55",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.55.bin",
-        "bytes": 1153160,
-        "sha256": "3c2885d617b13ff6b1a19e9412ddc9d599c07dcf372cb31437a5e9d30fb0e27a",
+        "version": "1.0.65",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.65.bin",
+        "bytes": 1165016,
+        "sha256": "38f85b5d8114d1bf0659455f7d1d2825b78e78b7fe829c6c624ec64bd1d438e8",
         "minApp": "1.6",
         "hw": 1,
         "product": "nano",
-        "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
-        "published": "2026-10-29"
+        "notes": "The Nano tells the app which Can-Am it's reading.",
+        "published": "2026-11-04"
       },
       "boards": {
         "2": {

@@ -38,15 +38,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.62",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.62-b2.bin",
-            "bytes": 1126584,
-            "sha256": "f36459b63b3c6c29f32d03869700aa2f041e59ef6e33949170e315f5265abf5f",
+            "version": "1.0.65",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.65-b2.bin",
+            "bytes": 1126952,
+            "sha256": "cf70e0104d02c7a7fa96ed6e53f14869a9e1e7712783da17d9ec40722f2da2f1",
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "The Nano sleeps when the vehicle is off, so it doesn't drain the battery, and updates over WiFi work.",
-            "published": "2026-11-01"
+            "notes": "The Nano tells the app which Can-Am it's reading.",
+            "published": "2026-11-04"
           },
           "beta": {
             "version": "1.0.62",

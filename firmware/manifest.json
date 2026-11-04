@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.55",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.55.bin",
-    "bytes": 1553928,
-    "sha256": "d5b6f367e090a100a1b7b0dab92ef238e4fee66e9b5651aee5622b22406e8e31",
+    "version": "1.0.65",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.65.bin",
+    "bytes": 1565080,
+    "sha256": "e2db76c66535c40c2eaa62f43b87b4bd32cb1893cadb6f0e91daafb56b476793",
     "minApp": "1.6",
     "hw": 1,
     "product": "gauge",
-    "notes": "Ghost Gauges only ever go on Can-Am vehicles, so nothing says \"car\" any more, and the Standard says its edition.",
-    "published": "2026-10-29"
+    "notes": "The gauge signs each GPS run for the leaderboard, and tells the app which Can-Am it's reading.",
+    "published": "2026-11-04"
   },
   "beta": {
     "version": "1.0.48",

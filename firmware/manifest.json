@@ -38,15 +38,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.65",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.65-b2.bin",
-            "bytes": 1126952,
-            "sha256": "cf70e0104d02c7a7fa96ed6e53f14869a9e1e7712783da17d9ec40722f2da2f1",
+            "version": "1.0.66",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.66-b2.bin",
+            "bytes": 1127656,
+            "sha256": "84f58011f08320d52547286a47ea7cb25b1955fbef972bd2cf1e4b2e87de4d54",
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "The Nano tells the app which Can-Am it's reading.",
-            "published": "2026-11-04"
+            "notes": "",
+            "published": "2026-11-05"
           },
           "beta": {
             "version": "1.0.62",

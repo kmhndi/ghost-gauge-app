@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.66",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.66.bin",
-    "bytes": 1566792,
-    "sha256": "dd3e3ba40ad93f098e0579b4ea3670780e73fc32de13f9788df995b8194f5667",
+    "version": "1.0.67",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.67.bin",
+    "bytes": 1566824,
+    "sha256": "b775fdf452710b9cdd3294370f94555fa6aae6856915c8f42e2993083154da72",
     "minApp": "1.6",
     "hw": 1,
     "product": "gauge",

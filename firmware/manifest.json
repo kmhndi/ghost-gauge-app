@@ -25,10 +25,10 @@
   "products": {
     "nano": {
       "stable": {
-        "version": "1.0.66",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.66.bin",
-        "bytes": 1165768,
-        "sha256": "c65695b5016340957ac7e3e124bba12f5820d6878ba7769e7d4c618c3c366766",
+        "version": "1.0.67",
+        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.67.bin",
+        "bytes": 1165896,
+        "sha256": "f0af94696b5f721050e704f53afd00db2df5b2c82927026ee2e1450b1b02c40e",
         "minApp": "1.6",
         "hw": 1,
         "product": "nano",

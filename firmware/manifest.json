@@ -79,10 +79,10 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.66",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.66-b2.bin",
-            "bytes": 1475944,
-            "sha256": "359013d6dc6c757a1636051377dd8481fdbe3f3438cf0536a64d1164134c9bd2",
+            "version": "1.0.67",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.67-b2.bin",
+            "bytes": 1475976,
+            "sha256": "0b0ab05819c6dcd47e2fd05edbf156416503657f5bb56d499cee839c9c3c8530",
             "minApp": "1.11",
             "hw": 2,
             "product": "gauge",

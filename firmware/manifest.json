@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "stable": {
-    "version": "1.0.65",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.65.bin",
-    "bytes": 1565080,
-    "sha256": "e2db76c66535c40c2eaa62f43b87b4bd32cb1893cadb6f0e91daafb56b476793",
+    "version": "1.0.66",
+    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.66.bin",
+    "bytes": 1566792,
+    "sha256": "dd3e3ba40ad93f098e0579b4ea3670780e73fc32de13f9788df995b8194f5667",
     "minApp": "1.6",
     "hw": 1,
     "product": "gauge",
-    "notes": "The gauge signs each GPS run for the leaderboard, and tells the app which Can-Am it's reading.",
-    "published": "2026-11-04"
+    "notes": "",
+    "published": "2026-11-05"
   },
   "beta": {
     "version": "1.0.48",

@@ -108,6 +108,33 @@ ol.timeline .what b { font-weight: 600; }
 .toast.bad { border-color: var(--bad); }
 @media (max-width: 560px) { ol.timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .tile b { font-size: 24px; } }
 
+/* the team: what someone may not do isn't offered (the database refuses it anyway) */
+#view.ro :is(#uSave, #uNoteAdd, #uNote, #gSave, #bNew, #iSave, #iDelete, #sAdd, [data-sdel], #inAdd, #cnAdd, [data-ndel], [data-panel],
+  #pDel, #pArchBtn, #pUseAdd, [data-unuse], #pSave, #oSave, #mSave, #tSave, #sSave, #sDec, #sInc, #cSave, #aSave, #buHold, [data-release],
+  #buNew, #nbSave, [data-ocancel], [data-cancel], #rNew, a[href^="#receive"], .ro-hide) { display: none !important; }
+#view.ro #pPhoto { pointer-events: none; }
+#view.ro .card { cursor: pointer; }
+body.nocosts .cost { display: none !important; }
+.rotag { display: inline-block; font: 700 10px/1 var(--readout); letter-spacing: 1.5px; color: var(--cool); border: 1px solid currentColor; border-radius: 6px; padding: 4px 7px; vertical-align: middle; margin-inline-start: 8px; }
+.team { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .team { grid-template-columns: 280px minmax(0, 1fr); } }
+.people { display: grid; gap: 4px; align-content: start; }
+.people a { display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; color: inherit; text-decoration: none; border: 1px solid transparent; }
+.people a:hover { background: var(--panel2); }
+.people a[aria-current="true"] { background: var(--panel2); border-color: var(--line2); }
+.people a span { color: var(--dim); font-size: 12px; overflow-wrap: anywhere; }
+.people a.off b { color: var(--dim); }
+.prow2 { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.prow2 > span { display: grid; gap: 2px; }
+.prow2 small { color: var(--dim); font-size: 12px; }
+.sw { position: relative; width: 40px; height: 22px; flex: none; }
+.sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.sw i { position: absolute; inset: 0; border-radius: 11px; background: var(--line2); pointer-events: none; transition: background .15s; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); transition: left .15s; }
+.sw input:checked + i { background: var(--gold); }
+.sw input:checked + i::after { left: 21px; background: #111; }
+.sw input:focus-visible + i { outline: 2px solid var(--cool); outline-offset: 2px; }
+
 /* the board: workstreams by stage, their steps as rev blocks */
 .kanban { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(210px, 1fr)); overflow-x: auto; align-items: start; padding-bottom: 4px; }
 @media (max-width: 900px) { .kanban { grid-template-columns: minmax(0, 1fr); } }
@@ -366,7 +393,7 @@ main.inv { max-width: 1432px; gap: 18px; color: #fff; font: 14px/1.4 -apple-syst
       <div class="who"><span id="whoEmail"></span><button class="btn sm" id="reload" type="button">Refresh</button><button class="btn sm" id="signOut" type="button">Sign out</button></div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#inventory">Inventory</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
+      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#inventory">Inventory</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a><a href="#team" hidden>Team</a>
     </nav>
   </header>
   <main id="view"></main>
@@ -439,10 +466,31 @@ async function show(session) {
   if (!email) { gateStep(false); return; }
   $('#whoEmail').textContent = email;
   me = email.toLowerCase();
-  const { data:admin } = await sb.rpc('is_admin');
-  if (!admin) { $('#view').innerHTML = '<p class="panel">This address isn’t one of Ghost Electronics’ admins.</p>'; return; }
+  const { data:access } = await sb.rpc('my_access');
+  setAccess(access);
+  if (!access) { $('#view').innerHTML = '<p class="panel">This address isn’t on Ghost Electronics’ team, or it has been switched off. Ask the owner.</p>'; return; }
   $('#view').innerHTML = '<p class="dim">Loading…</p>';
   await load(); render();
+}
+
+// ---------- the team: what the signed-in person may see and do (my_access(), migrations/20261109220000_team.sql) ----------
+// Only for showing the right things: the database checks every read and write itself.
+const AREAS = [['board', 'Board and calendar'], ['inventory', 'Inventory'], ['units', 'Units'], ['garages', 'Garages'], ['credits', 'Credits and payments'], ['pros', 'Pros'], ['licences', 'Licences']];
+const ACTS = [['costs', 'See what parts cost', 'Prices on parts and orders in the inventory'], ['grant', 'Give or take credits', 'On a garage’s page'],
+  ['prices', 'Change prices', 'The credit packs Studio sells'], ['cancel', 'Cancel a Pro serial', 'A wrong serial, within 7 days'], ['licence', 'Answer and revoke licences', 'Issue, refuse, revoke and restore']];
+const PAGE_AREA = { units:'units', unit:'units', garages:'garages', garage:'garages', credits:'credits', pros:'pros', licences:'licences',
+  board:'board', item:'board', calendar:'board', inventory:'inventory', part:'inventory', receive:'inventory', scan:'inventory', bin:'inventory', assemble:'inventory', team:'team' };
+const TAB_AREA = { board:'board', calendar:'board', inventory:'inventory', units:'units', garages:'garages', credits:'credits', pros:'pros', licences:'licences', team:'team' };
+let ACCESS = null;
+const isOwner = () => !!ACCESS?.owner;
+const level = a => (isOwner() ? 'edit' : a === 'team' ? '' : ACCESS?.perms?.[a] || '');
+const canSee = a => !!level(a);
+const canEdit = a => level(a) === 'edit';
+const allowed = k => isOwner() || ACCESS?.perms?.[k] === true;
+function setAccess(a) {
+  ACCESS = a || null;
+  document.querySelectorAll('nav.tabs a').forEach(t => { const area = TAB_AREA[t.getAttribute('href').slice(1)]; t.hidden = !!area && !canSee(area); });
+  document.body.classList.toggle('nocosts', !allowed('costs'));
 }
 
 // ---------- the data: small enough to fetch whole ----------
@@ -450,25 +498,29 @@ let D = null;
 async function q(p) { const { data, error } = await p; if (error) throw error; return data; }
 async function load() {
   try {
-    const [units, history, garages, licences, ledger, pros, prices, payments, counters, requests] = await Promise.all([
-      q(sb.from('units_full').select('*').order('allocated_at', { ascending:false })),
-      q(sb.from('unit_history').select('*').order('at', { ascending:false }).limit(5000)),
-      q(sb.from('garages_summary').select('*').order('name')),
-      q(sb.from('licences_status').select('*').order('issued', { ascending:false, nullsFirst:false })),
-      q(sb.from('ledger').select('*').order('id', { ascending:false }).limit(2000)),
-      q(sb.from('pros').select('*').order('created_at', { ascending:false })),
-      q(sb.from('prices').select('*').order('sort')),
-      q(sb.from('payments').select('*').order('created_at', { ascending:false }).limit(500)),
-      q(sb.from('counters').select('*')),
-      q(sb.from('licence_requests').select('*').order('created_at', { ascending:false }).limit(300)),
+    // only the sections this person may see: the rest would come back empty anyway
+    const S = (area, p) => (canSee(area) ? q(p) : Promise.resolve([]));
+    const [units, history, garages, licences, ledger, pros, prices, payments, counters, requests, names] = await Promise.all([
+      S('units', sb.from('units_full').select('*').order('allocated_at', { ascending:false })),
+      S('units', sb.from('unit_history').select('*').order('at', { ascending:false }).limit(5000)),
+      S('garages', sb.from('garages_summary').select('*').order('name')),
+      S('licences', sb.from('licences_status').select('*').order('issued', { ascending:false, nullsFirst:false })),
+      S('credits', sb.from('ledger').select('*').order('id', { ascending:false }).limit(2000)),
+      S('pros', sb.from('pros').select('*').order('created_at', { ascending:false })),
+      S('credits', sb.from('prices').select('*').order('sort')),
+      S('credits', sb.from('payments').select('*').order('created_at', { ascending:false }).limit(500)),
+      S('units', sb.from('counters').select('*')),
+      S('licences', sb.from('licence_requests').select('*').order('created_at', { ascending:false }).limit(300)),
+      q(sb.rpc('team_garage_names')),
     ]);
-    D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests });
-    [D.board, D.inv] = await Promise.all([loadBoard(), loadInv()]);
+    D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests, names });
+    [D.board, D.inv, D.team] = await Promise.all([canSee('board') ? loadBoard() : null, canSee('inventory') ? loadInv() : null, isOwner() ? loadTeam() : null]);
   } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
 }
 
 function prep(r) {
-  return { ...r, board:r.board || null, inv:r.inv ? invPrep(r.inv) : null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
+  return { ...r, board:r.board || null, inv:r.inv ? invPrep(r.inv) : null, team:r.team || null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])),
+    gname:{ ...(r.names || {}), ...Object.fromEntries(r.garages.map(g => [g.gid, g.name])) } };
 }
 
 // ---------- the views, by the address's #part ----------
@@ -481,10 +533,19 @@ function render() {
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage, assemble };
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage, assemble, team };
   const inv = ['inventory', 'part', 'receive', 'scan', 'bin', 'assemble'].includes(page);
   document.body.classList.toggle('invpage', inv); v.classList.toggle('inv', inv);
-  v.innerHTML = (views[page] || overview)(arg);
+  const area = PAGE_AREA[page], ro = !!area && !canEdit(area);
+  v.classList.toggle('ro', ro);
+  v.innerHTML = area && !canSee(area) ? `<p class="panel">This part of the page isn’t open to you. Ask the owner if you need it. <a href="#overview">Overview</a></p>`
+    : ro && ['receive', 'assemble'].includes(page) ? `<p class="panel">You can look at the inventory but not change it. <a href="#inventory">Back to the inventory</a></p>`
+    : (views[page] || overview)(arg);
+  if (ro) {                                    // view only: the fields that would save show what's there, nothing more
+    v.querySelectorAll('.form input, .form select, .form textarea, [data-licnote], [data-stepstate], [data-sf], [data-nf], [data-cnt], [data-tick], [data-setstage]').forEach(el => { el.disabled = true; });
+    v.querySelectorAll('[draggable]').forEach(el => { el.draggable = false; });
+    const h = v.querySelector('h1'); if (h) h.insertAdjacentHTML('beforeend', '<span class="rotag">VIEW ONLY</span>');
+  }
   // on a phone a table's cells stack with their column's name above them (CSS table.stack)
   v.querySelectorAll('table.stack').forEach(t => { const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
     t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, k) => { if (k && heads[k] && td.colSpan === 1) td.dataset.l = heads[k]; })); });
@@ -503,13 +564,13 @@ function overview() {
   ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 25);
   return `<h1>Overview</h1>
   <div class="tiles">
-    <a class="tile" href="#units" style="text-decoration:none;color:inherit"><span>Units made</span><b>${u.length}</b><i>${by('gauge')} Gauge · ${by('pro')} Pro · ${by('nano')} Nano</i></a>
-    <div class="tile"><span>Passed / failed</span><b>${pass} <span class="dim" style="font-size:18px">/ ${fail}</span></b><i>their last test</i></div>
-    <a class="tile" href="#garages" style="text-decoration:none;color:inherit"><span>Garages</span><b>${D.garages.length}</b><i>${D.licences.filter(l => l.status === 'active' || l.status === 'runs out soon').length} licences in date</i></a>
-    <a class="tile" href="#pros" style="text-decoration:none;color:inherit"><span>Pros set up</span><b>${prosUp}</b><i>${D.pros.filter(p => !p.cancelled_at && !p.used_at).length} not sent to yet</i></a>
-    <a class="tile" href="#credits" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>
-    <a class="tile" href="#licences" style="text-decoration:none;color:inherit"><span>Licence requests</span><b>${D.requests.filter(r => r.status === 'pending').length}</b><i>waiting for you</i></a>
-    <div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>
+    ${canSee('units') ? `<a class="tile" href="#units" style="text-decoration:none;color:inherit"><span>Units made</span><b>${u.length}</b><i>${by('gauge')} Gauge · ${by('pro')} Pro · ${by('nano')} Nano</i></a>
+    <div class="tile"><span>Passed / failed</span><b>${pass} <span class="dim" style="font-size:18px">/ ${fail}</span></b><i>their last test</i></div>` : ''}
+    ${canSee('garages') ? `<a class="tile" href="#garages" style="text-decoration:none;color:inherit"><span>Garages</span><b>${D.garages.length}</b><i>${canSee('licences') ? `${D.licences.filter(l => l.status === 'active' || l.status === 'runs out soon').length} licences in date` : 'with a licence'}</i></a>` : ''}
+    ${canSee('pros') ? `<a class="tile" href="#pros" style="text-decoration:none;color:inherit"><span>Pros set up</span><b>${prosUp}</b><i>${D.pros.filter(p => !p.cancelled_at && !p.used_at).length} not sent to yet</i></a>` : ''}
+    ${canSee('garages') ? `<a class="tile" href="#${canSee('credits') ? 'credits' : 'garages'}" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>` : ''}
+    ${canSee('licences') ? `<a class="tile" href="#licences" style="text-decoration:none;color:inherit"><span>Licence requests</span><b>${D.requests.filter(r => r.status === 'pending').length}</b><i>waiting for you</i></a>` : ''}
+    ${canSee('units') ? `<div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>` : ''}
     ${D.inv ? `<a class="tile" href="#inventory/low" style="text-decoration:none;color:inherit"><span>Parts below their minimum</span><b style="${D.inv.items.some(i => !i.archived && !isTool(i) && lvl(i) === 'crit') ? 'color:var(--bad)' : ''}">${D.inv.items.filter(i => !i.archived && !isTool(i) && lvl(i) === 'crit').length}</b><i>of ${D.inv.items.filter(i => !i.archived).length} in the inventory</i></a>` : ''}
     ${D.board ? `<a class="tile" href="#board/todo" style="text-decoration:none;color:inherit"><span>Board steps that need you</span><b style="color:var(--gold)">${D.board.steps.filter(s => s.state !== 'Done' && s.needs_you).length}</b><i>${D.board.items.filter(i => i.stage !== 'Done').length} workstreams under way</i></a>` : ''}
   </div>
@@ -606,8 +667,8 @@ function garage(gid) {
       if (error) return toast(error.message, true);
       toast(sign > 0 ? 'Given' : 'Taken back'); await load(); render();
     };
-    $('#gGive').addEventListener('click', () => grant(1));
-    $('#gTake').addEventListener('click', () => grant(-1));
+    $('#gGive')?.addEventListener('click', () => grant(1));
+    $('#gTake')?.addEventListener('click', () => grant(-1));
   });
   return `<a class="back" href="#garages">‹ Garages</a><h1>${esc(g.name)}</h1>
   <div class="two">
@@ -618,14 +679,14 @@ function garage(gid) {
       <div><button class="btn gold" id="gSave" type="button">Save</button></div></div></section>
     <section class="panel"><h2>Credits</h2>
       <div class="tiles" style="grid-template-columns:1fr 1fr;margin-bottom:14px"><div class="tile"><span>Pro credits</span><b>${g.pro}</b></div><div class="tile"><span>Screen credits</span><b>${g.screen}</b></div></div>
-      <div class="form"><label>Credits<select id="gKind"><option value="pro">Pro</option><option value="screen">Screen</option></select></label>
+      ${allowed('grant') ? `<div class="form"><label>Credits<select id="gKind"><option value="pro">Pro</option><option value="screen">Screen</option></select></label>
         <label>How many<input id="gQty" type="number" min="1" max="1000" value="1"></label>
         <label class="full">Why (in the ledger)<input id="gNote" placeholder="Paid by bank transfer, 10 Pro pack"></label>
-        <div class="tools"><button class="btn gold" id="gGive" type="button">Give</button><button class="btn danger" id="gTake" type="button">Take back</button></div></div></section>
+        <div class="tools"><button class="btn gold" id="gGive" type="button">Give</button><button class="btn danger" id="gTake" type="button">Take back</button></div></div>` : ''}</section>
   </div>
-  <section class="panel"><h2>Licences</h2>${lic.length ? licenceTable(lic, false) : '<p class="empty">None.</p>'}</section>
-  <section class="panel"><h2>Pros</h2>${pros.length ? proTable(pros, false) : '<p class="empty">None set up yet.</p>'}</section>
-  <section class="panel"><h2>Credit history</h2>${led.length ? ledgerTable(led, false) : '<p class="empty">No changes yet.</p>'}</section>`;
+  ${canSee('licences') ? `<section class="panel"><h2>Licences</h2>${lic.length ? licenceTable(lic, false) : '<p class="empty">None.</p>'}</section>` : ''}
+  ${canSee('pros') ? `<section class="panel"><h2>Pros</h2>${pros.length ? proTable(pros, false) : '<p class="empty">None set up yet.</p>'}</section>` : ''}
+  ${canSee('credits') ? `<section class="panel"><h2>Credit history</h2>${led.length ? ledgerTable(led, false) : '<p class="empty">No changes yet.</p>'}</section>` : ''}`;
 }
 
 function ledgerTable(rows, withGarage) {
@@ -646,8 +707,8 @@ function credits() {
   return `<h1>Credits</h1>
   <section class="panel"><h2>Packs and prices</h2><div class="tablewrap" style="border:0"><table><thead><tr><th>Pack</th><th>Price (QAR)</th><th></th></tr></thead><tbody>
   ${D.prices.map(p => `<tr><td>${p.qty} ${p.kind === 'pro' ? 'Pro' : 'screen'} credit${p.qty === 1 ? '' : 's'}</td>
-    <td><input id="price-${esc(p.sku)}" type="number" min="0" step="0.01" value="${p.amount_minor == null ? '' : (p.amount_minor / 100).toFixed(2)}" placeholder="not set" style="width:130px"></td>
-    <td><button class="btn sm" type="button" data-price="${esc(p.sku)}">Save</button></td></tr>`).join('')}
+    <td>${allowed('prices') ? `<input id="price-${esc(p.sku)}" type="number" min="0" step="0.01" value="${p.amount_minor == null ? '' : (p.amount_minor / 100).toFixed(2)}" placeholder="not set" style="width:130px">` : esc(p.amount_minor == null ? 'not set' : (p.amount_minor / 100).toFixed(2))}</td>
+    <td>${allowed('prices') ? `<button class="btn sm" type="button" data-price="${esc(p.sku)}">Save</button>` : ''}</td></tr>`).join('')}
   </tbody></table></div><p class="msg">Studio’s Buy credits shows these. Payments are in test mode until a card provider is chosen.</p></section>
   <section class="panel"><h2>Every change</h2>${D.ledger.length ? ledgerTable(D.ledger, true) : '<p class="empty">No credits have moved yet.</p>'}</section>
   <section class="panel"><h2>Payments</h2>${D.payments.length ? `<div class="tablewrap"><table><thead><tr><th>When</th><th>Garage</th><th>Buys</th><th>Amount</th><th>How</th><th>Status</th></tr></thead><tbody>
@@ -657,7 +718,7 @@ function credits() {
 }
 
 function proTable(rows, withGarage) {
-  const canCancel = p => !p.cancelled_at && !p.used_at && !p.demo && Date.now() - new Date(p.created_at) < 7 * 864e5;
+  const canCancel = p => allowed('cancel') && !p.cancelled_at && !p.used_at && !p.demo && Date.now() - new Date(p.created_at) < 7 * 864e5;
   setTimeout(() => document.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', async () => {
     const s = b.dataset.cancel;
     if (!confirm(`Cancel ${s}? Its garage gets its credits back and the serial is free to set up again.`)) return;
@@ -702,8 +763,8 @@ function licenceTable(rows, withGarage) {
   return `<div class="tablewrap"><table><thead><tr><th>Licence</th>${withGarage ? '<th>Garage</th>' : ''}<th>Laptop</th><th>Computer</th><th>Issued</th><th>Expires</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>
   ${rows.map(l => `<tr><td class="mono">${esc(l.id)}</td>${withGarage ? `<td><a href="#garage/${esc(l.gid)}">${esc(D.gname[l.gid])}</a></td>` : ''}<td class="mono dim">${esc(l.code)}</td><td>${esc(l.host)}</td>
     <td>${day(l.issued)}</td><td>${day(l.expires)}</td><td>${l.status ? `<span class="badge ${cls(l.status)}">${esc(l.status.toUpperCase())}</span>` : ''}</td>
-    <td><input data-licnote="${esc(l.id)}" value="${esc(l.notes)}" placeholder="—" aria-label="Notes for ${esc(l.id)}" style="width:180px;padding:5px 8px"></td>
-    <td>${l.revoked_at ? `<span class="dim" style="font-size:12px">${esc(l.revoked_reason || '')}</span> <button class="btn sm" type="button" data-restore="${esc(l.id)}">Restore</button>` : `<button class="btn sm danger" type="button" data-revoke="${esc(l.id)}">Revoke</button>`}</td></tr>`).join('')}
+    <td><input data-licnote="${esc(l.id)}" value="${esc(l.notes)}" placeholder="—" aria-label="Notes for ${esc(l.id)}" style="width:180px;padding:5px 8px" ${canEdit('licences') ? '' : 'disabled'}></td>
+    <td>${l.revoked_at ? `<span class="dim" style="font-size:12px">${esc(l.revoked_reason || '')}</span> ${allowed('licence') ? `<button class="btn sm" type="button" data-restore="${esc(l.id)}">Restore</button>` : ''}` : allowed('licence') ? `<button class="btn sm danger" type="button" data-revoke="${esc(l.id)}">Revoke</button>` : ''}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 // An uploaded .ghostlicence, checked here before it goes up: made with Ghost Electronics' key, for this
@@ -757,9 +818,9 @@ function licences() {
     ${waiting.length ? waiting.map(r => `<div class="req">
       <div><b>${esc(r.garage)}</b> <span class="mono">${esc(r.phone)}</span> <span class="dim">· asked ${when(r.created_at)}</span></div>
       <div class="dim" style="font-size:12.5px">Laptop <span class="mono">${esc(r.code)}</span> · ${esc(r.host || '?')} (${esc(r.platform || '?')}) · Studio ${esc(r.app || '?')}</div>
-      <div class="tools"><button class="btn sm" type="button" data-copyreq="${esc(r.id)}">Copy request</button>
+      ${allowed('licence') ? `<div class="tools"><button class="btn sm" type="button" data-copyreq="${esc(r.id)}">Copy request</button>
         <label class="btn sm gold" style="display:inline-block">Upload licence…<input type="file" accept=".ghostlicence,application/json" data-upload="${esc(r.id)}" hidden></label>
-        <button class="btn sm danger" type="button" data-refuse="${esc(r.id)}">Refuse</button></div></div>`).join('')
+        <button class="btn sm danger" type="button" data-refuse="${esc(r.id)}">Refuse</button></div>` : ''}</div>`).join('')
       : '<p class="empty">Nothing waiting. A garage asks from Ghost Studio’s first screen.</p>'}
     <p class="msg">To approve one: Copy request, run <span class="mono">node tools/studio/licence_tool.js issue</span> on the Mac (it reads the clipboard), then Upload licence with the file it makes. Studio on that laptop opens by itself.</p>
   </section>
@@ -769,6 +830,91 @@ function licences() {
     ${decided.map(r => `<tr><td>${when(r.created_at)}</td><td>${esc(r.garage)}</td><td class="mono">${esc(r.phone)}</td><td class="mono dim">${esc(r.code)}</td>
       <td><span class="badge ${r.status === 'issued' ? 'PASS' : 'FAIL'}">${esc(r.status.toUpperCase())}</span></td><td class="wrap">${r.status === 'issued' ? `<span class="mono">${esc(r.licence_id)}</span>` : esc(r.reason || '')}</td></tr>`).join('')}
   </tbody></table></div></section>` : ''}`;
+}
+
+// ---------- the team (the owner only): who is on it, what each may see and do, and everything they changed ----------
+async function loadTeam() {
+  try {
+    const [people, log] = await Promise.all([q(sb.rpc('team_list')), q(sb.from('team_log').select('*').order('at', { ascending:false }).limit(1000))]);
+    return { people, log };
+  } catch (e) { toast(`Couldn’t load the team: ${e.message}`, true); return null; }
+}
+const LOG_WHAT = { units:'unit', unit_history:'unit history', garages:'garage', ledger:'credits', prices:'price', pros:'Pro', licences:'licence',
+  licence_requests:'licence request', board_items:'workstream', board_steps:'step', board_notes:'calendar note', inv_items:'part', inv_moves:'stock',
+  inv_boms:'build list', inv_bom_lines:'build list', inv_orders:'order', inv_order_lines:'order line', inv_holds:'hold', inv_assemblies:'assembly', admins:'team member' };
+const AREA_NAME = { ...Object.fromEntries(AREAS), team:'Team' };
+let tView = { who:'' };
+function team(sel) {
+  if (!D.team) return '<p class="panel">The team didn’t load. Refresh to try again.</p>';
+  const people = D.team.people, nameOf = e => people.find(p => p.email === e)?.name || e;
+  const p = sel === 'new' ? null : people.find(x => x.email === sel) || people.find(x => !x.owner) || null;
+  const isNew = !p;
+  const perms = p?.perms || {};
+  const seg = (area, cur) => `<div class="seg" role="group" aria-label="${esc(AREA_NAME[area])}">${[['', 'Hidden'], ['view', 'View'], ['edit', 'Edit']]
+    .map(([v, t]) => `<button type="button" data-area="${area}" data-lvl="${v}" aria-pressed="${(cur || '') === v}">${t}</button>`).join('')}</div>`;
+  const sw = (id, on, label) => `<span class="sw"><input type="checkbox" ${id} ${on ? 'checked' : ''} aria-label="${esc(label)}"><i></i></span>`;
+  setTimeout(() => {
+    document.querySelectorAll('[data-area]').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll(`[data-area="${b.dataset.area}"]`).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+    $('#tmSave')?.addEventListener('click', async e => {
+      const email = isNew ? $('#tmEmail').value.trim().toLowerCase() : p.email;
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast('Type their email address', true);
+      if (isNew && people.some(x => x.email === email)) return toast('They’re on the team already', true);
+      const out = {};
+      document.querySelectorAll('[data-area][aria-pressed="true"]').forEach(b => { if (b.dataset.lvl) out[b.dataset.area] = b.dataset.lvl; });
+      document.querySelectorAll('[data-act]').forEach(c => { if (c.checked) out[c.dataset.act] = true; });
+      e.target.disabled = true;
+      const { data, error } = await sb.rpc('team_save', { p_email:email, p_name:$('#tmName').value.trim(), p_active:p?.owner ? true : $('#tmActive').checked, p_perms:out });
+      e.target.disabled = false;
+      if (error) return toast(error.message, true);
+      D.team.people = data;
+      toast(isNew ? `Added. ${email} signs in on this page with a code by email.` : 'Saved. It applies from their next click.');
+      D.team = await loadTeam() || D.team;
+      if (isNew) location.hash = `#team/${encodeURIComponent(email)}`; else render();
+    });
+    $('#tmRemove')?.addEventListener('click', async () => {
+      if (!confirm(`Take ${p.name || p.email} off the team? Their login is deleted and they can’t sign in again unless you add them back. What they changed stays, and stays in the activity list.`)) return;
+      const { data, error } = await sb.rpc('team_remove', { p_email:p.email });
+      if (error) return toast(error.message, true);
+      D.team.people = data; toast('Removed from the team');
+      D.team = await loadTeam() || D.team;
+      location.hash = '#team';
+    });
+    document.querySelectorAll('[data-tlog]').forEach(b => b.addEventListener('click', () => { tView.who = b.dataset.tlog; render(); }));
+  });
+  const editor = p?.owner
+    ? `<h2>${esc(p.name || p.email)}</h2><p class="dim" style="margin:0 0 12px">${esc(p.email)} · owner: sees and changes everything, and is the only one who manages the team. Only the name can change here.</p>
+       <div class="form"><label>Name<input id="tmName" value="${esc(p.name)}"></label><div><button class="btn gold" id="tmSave" type="button">Save</button></div></div>`
+    : `<div class="prow2" style="border-top:0;padding-top:0"><span><h2 style="margin:0">${isNew ? 'Add someone' : esc(p.name || p.email)}</h2>
+         ${isNew ? '' : `<small>${esc(p.email)} · ${p.last_in ? `last signed in ${when(p.last_in)}` : 'hasn’t signed in yet'} · added ${day(p.added)}${p.added_by ? ` by ${esc(nameOf(p.added_by))}` : ''}</small>`}</span>
+         <label style="display:flex;align-items:center;gap:10px;color:var(--ink);font-size:13px">Can sign in ${sw('id="tmActive"', isNew || p.active, 'Can sign in')}</label></div>
+       <div class="form" style="margin-top:8px"><label>Name<input id="tmName" value="${esc(p?.name || '')}" placeholder="Ahmed"></label>
+         ${isNew ? '<label>Email<input id="tmEmail" type="email" placeholder="ahmed@yourdomain.com" autocomplete="off"></label>' : ''}</div>
+       <h2 style="margin-top:20px">What they see</h2>
+       ${AREAS.map(([k, n]) => `<div class="prow2"><span>${esc(n)}</span>${seg(k, perms[k])}</div>`).join('')}
+       <h2 style="margin-top:20px">What matters most</h2>
+       ${ACTS.map(([k, n, d]) => `<div class="prow2"><span>${esc(n)}<small>${esc(d)}</small></span>${sw(`data-act="${k}"`, perms[k] === true, n)}</div>`).join('')}
+       <p class="msg" style="margin-top:12px">Hidden: the tab isn’t there and the database gives them nothing from it. View: they read it but can’t change it. Edit: they change what the section lets anyone change; the five switches are on top of that. Overview shows only what they can see.</p>
+       <div class="tools" style="margin-top:12px"><button class="btn gold" id="tmSave" type="button">${isNew ? 'Add to the team' : 'Save'}</button>${isNew ? '' : '<button class="btn danger" id="tmRemove" type="button">Remove from the team</button>'}</div>`;
+  const log = D.team.log.filter(l => !tView.who || l.who === tView.who);
+  const whoSeg = [['', 'Everyone'], ...[...new Set(D.team.log.map(l => l.who))].map(e => [e, nameOf(e)])];
+  return `<h1>Team</h1>
+  <div class="team">
+    <section class="panel people"><h2>People</h2>
+      ${people.map(x => `<a href="#team/${encodeURIComponent(x.email)}" aria-current="${x === p}" class="${x.active ? '' : 'off'}"><b>${esc(x.name || x.email)}</b>
+        <span>${x.owner ? 'Owner · everything' : !x.active ? 'Switched off' : esc(AREAS.filter(([k]) => x.perms[k]).map(([k, n]) => `${n}${x.perms[k] === 'view' ? ' (view)' : ''}`).join(', ') || 'Nothing yet')}</span></a>`).join('')}
+      <a href="#team/new" aria-current="${isNew}" style="color:var(--gold)"><b>+ Add someone</b><span>They sign in with their email</span></a>
+    </section>
+    <section class="panel">${editor}</section>
+  </div>
+  <section class="panel"><h2>Activity</h2>
+    <div class="seg" role="group" style="margin-bottom:12px;flex-wrap:wrap">${whoSeg.map(([v, n]) => `<button type="button" data-tlog="${esc(v)}" aria-pressed="${tView.who === v}">${esc(n)}</button>`).join('')}</div>
+    ${log.length ? `<div class="tablewrap"><table class="stack"><thead><tr><th>When</th><th>Who</th><th>Section</th><th>What</th><th>Change</th></tr></thead><tbody>
+      ${log.slice(0, 400).map(l => `<tr><td>${when(l.at)}</td><td>${l.who === me ? '<b>You</b>' : esc(nameOf(l.who))}</td><td>${esc(AREA_NAME[l.area] || l.area)}</td>
+        <td>${esc(l.action)} ${esc(LOG_WHAT[l.what] || l.what)}${l.title || l.row_key ? ` <span class="mono">${esc(l.title || l.row_key)}</span>` : ''}</td><td class="wrap dim">${esc(l.detail)}</td></tr>`).join('')}
+    </tbody></table></div>` : '<p class="empty">Nothing yet. Every change anyone makes on this page shows here.</p>'}
+  </section>`;
 }
 
 // ---------- the board: workstreams, their steps, the calendar (migrations/20261024120409_board.sql) ----------
@@ -1357,7 +1503,7 @@ function part(id) {
         <div><span class="lbl">Category</span><span>${esc(i.category)}</span></div>
         <div><span class="lbl">Bin</span><span class="num" style="font-size:15px">${esc(i.bin) || '—'}</span></div>
         <div><span class="lbl">Supplier</span><span>${esc(i.supplier) || '—'}</span></div>
-        <div><span class="lbl">Last price</span><span class="num" style="font-size:15px">${lastPrice}</span></div>
+        <div class="cost"><span class="lbl">Last price</span><span class="num" style="font-size:15px">${lastPrice}</span></div>
         <div><span class="lbl">Unit</span><span>${esc((INV_UNITS[i.unit] || INV_UNITS.pcs).long)}</span></div>
         <div><span class="lbl">Fitted by</span><span>${i.uses.length ? 'Us, at bring-up' : tool ? 'A tool on the bench' : 'Not on a build list'}</span></div>
       </div>
@@ -1386,7 +1532,7 @@ function part(id) {
       <div class="c2 col" style="gap:4px"><div class="row" style="justify-content:space-between;padding-bottom:6px"><span class="lbl">Orders</span><button class="link" type="button" data-panel="order">Record an order</button></div>
         ${orders.length ? `<div class="lines od">${orders.map(o => { const cls = o.status === 'open' ? 'lv-cool' : o.status === 'closed' ? 'lv-ok' : 'lv-off';
           const st = o.status === 'open' ? (o.got > 0 ? 'Part here' : 'In transit') : o.status === 'closed' ? 'Received' : 'Cancelled';
-          return `<div><span class="num" style="font-size:12px">${esc(o.ordered_on)}</span><span>${esc(o.supplier || 'No supplier')} · ${num(o.qty)} × ${priceStr(o.unit_cost, o.currency)}${o.ref ? ` · <span class="mono">${esc(o.ref)}</span>` : ''}</span>
+          return `<div><span class="num" style="font-size:12px">${esc(o.ordered_on)}</span><span>${esc(o.supplier || 'No supplier')} · ${num(o.qty)}<span class="cost"> × ${priceStr(o.unit_cost, o.currency)}</span>${o.ref ? ` · <span class="mono">${esc(o.ref)}</span>` : ''}</span>
           <span class="num ${cls}" style="font-size:14px">${o.status === 'open' ? num(o.left) : num(o.got)}</span><span class="lbl ${cls}">${st}</span>
           <span class="row" style="justify-content:flex-end;gap:6px">${o.status === 'open' ? `<a class="ib sm" href="#receive/${i.id}:${o.id}">Receive</a><button class="ib sm" type="button" data-cancel="${o.order_id}">Cancel</button>` : ''}</span></div>`; }).join('')}</div>`
           : '<p class="note">Nothing ordered yet.</p>'}
@@ -1417,7 +1563,7 @@ function partPanel(i) {
   if (pView.panel === 'order') return `<section class="panelform"><span class="lbl">Record an order</span>
     <div class="grid4"><label class="field"><span class="lbl">How many</span><input class="inp n" id="oQty" type="number" min="0" step="any" inputmode="decimal"></label>
       <label class="field"><span class="lbl">Supplier</span><input class="inp" id="oSupplier" value="${esc(i.supplier)}" placeholder="LCSC, AliExpress, JLCPCB"></label>
-      <label class="field"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="oCost" type="number" min="0" step="any" value="${i.unit_cost ?? ''}" style="flex:1"><select class="inp" id="oCur" style="width:92px">${opts(['QAR', 'USD', 'EUR', 'CNY'], i.currency || 'QAR')}</select></span></label>
+      <label class="field cost"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="oCost" type="number" min="0" step="any" value="${i.unit_cost ?? ''}" style="flex:1"><select class="inp" id="oCur" style="width:92px">${opts(['QAR', 'USD', 'EUR', 'CNY'], i.currency || 'QAR')}</select></span></label>
       <label class="field"><span class="lbl">Ordered on</span><input class="inp" id="oDay" type="date" value="${today()}"></label>
       <label class="field"><span class="lbl">Order number</span><input class="inp" id="oRef" placeholder="Optional"></label>
       <label class="field"><span class="lbl">Note</span><input class="inp" id="oNote" placeholder="Optional"></label></div>
@@ -1430,7 +1576,7 @@ function partPanel(i) {
       <label class="field"><span class="lbl">Bin</span><input class="inp n" id="pBin" value="${esc(i.bin)}"></label>
       <label class="field"><span class="lbl">Warn below</span><input class="inp n" id="pMin" type="number" min="0" step="any" value="${i.min_qty || ''}" placeholder="0"></label>
       <label class="field"><span class="lbl">Supplier</span><input class="inp" id="pSupplier" value="${esc(i.supplier)}"></label>
-      <label class="field"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="pCost" type="number" min="0" step="any" value="${i.unit_cost ?? ''}" style="flex:1"><select class="inp" id="pCur" style="width:92px">${opts(['QAR', 'USD', 'EUR', 'CNY'], i.currency || 'QAR')}</select></span></label>
+      <label class="field cost"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="pCost" type="number" min="0" step="any" value="${i.unit_cost ?? ''}" style="flex:1"><select class="inp" id="pCur" style="width:92px">${opts(['QAR', 'USD', 'EUR', 'CNY'], i.currency || 'QAR')}</select></span></label>
       <label class="field"><span class="lbl">LCSC number</span><input class="inp" id="pLcsc" value="${esc(i.lcsc || '')}"></label>
       <label class="field"><span class="lbl">Maker’s part number</span><input class="inp" id="pMpn" value="${esc(i.mpn)}"></label>
     </div>
@@ -1525,7 +1671,7 @@ function bindPart(i) {
     if (lcsc && !/^C\d+$/.test(lcsc)) { toast('An LCSC number is a C and digits, like C2932676.', true); return; }
     pView.panel = '';
     writeInv(sb.from('inv_items').update({ name, category:$('#pCat').value, unit:$('#pUnit').value, bin:$('#pBin').value.trim(), min_qty:Number($('#pMin').value || 0),
-      supplier:$('#pSupplier').value.trim(), unit_cost:$('#pCost').value === '' ? null : Number($('#pCost').value), currency:$('#pCur').value || 'QAR',
+      supplier:$('#pSupplier').value.trim(), ...(allowed('costs') ? { unit_cost:$('#pCost').value === '' ? null : Number($('#pCost').value), currency:$('#pCur').value || 'QAR' } : {}),
       lcsc:lcsc || null, mpn:$('#pMpn').value.trim(), url:$('#pUrl').value.trim(), notes:$('#pNotes').value.trim(), checks:$('#pChecks').value.trim() }).eq('id', i.id), 'Saved').then(ok => { if (!ok) { pView.panel = 'edit'; redraw(); } });
   });
 }
@@ -1676,7 +1822,7 @@ function receiveNew() {
     <details id="rMore" ${rView.more ? 'open' : ''} style="border-top:1px solid #1e2126;padding-top:14px"><summary class="lbl">Where it came from — optional</summary>
       <div class="grid4" style="padding-top:12px">
         <label class="field"><span class="lbl">Supplier</span><input class="inp" id="rSupplier" placeholder="LCSC, AliExpress, Voltaat"></label>
-        <label class="field"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="rCost" type="number" min="0" step="any" inputmode="decimal" style="flex:1;min-width:0"><select class="inp" id="rCur" style="width:84px">${opts(['QAR', 'USD', 'EUR', 'CNY'], 'QAR')}</select></span></label>
+        <label class="field cost"><span class="lbl">Price each</span><span style="display:flex;gap:6px"><input class="inp n" id="rCost" type="number" min="0" step="any" inputmode="decimal" style="flex:1;min-width:0"><select class="inp" id="rCur" style="width:84px">${opts(['QAR', 'USD', 'EUR', 'CNY'], 'QAR')}</select></span></label>
         <label class="field"><span class="lbl">LCSC number</span><span style="display:flex;gap:6px"><input class="inp" id="rLcsc" placeholder="C…" autocomplete="off" style="flex:1;min-width:0"><button class="ib" type="button" id="rFill" style="padding:0 12px;font-size:13px">Fill in</button></span></label>
         <label class="field"><span class="lbl">Shop link</span><input class="inp" id="rUrl" type="url" placeholder="https://"></label>
       </div></details>
@@ -2334,7 +2480,7 @@ function invCount() {
 }
 
 // tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in
-if (window.__previewData) { D = prep(window.__previewData); me = window.__previewData.me || ''; $('#gate').hidden = true; $('#app').hidden = false; $('#whoEmail').textContent = 'preview'; render(); }
+if (window.__previewData) { setAccess(window.__previewData.access || { owner:true, perms:{} }); D = prep(window.__previewData); me = window.__previewData.me || ''; $('#gate').hidden = true; $('#app').hidden = false; $('#whoEmail').textContent = 'preview'; render(); }
 else sb.auth.getSession().then(({ data }) => show(data.session));
 })();
 </script>

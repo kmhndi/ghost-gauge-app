@@ -220,7 +220,8 @@ main.inv { max-width: 1432px; gap: 18px; color: #fff; font: 14px/1.4 -apple-syst
 .inv .seg.sm { border-radius: 14px; padding: 2px; }
 .inv .segb { all: unset; box-sizing: border-box; min-height: 44px; padding: 0 18px; border-radius: 12px; cursor: pointer; font: 600 14px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; color: #7b8488; text-align: center; }
 .inv .seg.sm .segb { flex: 1; min-height: 40px; padding: 0 10px; border-radius: 10px; }
-.inv .seg.fill .segb { flex: 1; font-size: 15px; }
+.inv .seg.fill { flex-wrap: nowrap; }
+.inv .seg.fill .segb { flex: 1; font-size: 15px; padding: 0 6px; min-width: 0; }
 .inv .segb[aria-pressed="true"] { background: #1e2126; color: #fff; }
 .inv .step { all: unset; box-sizing: border-box; width: 44px; height: 44px; border-radius: 12px; border: 1px solid #2a2f36; display: flex; align-items: center; justify-content: center; cursor: pointer; font: 700 20px Orbitron, monospace; color: #fff; flex-shrink: 0; }
 .inv .step.xl { width: 64px; height: 64px; border-radius: 16px; font-size: 28px; }
@@ -432,13 +433,13 @@ window.addEventListener('hashchange', render);
 function render() {
   if (!D) return;
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
-  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : ['part', 'receive', 'scan', 'bin'].includes(page) ? 'inventory' : page)));
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : ['part', 'receive', 'scan', 'bin', 'assemble'].includes(page) ? 'inventory' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage };
-  const inv = ['inventory', 'part', 'receive', 'scan', 'bin'].includes(page);
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage, assemble };
+  const inv = ['inventory', 'part', 'receive', 'scan', 'bin', 'assemble'].includes(page);
   document.body.classList.toggle('invpage', inv); v.classList.toggle('inv', inv);
   v.innerHTML = (views[page] || overview)(arg);
   window.scrollTo(0, 0);
@@ -1121,13 +1122,14 @@ async function loadInv() {
       q(sb.from('inv_moves').select('*').order('at', { ascending:false }).limit(5000)),
       q(sb.from('inv_order_view').select('*').order('ordered_on', { ascending:false }).order('id', { ascending:false }).limit(1000)),
       q(sb.from('inv_holds').select('*').order('id', { ascending:false }).limit(500))]);
+    const assemblies = await q(sb.from('inv_assemblies').select('*').order('id', { ascending:false }).limit(300));
     let photos = {};
     const paths = items.map(i => i.photo).filter(Boolean);
     if (paths.length) {
       const { data } = await sb.storage.from('inv-photos').createSignedUrls(paths, 6 * 3600);
       photos = Object.fromEntries((data || []).filter(d => d.signedUrl).map(d => [d.path, d.signedUrl]));
     }
-    return invPrep({ items, boms, lines, moves, orders, holds, photos });
+    return invPrep({ items, boms, lines, moves, orders, holds, assemblies, photos });
   } catch (e) { toast(`Couldn’t load the inventory: ${e.message}`, true); return null; }
 }
 function invPrep(v) {
@@ -1135,6 +1137,7 @@ function invPrep(v) {
   v.lines = (v.lines || []).map(l => ({ ...l, qty_per:Number(l.qty_per) }));
   v.orders = (v.orders || []).map(o => ({ ...o, qty:Number(o.qty), got:Number(o.got || 0), left:Math.max(0, Number(o.qty) - Number(o.got || 0)) }));
   v.holds = (v.holds || []).map(h => ({ ...h, units:Number(h.units), asked:Number(h.asked) }));
+  v.assemblies = (v.assemblies || []).map(a => ({ ...a, units:Number(a.units), waiting:Number(a.waiting) }));
   v.boms = (v.boms || []).filter(b => b.kind === 'product').sort((a, b) => (PRODUCT_ORDER[a.product] ?? 9) - (PRODUCT_ORDER[b.product] ?? 9) || a.name.localeCompare(b.name));
   v.photos = v.photos || {};
   v.byId = new Map(v.items.map(i => [i.id, i]));
@@ -1534,6 +1537,11 @@ function invBuild() {
     <p class="note" style="max-width:760px">The parts JLCPCB solders on come with the assembled board, so they are not counted again here. Reserve puts these parts aside for the build, so a second plan can't count them twice.${b.product ? ` When Ghost Factory passes a ${esc(PRODUCT[b.product])}, it takes one unit’s list out of stock and one off the oldest hold.` : ''}</p>
     <div class="row"><input class="inp" id="buNote" placeholder="What it’s for (optional)" style="width:220px"><button class="ib" type="button" id="buCopy">Copy shopping list</button><button class="ib gold" type="button" id="buHold" ${rows.length ? '' : 'disabled'}>Reserve for ${q}</button></div>
   </div>`}
+  ${b ? `<div class="row" style="justify-content:space-between"><span class="note">Assembling at the bench? Scan the ${esc(b.name)} product label on a phone, or <a href="#assemble/${encodeURIComponent(b.id)}">open its pick list here</a>.</span></div>` : ''}
+  ${I().assemblies.length ? `<div class="c2 col" style="gap:4px"><span class="lbl" style="padding-bottom:6px">Assembled at the bench</span>
+    <div class="lines od">${I().assemblies.slice(0, 15).map(a => { const ab = boms.find(x => x.id === a.bom_id);
+      return `<div><span class="num" style="font-size:12px">${esc(day(a.created_at))}</span><span><b style="font-weight:600">${esc(ab ? ab.name : a.bom_id)}</b>${a.ref ? ` · <span class="mono">${esc(a.ref)}</span>` : ''} <span class="soft">· ${who(a.updated_by)}</span></span>
+      <span class="num" style="font-size:14px">× ${num(a.units)}</span><span class="lbl">${ab?.product ? (a.waiting ? `${num(a.waiting)} not passed yet` : 'All passed') : 'Done'}</span><span></span></div>`; }).join('')}</div></div>` : ''}
   ${holds.length ? `<div class="c2 col" style="gap:4px"><span class="lbl" style="padding-bottom:6px">Held for builds</span>
     <div class="lines od">${holds.map(h => { const hb = boms.find(x => x.id === h.bom_id);
       return `<div><span class="num" style="font-size:12px">${esc(day(h.created_at))}</span><span><b style="font-weight:600">${esc(hb ? hb.name : h.bom_id)}</b>${h.note ? ` · ${esc(h.note)}` : ''} <span class="soft">· ${who(h.updated_by)}</span></span>
@@ -1794,7 +1802,7 @@ function scan(arg) {
     <p class="c2">No part has the label ${esc(key)}. It may have been archived; <a href="#inventory">search the inventory</a>.</p></div>`;
   if (sView.key !== i.sku) sView = { key:i.sku, mode:'take', n:1, tstate:null };
   const l = lvl(i), tool = isTool(i), have = i.on_hand, n = +sView.n || 0;
-  const after = sView.mode === 'take' ? have - n : sView.mode === 'add' ? have + n : n, al = { ...i, on_hand:after };
+  const after = sView.mode === 'take' ? have - n : sView.mode === 'count' ? n : have + n, al = { ...i, on_hand:after };
   const uses = i.uses.map(u => `${u.name} · ${perStr(u.qty, i.unit)} a unit`).join(' · ');
   return `<div class="phone">
     <div class="row" style="justify-content:space-between"><button class="link" type="button" id="sAgain" style="font-size:16px;font-weight:400;min-height:44px">‹ Scan again</button>${i.bin ? `<a class="lbl" href="#bin/${encodeURIComponent(i.bin)}/all" style="color:#7b8488;text-decoration:none">Bin ${esc(i.bin)} ›</a>` : '<span class="lbl">No bin</span>'}</div>
@@ -1802,19 +1810,19 @@ function scan(arg) {
       <div class="col" style="gap:4px"><a class="pn" href="#part/${i.id}" style="font-size:17px;font-weight:700;line-height:22px">${esc(i.name)}</a><span style="font-size:13px;color:#7b8488">${esc(uses || i.sku)}</span>
       <span class="lbl" style="color:${l === 'ok' ? '#7b8488' : LV[l]}">${tool ? esc(i.tool_state || 'On bench') : l === 'crit' && i.min_qty ? `Below minimum ${num(i.min_qty)}` : l === 'warn' ? `Near minimum ${num(i.min_qty)}` : `${num(have)} ${uTag(i)} on the shelf`}</span></div></div>
     ${tool ? `<div class="seg fill" role="group" aria-label="Where it is">${TOOL_STATES.map(s => `<button class="segb" type="button" data-sstate="${esc(s)}" aria-pressed="${(sView.tstate || i.tool_state || 'On bench') === s}">${esc(s)}</button>`).join('')}</div>`
-    : `<div class="seg fill" role="group" aria-label="What happened">${[['take', 'Took'], ['add', 'Added'], ['count', 'Counted']].map(([id, name]) => `<button class="segb" type="button" data-smode="${id}" aria-pressed="${sView.mode === id}">${name}</button>`).join('')}</div>
-    <div class="c2" style="padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:14px"><span class="lbl">${sView.mode === 'take' ? 'How many did you take' : sView.mode === 'add' ? 'How many went in' : 'How many are in the bin'}</span>
+    : `<div class="seg fill" role="group" aria-label="What happened">${[['take', 'Took'], ['add', 'Added'], ['return', 'Returned'], ['count', 'Counted']].map(([id, name]) => `<button class="segb" type="button" data-smode="${id}" aria-pressed="${sView.mode === id}">${name}</button>`).join('')}</div>
+    <div class="c2" style="padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:14px"><span class="lbl">${{ take:'How many did you take', add:'How many went in', return:'How many went back', count:'How many are in the bin' }[sView.mode]}</span>
       <div style="display:flex;align-items:center;gap:18px"><button class="step xl" type="button" id="sDec" aria-label="Less">−</button><input class="bignum" id="sN" inputmode="decimal" value="${esc(sView.n)}" style="width:120px" aria-label="How many"><button class="step xl" type="button" id="sInc" aria-label="More">+</button></div>
       <span style="font-size:15px;color:#7b8488">On the shelf after: <span class="num" id="sAfter" style="font-size:15px;color:${lvInk(lvl(al))}">${num(Math.max(0, after))}</span></span></div>
-    <label class="field"><span class="lbl">Note</span><input class="inp" id="sNote" placeholder="For GE-P-000003" style="min-height:48px;font-size:16px"></label>`}
+    <label class="field"><span class="lbl">Note</span><input class="inp" id="sNote" placeholder="${sView.mode === 'return' ? 'Left over from GE-P-000003' : 'For GE-P-000003'}" style="min-height:48px;font-size:16px"></label>`}
     <div style="flex:1"></div>
     <button class="ib gold big" type="button" id="sSave" style="min-height:54px;font-size:17px">Save</button>
     <span style="font-size:13px;color:#7b8488;text-align:center">Every part and every bin has a NIIMBOT label. The phone's camera reads it; no app to install.</span>
   </div>`;
 }
 // A part or bin label's QR code, from the camera: open what it points at.
-const openLabel = t => { const m = /#(scan|bin)\/([^\s#?]+)/.exec(String(t)); if (m) { location.hash = `#${m[1]}/${m[2]}`; return true; } return false; };
-const scanLabel = () => scanCode(t => { if (!openLabel(t)) toast('That isn’t one of our labels.', true); }, 'Point at a part or bin label');
+const openLabel = t => { const m = /#(scan|bin|assemble)\/([^\s#?]+)/.exec(String(t)); if (m) { location.hash = `#${m[1]}/${m[2]}`; return true; } return false; };
+const scanLabel = () => scanCode(t => { if (!openLabel(t)) toast('That isn’t one of our labels.', true); }, 'Point at a part, bin or product label');
 function bindScan() {
   $('#sAgain')?.addEventListener('click', scanLabel);
   const key = decodeURIComponent(location.hash.split('/')[1] || ''), i = I().items.find(x => x.sku === key) || I().items.find(x => String(x.id) === key);
@@ -1822,7 +1830,7 @@ function bindScan() {
   const qr = $('#sQr'); if (qr) qrInto(qr, labelUrl(i)).catch(() => {});
   document.querySelectorAll('[data-smode]').forEach(b => b.addEventListener('click', () => { sView.mode = b.dataset.smode; sView.n = sView.mode === 'count' ? Math.max(0, i.on_hand) : 1; const el = $('#sN'); if (el) el.defaultValue = sView.n; redraw(); }));
   document.querySelectorAll('[data-sstate]').forEach(b => b.addEventListener('click', () => { sView.tstate = b.dataset.sstate; redraw(); }));
-  const show = () => { sView.n = $('#sN').value; const n = +sView.n || 0, a = sView.mode === 'take' ? i.on_hand - n : sView.mode === 'add' ? i.on_hand + n : n;
+  const show = () => { sView.n = $('#sN').value; const n = +sView.n || 0, a = sView.mode === 'take' ? i.on_hand - n : sView.mode === 'count' ? n : i.on_hand + n;
     const el = $('#sAfter'); el.textContent = num(Math.max(0, a)); el.style.color = lvInk(lvl({ ...i, on_hand:a })); };
   const step = d => { const el = $('#sN'); el.value = Math.max(0, Math.round((+el.value || 0) + d)); el.defaultValue = el.value; show(); };
   $('#sDec')?.addEventListener('click', () => step(-1)); $('#sInc')?.addEventListener('click', () => step(1));
@@ -1832,7 +1840,7 @@ function bindScan() {
     const n = +$('#sN').value;
     if (isNaN(n) || n < 0 || (sView.mode !== 'count' && n === 0)) { toast('How many?', true); return; }
     const row = { item_id:i.id, note:$('#sNote').value.trim() };
-    if (sView.mode === 'count') Object.assign(row, { kind:'counted', count_to:n }); else Object.assign(row, { kind:sView.mode === 'take' ? 'used' : 'received', qty:n });
+    if (sView.mode === 'count') Object.assign(row, { kind:'counted', count_to:n }); else Object.assign(row, { kind:{ take:'used', add:'received', return:'returned' }[sView.mode], qty:n });
     e.target.disabled = true;
     const ok = await writeInv(sb.from('inv_moves').insert(row), `Saved: ${i.name}`, ['#sNote']);
     if (ok) { sView.n = sView.mode === 'count' ? Math.max(0, I().byId.get(i.id).on_hand) : 1; const el = $('#sN'); if (el) { el.value = sView.n; el.defaultValue = sView.n; } } else e.target.disabled = false;
@@ -1855,16 +1863,20 @@ function binCodes(text) {            // "D1-01..D1-12, E2-03" -> every code, a r
   }
   return out;
 }
+const pSel = new Set();
+const prodT = b => ({ productLabel:true, bom:b.id, name:b.name });
 function invLabels() {
-  const parts = lView.kind === 'part', rows = invRows().filter(i => !i.archived), bins = binList(), inBin = binsWith();
-  const keys = parts ? rows.map(i => i.id) : bins, sel = parts ? lSel : bSel, n = keys.filter(k => sel.has(k)).length;
+  const kind = lView.kind, rows = invRows().filter(i => !i.archived), bins = binList(), inBin = binsWith(), boms = I().boms;
+  const keys = kind === 'part' ? rows.map(i => i.id) : kind === 'bin' ? bins : boms.map(b => b.id);
+  const sel = { part:lSel, bin:bSel, product:pSel }[kind], n = keys.filter(k => sel.has(k)).length;
   setTimeout(() => {
     document.querySelectorAll('[data-lkind]').forEach(b => b.addEventListener('click', () => { lView.kind = b.dataset.lkind; redraw(); }));
     document.querySelectorAll('canvas[data-label]').forEach(c => { const i = I().byId.get(+c.dataset.label); if (i) drawLabel(c, i).catch(() => {}); });
     document.querySelectorAll('canvas[data-binlabel]').forEach(c => drawBinLabel(c, c.dataset.binlabel).catch(() => {}));
-    document.querySelectorAll('[data-lsel]').forEach(b => b.addEventListener('change', () => { const k = parts ? +b.dataset.lsel : b.dataset.lsel; if (b.checked) sel.add(k); else sel.delete(k); redraw(); }));
+    document.querySelectorAll('canvas[data-prodlabel]').forEach(c => { const b = boms.find(x => x.id === c.dataset.prodlabel); if (b) drawProductLabel(c, prodT(b)).catch(() => {}); });
+    document.querySelectorAll('[data-lsel]').forEach(b => b.addEventListener('change', () => { const k = kind === 'part' ? +b.dataset.lsel : b.dataset.lsel; if (b.checked) sel.add(k); else sel.delete(k); redraw(); }));
     $('#lAll')?.addEventListener('click', () => { const all = keys.every(k => sel.has(k)); keys.forEach(k => all ? sel.delete(k) : sel.add(k)); redraw(); });
-    const picked = () => parts ? rows.filter(i => lSel.has(i.id)) : bins.filter(b => bSel.has(b)).map(binT);
+    const picked = () => kind === 'part' ? rows.filter(i => lSel.has(i.id)) : kind === 'bin' ? bins.filter(b => bSel.has(b)).map(binT) : boms.filter(b => pSel.has(b.id)).map(prodT);
     $('#lPrint')?.addEventListener('click', () => printLabels(picked()));
     $('#lSave')?.addEventListener('click', () => saveLabels(picked()));
     $('#lA4')?.addEventListener('click', () => printA4(picked()));
@@ -1872,24 +1884,28 @@ function invLabels() {
     $('#lAdd')?.addEventListener('click', addBins);
     $('#lBins')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addBins(); } });
   });
+  const card = (key, checked, title, canvas) => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${esc(key)}" ${checked ? 'checked' : ''}> ${title}</span><span class="label">${canvas}</span></label>`;
   return `<div class="col" style="gap:6px"><a class="back lbl" href="#inventory">‹ Inventory</a><h1 class="t">Labels</h1>
-    <p class="lede">${parts ? 'A part label goes on the part’s bag or box. Its QR code opens the part on a phone: took, added or counted, then Save.'
-      : 'A bin label goes on the bin. It carries only the bin’s code, so it stays right whatever moves in or out; its QR code opens the list of what is in that bin.'} 50 × 30 mm: on the NIIMBOT from Chrome on the Mac (its USB-C cable), or on A4 paper, ${A4_PER} to a page, to cut out along the dashes. Pick one or as many as you like.</p></div>
+    <p class="lede">${{ part:'A part label goes on the part’s bag or box. Its QR code opens the part on a phone: took, added, returned or counted, then Save.',
+      bin:'A bin label goes on the bin. It carries only the bin’s code, so it stays right whatever moves in or out; its QR code opens the list of what is in that bin.',
+      product:'A product label goes at the assembly bench. Its QR code opens that product’s pick list on a phone: what to take, from which bin, whether it’s in stock, and one tap takes it all out.' }[kind]}
+      50 × 30 mm: on the NIIMBOT from Chrome on the Mac (its USB-C cable), or on A4 paper, ${A4_PER} to a page, to cut out along the dashes. Pick one or as many as you like.</p></div>
   <div class="row" style="gap:16px">
-    <div class="seg" role="group" aria-label="Which labels"><button class="segb" type="button" data-lkind="part" aria-pressed="${parts}">Part labels</button><button class="segb" type="button" data-lkind="bin" aria-pressed="${!parts}">Bin labels</button></div>
-    ${parts ? '' : `<div class="row" style="flex:1 1 360px"><input class="inp n" id="lBins" placeholder="More bins: D1-01..D1-12, E2-03" style="flex:1;width:auto" autocomplete="off"><button class="ib" type="button" id="lAdd">Add</button></div>`}
+    <div class="seg" role="group" aria-label="Which labels">${[['part', 'Part labels'], ['bin', 'Bin labels'], ['product', 'Product labels']].map(([k, t]) => `<button class="segb" type="button" data-lkind="${k}" aria-pressed="${kind === k}">${t}</button>`).join('')}</div>
+    ${kind === 'bin' ? `<div class="row" style="flex:1 1 360px"><input class="inp n" id="lBins" placeholder="More bins: D1-01..D1-12, E2-03" style="flex:1;width:auto" autocomplete="off"><button class="ib" type="button" id="lAdd">Add</button></div>` : ''}
   </div>
   <div class="row"><button class="ib" type="button" id="lAll">${keys.length && keys.every(k => sel.has(k)) ? 'Select none' : `Select all ${keys.length}`}</button>
     <button class="ib gold" type="button" id="lPrint" ${n ? '' : 'disabled'}>${n ? `Print ${n} on the NIIMBOT` : 'Print on the NIIMBOT'}</button>
     <button class="ib" type="button" id="lA4" ${n ? '' : 'disabled'}>${n ? `Print ${n} on A4` : 'Print on A4'}${n > A4_PER ? ` · ${Math.ceil(n / A4_PER)} pages` : ''}</button>
     <button class="ib" type="button" id="lSave" ${n ? '' : 'disabled'}>Save ${n || ''} as pictures</button>
-    <span class="note">${parts && (iView.cat !== 'All' || iView.text) ? `Showing the parts Stock is filtered to (${esc(iView.cat)}${iView.text ? `, “${esc(iView.text)}”` : ''}).` : ''}${B1.supported ? '' : ' This browser can’t reach the printer: save the labels and print them from the NIIMBOT app.'}</span></div>
-  <div class="labels">${parts
-    ? rows.map(i => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${i.id}" ${lSel.has(i.id) ? 'checked' : ''}> <span style="overflow-wrap:anywhere">${esc(i.name)}</span></span>
-      <span class="label"><canvas data-label="${i.id}" width="384" height="240"></canvas></span></label>`).join('') || '<p class="c2">No parts to label.</p>'
-    : bins.map(b => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${esc(b)}" ${bSel.has(b) ? 'checked' : ''}> <span class="num" style="font-size:13px;white-space:nowrap">${esc(b)}</span>
-      <span class="soft" style="overflow-wrap:anywhere">${inBin[b] ? esc(inBin[b].length === 1 ? inBin[b][0] : `${inBin[b].length} parts`) : 'empty'}</span></span>
-      <span class="label"><canvas data-binlabel="${esc(b)}" width="384" height="240"></canvas></span></label>`).join('') || '<p class="c2">No bins yet. Type the codes of the bins to label above.</p>'}</div>`;
+    <span class="note">${kind === 'part' && (iView.cat !== 'All' || iView.text) ? `Showing the parts Stock is filtered to (${esc(iView.cat)}${iView.text ? `, “${esc(iView.text)}”` : ''}).` : ''}${B1.supported ? '' : ' This browser can’t reach the printer: save the labels and print them from the NIIMBOT app.'}</span></div>
+  <div class="labels">${kind === 'part'
+    ? rows.map(i => card(i.id, lSel.has(i.id), `<span style="overflow-wrap:anywhere">${esc(i.name)}</span>`, `<canvas data-label="${i.id}" width="384" height="240"></canvas>`)).join('') || '<p class="c2">No parts to label.</p>'
+    : kind === 'bin'
+    ? bins.map(b => card(b, bSel.has(b), `<span class="num" style="font-size:13px;white-space:nowrap">${esc(b)}</span> <span class="soft" style="overflow-wrap:anywhere">${inBin[b] ? esc(inBin[b].length === 1 ? inBin[b][0] : `${inBin[b].length} parts`) : 'empty'}</span>`,
+      `<canvas data-binlabel="${esc(b)}" width="384" height="240"></canvas>`)).join('') || '<p class="c2">No bins yet. Type the codes of the bins to label above.</p>'
+    : boms.map(b => card(b.id, pSel.has(b.id), `<span style="overflow-wrap:anywhere">${esc(b.name)}</span> <span class="soft">${linesOf(b.id).length} parts</span>`,
+      `<canvas data-prodlabel="${esc(b.id)}" width="384" height="240"></canvas>`)).join('') || '<p class="c2">No products yet. Start a build list on Can I build?</p>'}</div>`;
 }
 const labelUrl = i => `${INV_SITE}#scan/${encodeURIComponent(i.sku)}`;
 const binUrl = bin => `${INV_SITE}#bin/${encodeURIComponent(bin)}`;
@@ -1959,12 +1975,22 @@ async function drawBinLabel(canvas, bin) {
   wrapText(g, 'Scan to see what’s inside', tw, 2).forEach((line, k) => g.fillText(line, tx, H - 40 + k * 21));
   return labelInk(canvas);
 }
-const drawAny = (c, t) => (t.binLabel ? drawBinLabel(c, t.bin) : drawLabel(c, t));
+// The product label: the product's name and what the code is for.
+async function drawProductLabel(canvas, t) {
+  const { g, H, tx, tw } = await labelBase(canvas, `${INV_SITE}#assemble/${encodeURIComponent(t.bom)}`);
+  g.font = '800 18px Orbitron, ui-monospace, monospace'; g.fillText('ASSEMBLE', tx, 40);
+  g.font = '800 25px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  wrapText(g, t.name, tw, 4).forEach((line, k) => g.fillText(line, tx, 74 + k * 29));
+  g.font = '700 16px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  g.fillText('Scan to pick its parts', tx, H - 18);
+  return labelInk(canvas);
+}
+const drawAny = (c, t) => (t.binLabel ? drawBinLabel(c, t.bin) : t.productLabel ? drawProductLabel(c, t) : drawLabel(c, t));
 async function labelCanvases(items) { return Promise.all(items.map(t => drawAny(document.createElement('canvas'), t))); }
 async function saveLabels(items) {
   for (const [k, c] of (await labelCanvases(items)).entries()) {
     const t = items[k], a = document.createElement('a');
-    a.download = t.binLabel ? `bin-${t.bin}-label.png` : `${t.sku}-label.png`; a.href = c.toDataURL('image/png'); a.click();
+    a.download = t.binLabel ? `bin-${t.bin}-label.png` : t.productLabel ? `product-${t.bom}-label.png` : `${t.sku}-label.png`; a.href = c.toDataURL('image/png'); a.click();
     await new Promise(r => setTimeout(r, 250));
   }
 }
@@ -1978,7 +2004,7 @@ async function printA4(items) {
   const sheet = document.createElement('div'); sheet.id = 'a4';
   for (let k = 0; k < urls.length; k += A4_PER) {
     const page = document.createElement('section'); page.className = 'a4page';
-    urls.slice(k, k + A4_PER).forEach((u, j) => { const img = new Image(); img.src = u; img.alt = items[k + j].binLabel ? `Bin ${items[k + j].bin}` : items[k + j].name; page.appendChild(img); });
+    urls.slice(k, k + A4_PER).forEach((u, j) => { const img = new Image(); img.src = u; img.alt = items[k + j].binLabel ? `Bin ${items[k + j].bin}` : items[k + j].name || ''; page.appendChild(img); });
     sheet.appendChild(page);
   }
   document.body.appendChild(sheet);
@@ -1995,6 +2021,59 @@ async function printLabels(items, quiet) {
     await B1.print(await labelCanvases(items));
     toast(`Printed ${items.length} label${items.length === 1 ? '' : 's'}`);
   } catch (e) { toast(e.message, true); }
+}
+// ---------- the phone: a product label's QR code opens this, the pick list for assembling it ----------
+let aView = { bom:'', n:1, ticks:new Set() };
+function assemble(arg) {
+  if (!D.inv) return noInv;
+  const id = decodeURIComponent(arg || ''), b = I().boms.find(x => x.id === id);
+  setTimeout(bindAssemble);
+  if (!b) return `<div class="phone"><button class="link" type="button" id="aAgain" style="font-size:16px;font-weight:400;min-height:44px;align-self:flex-start">‹ Scan again</button>
+    <p class="c2">No product has the label ${esc(id)}. <a href="#inventory/build">See the build lists</a>.</p></div>`;
+  if (aView.bom !== b.id) aView = { bom:b.id, n:1, ticks:new Set() };
+  const n = Math.max(1, +aView.n || 1), ls = linesOf(b.id), can = buildable(b.id);
+  const rows = ls.map(l => { const it = l.item, tool = isTool(it), need = tool ? 1 : l.qty_per * n, short = tool ? (it.tool_state === 'On bench' ? 0 : 1) : Math.max(0, need - Math.max(0, it.on_hand));
+    return { l, it, tool, need, short }; }).sort((x, y) => (x.it.bin || '~').localeCompare(y.it.bin || '~', 'en', { numeric:true }));
+  const ticked = rows.filter(r => aView.ticks.has(r.it.id)).length, shortN = rows.filter(r => r.short > 0).length;
+  const waiting = I().assemblies.filter(a => a.bom_id === b.id && a.waiting > 0).reduce((t, a) => t + a.waiting, 0);
+  return `<div class="phone">
+    <div class="row" style="justify-content:space-between"><button class="link" type="button" id="aAgain" style="font-size:16px;font-weight:400;min-height:44px">‹ Scan again</button><a class="lbl" href="#inventory/build" style="color:#7b8488;text-decoration:none">Can I build? ›</a></div>
+    <div class="c1" style="padding:18px;display:flex;gap:14px;align-items:center"><div class="qr"><canvas id="aQr" width="33" height="33"></canvas></div>
+      <div class="col" style="gap:4px"><span class="lbl">Assemble</span><span style="font-size:19px;font-weight:700;line-height:24px">${esc(b.name)}</span>
+      <span class="lbl" style="color:${can === 0 ? LV.crit : can != null && can < n ? LV.warn : '#7b8488'}">${can == null ? 'No parts on its list yet' : `Stock for ${num(can)} now`}</span></div></div>
+    <div class="c2" style="padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span class="lbl">How many</span>
+      <div style="display:flex;align-items:center;gap:14px"><button class="step" type="button" id="aDec" aria-label="One fewer">−</button><input class="midnum" id="aN" inputmode="numeric" value="${n}" aria-label="How many to assemble"><button class="step" type="button" id="aInc" aria-label="One more">+</button></div></div>
+    ${rows.length ? `<div class="c2" style="padding:4px 14px">${rows.map(r => `<label style="display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 0;border-bottom:1px solid #1e2126;cursor:pointer;color:#fff;font-size:15px">
+        <input type="checkbox" data-tick="${r.it.id}" ${aView.ticks.has(r.it.id) ? 'checked' : ''} style="width:24px;height:24px;flex-shrink:0;accent-color:#35d07f">
+        <span class="col" style="gap:2px;flex:1"><span style="font-size:15px;font-weight:600;line-height:19px">${esc(r.it.name)}</span><span class="mono">${r.it.bin ? `Bin ${esc(r.it.bin)} · ` : ''}${r.tool ? 'a tool' : `take ${perStr(r.need, r.it.unit)}`}</span></span>
+        <span style="text-align:right;white-space:nowrap">${r.short > 0 ? `<span class="lbl" style="color:${LV.crit}">${r.tool ? esc(r.it.tool_state) : `Short ${perStr(r.short, r.it.unit)}`}</span>` : `<span class="lbl" style="color:${LV.ok}">${r.tool ? 'On bench' : 'In stock'}</span>`}
+          ${r.tool ? '' : `<br><span class="num" style="font-size:12px;color:#7b8488">${num(r.it.on_hand)} ${uTag(r.it)}</span>`}</span></label>`).join('')}</div>`
+      : `<p class="c2" style="margin:0">Nothing is on the ${esc(b.name)} build list yet. Open a part on the computer and add it under Goes into.</p>`}
+    ${shortN ? `<p class="note" style="color:${LV.warn}">${shortN} part${shortN === 1 ? ' is' : 's are'} short. Saving still takes them out and the count goes below zero: count that bin if the number looks wrong.</p>` : ''}
+    <label class="field"><span class="lbl">Serial or note</span><input class="inp" id="aRef" placeholder="Optional" style="min-height:48px;font-size:16px"></label>
+    <div style="flex:1"></div>
+    <button class="ib gold big" type="button" id="aSave" style="min-height:54px;font-size:17px" ${rows.length && ticked === rows.length ? '' : 'disabled'}>${rows.length && ticked === rows.length ? `Took them all — assemble ${num(n)}` : `Tick each part as you pick it · ${ticked} of ${rows.length}`}</button>
+    <span style="font-size:13px;color:#7b8488;text-align:center">${b.product ? `When Ghost Factory passes these units it won’t take their parts again.${waiting ? ` ${num(waiting)} assembled ${waiting === 1 ? 'unit is' : 'units are'} waiting for it.` : ''}` : 'Saving takes the parts out of stock.'}</span>
+  </div>`;
+}
+function bindAssemble() {
+  $('#aAgain')?.addEventListener('click', scanLabel);
+  const b = I().boms.find(x => x.id === aView.bom);
+  if (!b) return;
+  const qr = $('#aQr'); if (qr) qrInto(qr, `${INV_SITE}#assemble/${encodeURIComponent(b.id)}`).catch(() => {});
+  const setN = v => { aView.n = Math.max(1, Math.min(99, Math.round(v) || 1)); const el = $('#aN'); if (el) el.defaultValue = aView.n; redraw(); };
+  $('#aDec')?.addEventListener('click', () => setN((+aView.n || 1) - 1)); $('#aInc')?.addEventListener('click', () => setN((+aView.n || 1) + 1));
+  $('#aN')?.addEventListener('change', e => setN(+e.target.value));
+  document.querySelectorAll('[data-tick]').forEach(c => c.addEventListener('change', () => { const k = +c.dataset.tick; if (c.checked) aView.ticks.add(k); else aView.ticks.delete(k); redraw(); }));
+  $('#aSave')?.addEventListener('click', async e => {
+    const n = Math.max(1, +aView.n || 1), ref = $('#aRef').value.trim();
+    e.target.disabled = true;
+    const { error } = await sb.rpc('inv_assemble', { bom:b.id, n, ref, note:'' });
+    if (error) { e.target.disabled = false; toast(error.message, true); return; }
+    aView = { bom:b.id, n:1, ticks:new Set() };
+    const el = $('#aRef'); if (el) resetField(el);
+    D.inv = await loadInv(); toast(`Assembled ${num(n)} ${b.name}: the parts are out of stock`); redraw();
+  });
 }
 // ---------- the phone: a bin label's QR code opens this, what is in that bin ----------
 function binPage(arg) {

@@ -191,6 +191,7 @@ main.inv { max-width: 1432px; gap: 18px; color: #fff; font: 14px/1.4 -apple-syst
 .inv .ib.big { min-height: 52px; font-size: 16px; width: 100%; }
 .inv .ib.sm { min-height: 32px; padding: 0 10px; font-size: 12.5px; border-radius: 10px; }
 .inv .ib.on { border-color: #ff4338; color: #ff4338 !important; }
+.inv .ib.danger { color: #ff4338 !important; } .inv .ib.danger:hover { border-color: #ff4338; }
 .inv .ib:disabled, .inv .ib[aria-disabled="true"] { opacity: .45; cursor: default; }
 .inv .ib:focus-visible, .inv .catbtn:focus-visible, .inv .segb:focus-visible, .inv .step:focus-visible, .inv .chipbtn:focus-visible { outline: 2px solid #3ba9f5; outline-offset: 2px; }
 .inv .link { all: unset; color: #3ba9f5; cursor: pointer; font-size: 14px; font-weight: 600; }
@@ -419,13 +420,13 @@ window.addEventListener('hashchange', render);
 function render() {
   if (!D) return;
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
-  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : ['part', 'receive', 'scan'].includes(page) ? 'inventory' : page)));
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : ['part', 'receive', 'scan', 'bin'].includes(page) ? 'inventory' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan };
-  const inv = ['inventory', 'part', 'receive', 'scan'].includes(page);
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage };
+  const inv = ['inventory', 'part', 'receive', 'scan', 'bin'].includes(page);
   document.body.classList.toggle('invpage', inv); v.classList.toggle('inv', inv);
   v.innerHTML = (views[page] || overview)(arg);
   window.scrollTo(0, 0);
@@ -1077,7 +1078,7 @@ function calendar(arg) {
 
 // ---------- the inventory (migrations/20261109120000_inventory.sql and 20261109180000_inventory_orders.sql) ----------
 // Laid out as the canvas "Ghost Inventory" draws it (https://claude.ai/artifact/7FkZLw3SyeiQR2RoEowFSB): Stock, a part,
-// Can I build?, Receive stock, bin labels, and the phone screen a bin label's QR code opens.
+// Can I build?, Receive stock, part and bin labels, and the phone screens their QR codes open.
 const INV_CATS = ['Boards', 'Displays', 'Modules', 'Sensors', 'Components', 'Connectors', 'Cable & wire', 'Fasteners', 'Print & consumables', 'Packaging', 'Tools'];
 const INV_UNITS = { pcs:{ name:'Pieces', tag:'PCS', word:'pieces', long:'Each' }, m:{ name:'Metres', tag:'M', word:'metres', long:'By the metre' },
   kg:{ name:'Kilos', tag:'KG', word:'kg', long:'By the kilo' }, tool:{ name:'Tool', tag:'TOOL', word:'tools', long:'A tool: a state, not a count' } };
@@ -1223,7 +1224,7 @@ function inventory(sub) {
         <label class="search">${SVG.search}<span class="sr">Search parts</span><input type="search" id="iSearch" value="${esc(iView.text)}" placeholder="Search a name, value, LCSC number or bin" autocomplete="off"></label>
         <button class="ib${iView.low ? ' on' : ''}" id="iLow" type="button" aria-pressed="${iView.low}">Below minimum only</button>
         <a class="ib" href="#inventory/count">Stocktake</a>
-        <a class="ib" href="#inventory/labels">Print bin labels</a>
+        <a class="ib" href="#inventory/labels">Print labels</a>
         <a class="ib gold" href="#receive">Receive stock</a>
       </div>
       <div class="tw c1"><table style="min-width:980px"><thead><tr><th>Part</th><th>Category</th><th>Bin</th><th class="r">On hand</th><th style="width:150px">Vs minimum</th><th>Per unit</th><th class="r">On order</th></tr></thead><tbody>
@@ -1266,9 +1267,9 @@ function part(id) {
   const minLine = l === 'crit' && i.min_qty > 0 ? `Below minimum ${num(i.min_qty)}` : l === 'crit' ? 'Below zero: count it' : l === 'warn' ? `Near minimum ${num(i.min_qty)}` : i.min_qty > 0 ? `Minimum ${num(i.min_qty)}` : 'No minimum set';
   return `<a class="back lbl" href="#inventory">‹ Inventory · ${esc(i.category)}</a>
   <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between">
-    <div class="col" style="gap:6px"><h1 class="t">${esc(i.name)}</h1><span class="mono">${esc([i.sku, i.lcsc && 'LCSC ' + i.lcsc, i.mpn, firstLine(i.notes)].filter(Boolean).join(' · '))}${i.archived ? ' · archived' : ''}</span></div>
+    <div class="col" style="gap:6px"><h1 class="t">${esc(i.name)}</h1><span class="mono">${esc([i.sku, i.lcsc && 'LCSC ' + i.lcsc, i.mpn, firstLine(i.notes)].filter(Boolean).join(' · '))}</span>${i.archived ? '<span class="lbl" style="color:#ff9e2c">Archived: not in Stock. Edit details › Restore it brings it back.</span>' : ''}</div>
     <div class="row">
-      <button class="ib" type="button" id="pPrint">Print bin label</button>
+      <button class="ib" type="button" id="pPrint">Print part label</button>
       <button class="ib" type="button" data-panel="adjust" aria-expanded="${pView.panel === 'adjust'}">${tool ? 'Change its state' : 'Adjust count'}</button>
       ${tool ? '' : `<a class="ib gold" href="#receive/${i.id}">${i.on_order ? `Receive the ${num(i.on_order)} on order` : 'Receive stock'}</a>`}
     </div>
@@ -1362,8 +1363,11 @@ function partPanel(i) {
     <label class="field"><span class="lbl">Shop link</span><input class="inp" id="pUrl" type="url" value="${esc(i.url)}"></label>
     <div class="grid2"><label class="field"><span class="lbl">Notes</span><textarea class="inp" id="pNotes">${esc(i.notes)}</textarea></label>
       <label class="field"><span class="lbl">Check on arrival, one per line</span><textarea class="inp" id="pChecks" placeholder="Markings say TM070RDHG34-00">${esc(i.checks)}</textarea></label></div>
-    <label class="check"><input type="checkbox" id="pArch" ${i.archived ? 'checked' : ''}> Archived: no longer bought or used (it keeps its history)</label>
-    <div class="row"><button class="ib gold" type="button" id="pSave">Save</button>${close}</div></section>`;
+    <div class="row"><button class="ib gold" type="button" id="pSave">Save</button>${close}</div>
+    <div class="row" style="border-top:1px solid #1e2126;padding-top:14px;justify-content:space-between">
+      <span class="note" style="max-width:520px">${I().moves.some(m => m.item_id === i.id) ? 'It has movements, so it can’t be deleted: archive it instead. An archived part leaves Stock and keeps its history; it is under Archived in the categories.'
+        : 'Nothing has moved yet, so it can be deleted, with its orders and its place on build lists. Or archive it to keep it.'}</span>
+      <span class="row"><button class="ib" type="button" id="pArchBtn">${i.archived ? 'Restore it' : 'Archive'}</button>${I().moves.some(m => m.item_id === i.id) ? '' : '<button class="ib danger" type="button" id="pDel">Delete part</button>'}</span></div></section>`;
 }
 async function shrinkPhoto(file) {
   try {
@@ -1425,6 +1429,22 @@ function bindPart(i) {
     if (!(per > 0)) { toast('How many go into one unit?', true); return; }
     writeInv(sb.from('inv_bom_lines').insert({ bom_id:$('#pUseBom').value, item_id:i.id, qty_per:per, fitted_by:'us' }), 'Added to the build list', ['#pUsePer']);
   });
+  $('#pArchBtn')?.addEventListener('click', () => { pView.panel = ''; writeInv(sb.from('inv_items').update({ archived:!i.archived }).eq('id', i.id), i.archived ? `Restored: ${i.name}` : `Archived: ${i.name}`); });
+  $('#pDel')?.addEventListener('click', async e => {
+    if (I().moves.some(m => m.item_id === i.id)) { toast('It has movements, so it can only be archived.', true); return; }
+    const mine = I().orders.filter(o => o.item_id === i.id);
+    if (!confirm(`Delete ${i.name} (${i.sku})? This can’t be undone.${mine.length ? ` Its ${mine.length} order${mine.length === 1 ? '' : 's'} go too.` : ''}`)) return;
+    e.target.disabled = true;
+    const steps = [sb.from('inv_bom_lines').delete().eq('item_id', i.id), sb.from('inv_order_lines').delete().eq('item_id', i.id)];
+    for (const p of steps) { const { error } = await p; if (error) { e.target.disabled = false; toast(error.message, true); return; } }
+    const empty = [...new Set(mine.map(o => o.order_id))].filter(oid => !I().orders.some(o => o.order_id === oid && o.item_id !== i.id));
+    if (empty.length) await sb.from('inv_orders').delete().in('id', empty);
+    const { error } = await sb.from('inv_items').delete().eq('id', i.id);
+    if (error) { e.target.disabled = false; toast(/foreign key|violates/.test(error.message) ? 'It has movements now, so it can only be archived.' : error.message, true); D.inv = await loadInv(); redraw(); return; }
+    if (i.photo) await sb.storage.from('inv-photos').remove([i.photo]);
+    D.inv = await loadInv(); pView = { id:null, panel:'', kind:'counted' };
+    toast(`Deleted ${i.sku}: ${i.name}`); location.hash = '#inventory';
+  });
   $('#pSave')?.addEventListener('click', () => {
     const name = $('#pName').value.trim(), lcsc = $('#pLcsc').value.trim().toUpperCase();
     if (!name) { toast('A part needs a name.', true); return; }
@@ -1432,8 +1452,7 @@ function bindPart(i) {
     pView.panel = '';
     writeInv(sb.from('inv_items').update({ name, category:$('#pCat').value, unit:$('#pUnit').value, bin:$('#pBin').value.trim(), min_qty:Number($('#pMin').value || 0),
       supplier:$('#pSupplier').value.trim(), unit_cost:$('#pCost').value === '' ? null : Number($('#pCost').value), currency:$('#pCur').value || 'QAR',
-      lcsc:lcsc || null, mpn:$('#pMpn').value.trim(), url:$('#pUrl').value.trim(), notes:$('#pNotes').value.trim(), checks:$('#pChecks').value.trim(),
-      archived:$('#pArch').checked }).eq('id', i.id), 'Saved').then(ok => { if (!ok) { pView.panel = 'edit'; redraw(); } });
+      lcsc:lcsc || null, mpn:$('#pMpn').value.trim(), url:$('#pUrl').value.trim(), notes:$('#pNotes').value.trim(), checks:$('#pChecks').value.trim() }).eq('id', i.id), 'Saved').then(ok => { if (!ok) { pView.panel = 'edit'; redraw(); } });
   });
 }
 
@@ -1601,7 +1620,7 @@ function receiveAside(it) {
       : `<label class="field"><span class="lbl">Against an order</span><select class="inp" id="rOrder"><option value="">No order — bought outright</option>${lines.map(o => `<option value="${o.id}" ${String(o.id) === rView.order ? 'selected' : ''}>${esc(o.ordered_on)} · ${esc(o.supplier || 'No supplier')} · ${num(o.left)} still to come${o.ref ? ` · ${esc(o.ref)}` : ''}</option>`).join('')}</select></label>`}
       <label class="field"><span class="lbl">Note</span><input class="inp" id="rNote" placeholder="For the rev C case's back plate"></label>
     </div>
-    <div class="c2 col" style="gap:10px"><span class="lbl">Bin label</span><div class="label"><canvas id="rLabel" width="384" height="240"></canvas></div>
+    <div class="c2 col" style="gap:10px"><span class="lbl">Part label</span><div class="label"><canvas id="rLabel" width="384" height="240"></canvas></div>
       <label class="check" style="font-size:14px"><input type="checkbox" id="rPrint" ${rView.print ? 'checked' : ''}> ${B1.supported ? 'Print it on the NIIMBOT after saving' : 'Save the label as a picture after saving (print it from the NIIMBOT app)'}</label></div>
     <div class="c2 col" style="gap:6px"><span class="lbl">Saving will</span><div id="rSum" class="col" style="gap:6px"></div></div>
     <button class="ib gold big" type="button" id="rSave"></button>
@@ -1635,7 +1654,7 @@ function rSync() {
   if (ordering) sum.push(`Record an order of ${num(q)} ${esc(word)}${sup ? ` from ${esc(sup)}` : ''}, ordered ${esc($('#rDay')?.value || today())}; nothing goes on the shelf until it arrives`);
   else sum.push(tool ? 'Put it on the bench' : `Record ${num(q)} ${esc(word)} received, today, by you${o ? `, against the ${esc(o.supplier || '')} order of ${esc(o.ordered_on)}` : ''}`);
   if (!it) sum.push(on.length ? `Add it to the build list of ${on.map(b => `${esc(b.name)} × ${esc(rView.prods[b.id] || 1)}`).join(', ')}` : 'Keep it off every build list (a spare)');
-  if (rView.print) sum.push(B1.supported ? 'Print its bin label on the NIIMBOT' : 'Save its bin label as a picture');
+  if (rView.print) sum.push(B1.supported ? 'Print its part label on the NIIMBOT' : 'Save its part label as a picture');
   if ($('#rSum')) $('#rSum').innerHTML = sum.map(s => `<span style="font-size:14px;color:#c9d0d4">${s}</span>`).join('');
   if ($('#rSave')) $('#rSave').textContent = it ? `Receive ${num(q)}` : tool ? 'Add the tool' : ordering ? `Add part, ${num(q)} on order` : `Add part and receive ${num(q)}`;
   clearTimeout(rLabelT);
@@ -1741,6 +1760,7 @@ async function rSave(btn) {
   } finally { btn.disabled = false; }
 }
 function rFromBag(text) {
+  if (openLabel(text)) return;
   const t = String(text).trim(), code = /pc:\s*(C\d+)/i.exec(t)?.[1]?.toUpperCase() || (/^C\d+$/i.test(t) ? t.toUpperCase() : '');
   const qty = +(/qty:\s*(\d+)/i.exec(t)?.[1] || 0);
   if (!code) { toast('That QR code isn’t an LCSC bag’s. Type the part instead.', true); return; }
@@ -1752,7 +1772,7 @@ function rFromBag(text) {
   setTimeout(() => { const l = $('#rLcsc'); if (l) { l.value = code; $('#rSupplier').value = 'LCSC'; rFill(); } });
 }
 
-// ---------- the phone: a bin label's QR code opens this ----------
+// ---------- the phone: a part label's QR code opens this ----------
 let sView = { key:'', mode:'take', n:1, tstate:null };
 function scan(arg) {
   if (!D.inv) return noInv;
@@ -1765,7 +1785,7 @@ function scan(arg) {
   const after = sView.mode === 'take' ? have - n : sView.mode === 'add' ? have + n : n, al = { ...i, on_hand:after };
   const uses = i.uses.map(u => `${u.name} · ${perStr(u.qty, i.unit)} a unit`).join(' · ');
   return `<div class="phone">
-    <div class="row" style="justify-content:space-between"><button class="link" type="button" id="sAgain" style="font-size:16px;font-weight:400;min-height:44px">‹ Scan again</button><span class="lbl">Bin ${esc(i.bin) || '—'}</span></div>
+    <div class="row" style="justify-content:space-between"><button class="link" type="button" id="sAgain" style="font-size:16px;font-weight:400;min-height:44px">‹ Scan again</button>${i.bin ? `<a class="lbl" href="#bin/${encodeURIComponent(i.bin)}/all" style="color:#7b8488;text-decoration:none">Bin ${esc(i.bin)} ›</a>` : '<span class="lbl">No bin</span>'}</div>
     <div class="c1" style="padding:18px;display:flex;gap:14px;align-items:center"><div class="qr"><canvas id="sQr" width="33" height="33"></canvas></div>
       <div class="col" style="gap:4px"><a class="pn" href="#part/${i.id}" style="font-size:17px;font-weight:700;line-height:22px">${esc(i.name)}</a><span style="font-size:13px;color:#7b8488">${esc(uses || i.sku)}</span>
       <span class="lbl" style="color:${l === 'ok' ? '#7b8488' : LV[l]}">${tool ? esc(i.tool_state || 'On bench') : l === 'crit' && i.min_qty ? `Below minimum ${num(i.min_qty)}` : l === 'warn' ? `Near minimum ${num(i.min_qty)}` : `${num(have)} ${uTag(i)} on the shelf`}</span></div></div>
@@ -1777,11 +1797,14 @@ function scan(arg) {
     <label class="field"><span class="lbl">Note</span><input class="inp" id="sNote" placeholder="For GE-P-000003" style="min-height:48px;font-size:16px"></label>`}
     <div style="flex:1"></div>
     <button class="ib gold big" type="button" id="sSave" style="min-height:54px;font-size:17px">Save</button>
-    <span style="font-size:13px;color:#7b8488;text-align:center">Every bin has a NIIMBOT label. The phone's camera reads it; no app to install.</span>
+    <span style="font-size:13px;color:#7b8488;text-align:center">Every part and every bin has a NIIMBOT label. The phone's camera reads it; no app to install.</span>
   </div>`;
 }
+// A part or bin label's QR code, from the camera: open what it points at.
+const openLabel = t => { const m = /#(scan|bin)\/([^\s#?]+)/.exec(String(t)); if (m) { location.hash = `#${m[1]}/${m[2]}`; return true; } return false; };
+const scanLabel = () => scanCode(t => { if (!openLabel(t)) toast('That isn’t one of our labels.', true); }, 'Point at a part or bin label');
 function bindScan() {
-  $('#sAgain')?.addEventListener('click', () => scanCode(t => { const m = /#scan\/([^\s#?]+)/.exec(t); if (m) location.hash = '#scan/' + m[1]; else toast('That isn’t one of our bin labels.', true); }, 'Point at a bin label'));
+  $('#sAgain')?.addEventListener('click', scanLabel);
   const key = decodeURIComponent(location.hash.split('/')[1] || ''), i = I().items.find(x => x.sku === key) || I().items.find(x => String(x.id) === key);
   if (!i) return;
   const qr = $('#sQr'); if (qr) qrInto(qr, labelUrl(i)).catch(() => {});
@@ -1804,28 +1827,57 @@ function bindScan() {
   });
 }
 
-// ---------- bin labels: 50 × 30 mm on the NIIMBOT B1, a QR code that opens the part on a phone ----------
-const lSel = new Set();
+// ---------- labels: 50 × 30 mm on the NIIMBOT B1 ----------
+// A part label goes on the part's bag or box and opens that part on a phone; a bin label goes on the bin and opens
+// the list of what is in it. A bin label carries only the bin's code, so it stays right whatever moves in or out.
+const lSel = new Set(), bSel = new Set();
+let lView = { kind:'part', extra:[] };
+const binList = () => [...new Set([...live().map(i => i.bin).filter(Boolean), ...lView.extra])].sort((a, b) => a.localeCompare(b, 'en', { numeric:true }));
+const binT = bin => ({ binLabel:true, bin });
+function binCodes(text) {            // "D1-01..D1-12, E2-03" -> every code, a range counting up with its zeros kept
+  const out = [];
+  for (const part of String(text).toUpperCase().split(/[\s,]+/).filter(Boolean)) {
+    const m = /^(.*?)(\d+)\.\.(?:\1)?(\d+)$/.exec(part);
+    if (m && +m[3] >= +m[2] && +m[3] - +m[2] < 200) for (let n = +m[2]; n <= +m[3]; n++) out.push(m[1] + String(n).padStart(m[2].length, '0'));
+    else out.push(part);
+  }
+  return out;
+}
 function invLabels() {
-  const rows = invRows().filter(i => !i.archived);
+  const parts = lView.kind === 'part', rows = invRows().filter(i => !i.archived), bins = binList(), inBin = binsWith();
+  const keys = parts ? rows.map(i => i.id) : bins, sel = parts ? lSel : bSel, n = keys.filter(k => sel.has(k)).length;
   setTimeout(() => {
+    document.querySelectorAll('[data-lkind]').forEach(b => b.addEventListener('click', () => { lView.kind = b.dataset.lkind; redraw(); }));
     document.querySelectorAll('canvas[data-label]').forEach(c => { const i = I().byId.get(+c.dataset.label); if (i) drawLabel(c, i).catch(() => {}); });
-    document.querySelectorAll('[data-lsel]').forEach(b => b.addEventListener('change', () => { if (b.checked) lSel.add(+b.dataset.lsel); else lSel.delete(+b.dataset.lsel); redraw(); }));
-    $('#lAll')?.addEventListener('click', () => { const all = rows.every(i => lSel.has(i.id)); rows.forEach(i => all ? lSel.delete(i.id) : lSel.add(i.id)); redraw(); });
-    const picked = () => rows.filter(i => lSel.has(i.id));
+    document.querySelectorAll('canvas[data-binlabel]').forEach(c => drawBinLabel(c, c.dataset.binlabel).catch(() => {}));
+    document.querySelectorAll('[data-lsel]').forEach(b => b.addEventListener('change', () => { const k = parts ? +b.dataset.lsel : b.dataset.lsel; if (b.checked) sel.add(k); else sel.delete(k); redraw(); }));
+    $('#lAll')?.addEventListener('click', () => { const all = keys.every(k => sel.has(k)); keys.forEach(k => all ? sel.delete(k) : sel.add(k)); redraw(); });
+    const picked = () => parts ? rows.filter(i => lSel.has(i.id)) : bins.filter(b => bSel.has(b)).map(binT);
     $('#lPrint')?.addEventListener('click', () => printLabels(picked()));
     $('#lSave')?.addEventListener('click', () => saveLabels(picked()));
+    const addBins = () => { const codes = binCodes($('#lBins').value); if (!codes.length) return; lView.extra = [...new Set([...lView.extra, ...codes])]; codes.forEach(c => bSel.add(c)); $('#lBins').value = ''; $('#lBins').defaultValue = ''; redraw(); };
+    $('#lAdd')?.addEventListener('click', addBins);
+    $('#lBins')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addBins(); } });
   });
-  const n = rows.filter(i => lSel.has(i.id)).length;
-  return `<div class="col" style="gap:6px"><a class="back lbl" href="#inventory">‹ Inventory</a><h1 class="t">Bin labels</h1>
-    <p class="lede">A 50 × 30 mm label for each bin. Its QR code opens the part on a phone: took, added or counted, then Save. The NIIMBOT prints from Chrome on the Mac, on its USB-C cable.</p></div>
-  <div class="row"><button class="ib" type="button" id="lAll">${rows.length && rows.every(i => lSel.has(i.id)) ? 'Select none' : `Select all ${rows.length}`}</button>
+  return `<div class="col" style="gap:6px"><a class="back lbl" href="#inventory">‹ Inventory</a><h1 class="t">Labels</h1>
+    <p class="lede">${parts ? 'A part label goes on the part’s bag or box. Its QR code opens the part on a phone: took, added or counted, then Save.'
+      : 'A bin label goes on the bin. It carries only the bin’s code, so it stays right whatever moves in or out; its QR code opens the list of what is in that bin.'} 50 × 30 mm, printed on the NIIMBOT from Chrome on the Mac, on its USB-C cable.</p></div>
+  <div class="row" style="gap:16px">
+    <div class="seg" role="group" aria-label="Which labels"><button class="segb" type="button" data-lkind="part" aria-pressed="${parts}">Part labels</button><button class="segb" type="button" data-lkind="bin" aria-pressed="${!parts}">Bin labels</button></div>
+    ${parts ? '' : `<div class="row" style="flex:1 1 360px"><input class="inp n" id="lBins" placeholder="More bins: D1-01..D1-12, E2-03" style="flex:1;width:auto" autocomplete="off"><button class="ib" type="button" id="lAdd">Add</button></div>`}
+  </div>
+  <div class="row"><button class="ib" type="button" id="lAll">${keys.length && keys.every(k => sel.has(k)) ? 'Select none' : `Select all ${keys.length}`}</button>
     <button class="ib gold" type="button" id="lPrint" ${n ? '' : 'disabled'}>${n ? `Print ${n} on the NIIMBOT` : 'Print on the NIIMBOT'}</button><button class="ib" type="button" id="lSave" ${n ? '' : 'disabled'}>Save ${n || ''} as pictures</button>
-    <span class="note">${iView.cat !== 'All' || iView.text ? `Showing the parts Stock is filtered to (${esc(iView.cat)}${iView.text ? `, “${esc(iView.text)}”` : ''}).` : ''}${B1.supported ? '' : ' This browser can’t reach the printer: save the labels and print them from the NIIMBOT app.'}</span></div>
-  <div class="labels">${rows.map(i => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${i.id}" ${lSel.has(i.id) ? 'checked' : ''}> <span style="overflow-wrap:anywhere">${esc(i.name)}</span></span>
-    <span class="label"><canvas data-label="${i.id}" width="384" height="240"></canvas></span></label>`).join('') || '<p class="c2">No parts to label.</p>'}</div>`;
+    <span class="note">${parts && (iView.cat !== 'All' || iView.text) ? `Showing the parts Stock is filtered to (${esc(iView.cat)}${iView.text ? `, “${esc(iView.text)}”` : ''}).` : ''}${B1.supported ? '' : ' This browser can’t reach the printer: save the labels and print them from the NIIMBOT app.'}</span></div>
+  <div class="labels">${parts
+    ? rows.map(i => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${i.id}" ${lSel.has(i.id) ? 'checked' : ''}> <span style="overflow-wrap:anywhere">${esc(i.name)}</span></span>
+      <span class="label"><canvas data-label="${i.id}" width="384" height="240"></canvas></span></label>`).join('') || '<p class="c2">No parts to label.</p>'
+    : bins.map(b => `<label class="c2 col" style="gap:10px;cursor:pointer"><span class="check" style="font-size:14px"><input type="checkbox" data-lsel="${esc(b)}" ${bSel.has(b) ? 'checked' : ''}> <span class="num" style="font-size:13px;white-space:nowrap">${esc(b)}</span>
+      <span class="soft" style="overflow-wrap:anywhere">${inBin[b] ? esc(inBin[b].length === 1 ? inBin[b][0] : `${inBin[b].length} parts`) : 'empty'}</span></span>
+      <span class="label"><canvas data-binlabel="${esc(b)}" width="384" height="240"></canvas></span></label>`).join('') || '<p class="c2">No bins yet. Type the codes of the bins to label above.</p>'}</div>`;
 }
 const labelUrl = i => `${INV_SITE}#scan/${encodeURIComponent(i.sku)}`;
+const binUrl = bin => `${INV_SITE}#bin/${encodeURIComponent(bin)}`;
 async function qrMatrix(text) {
   await loadScript(QR_LIB);
   const qr = qrcode(0, 'M'); qr.addData(text); qr.make();
@@ -1848,33 +1900,51 @@ function wrapText(g, text, w, max) {
   if (lines.length > max) { lines.length = max; let last = lines[max - 1]; while (g.measureText(last + '…').width > w && last.length) last = last.slice(0, -1); lines[max - 1] = last.trimEnd() + '…'; }
   return lines;
 }
-// The label as the B1 prints it: 384 dots across (48 mm of a 50 mm label) and 240 along the feed, black or white.
-async function drawLabel(canvas, i) {
-  const m = await qrMatrix(labelUrl(i));
+// A label as the B1 prints it: 384 dots across (48 mm of a 50 mm label) and 240 along the feed, black or white.
+async function labelBase(canvas, url) {
+  const m = await qrMatrix(url);
   try { await document.fonts.load('800 40px Orbitron'); } catch {}
   const W = 384, H = 240; canvas.width = W; canvas.height = H;
   const g = canvas.getContext('2d');
-  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000';
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000'; g.textBaseline = 'alphabetic';
   const cell = Math.max(2, Math.floor(196 / m.n)), size = cell * m.n, x0 = 12, y0 = Math.round((H - size) / 2);
   for (let r = 0; r < m.n; r++) for (let c = 0; c < m.n; c++) if (m.dark(r, c)) g.fillRect(x0 + c * cell, y0 + r * cell, cell, cell);
-  const tx = x0 + size + 14, tw = W - tx - 8, bin = (i.bin || '—').toUpperCase();
-  let fs = 44;
-  do { g.font = `800 ${fs}px Orbitron, ui-monospace, monospace`; } while (g.measureText(bin).width > tw && --fs > 14);
-  g.textBaseline = 'alphabetic';
-  g.fillText(bin, tx, 22 + fs * 0.78);
-  g.font = '700 22px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
-  wrapText(g, i.name, tw, 4).forEach((line, k) => g.fillText(line, tx, 22 + fs * 0.78 + 34 + k * 26));
-  g.font = '700 18px ui-monospace, Menlo, monospace';
-  g.fillText(i.sku, tx, H - 16);
-  const img = g.getImageData(0, 0, W, H), d = img.data;
+  const tx = x0 + size + 14;
+  return { g, W, H, tx, tw:W - tx - 8 };
+}
+function labelInk(canvas) {
+  const g = canvas.getContext('2d'), img = g.getImageData(0, 0, canvas.width, canvas.height), d = img.data;
   for (let k = 0; k < d.length; k += 4) { const v = d[k] * 0.3 + d[k + 1] * 0.59 + d[k + 2] * 0.11 < 150 ? 0 : 255; d[k] = d[k + 1] = d[k + 2] = v; d[k + 3] = 255; }
   g.putImageData(img, 0, 0);
   return canvas;
 }
-async function labelCanvases(items) { return Promise.all(items.map(i => drawLabel(document.createElement('canvas'), i))); }
+const fitFont = (g, text, w, big, small, face) => { let fs = big; do { g.font = face(fs); } while (g.measureText(text).width > w && --fs > small); return fs; };
+// The part label: its name, its sku and the bin it lives in.
+async function drawLabel(canvas, i) {
+  const { g, H, tx, tw } = await labelBase(canvas, labelUrl(i));
+  g.font = '800 24px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  wrapText(g, i.name, tw, 4).forEach((line, k) => g.fillText(line, tx, 44 + k * 28));
+  if (i.bin) { fitFont(g, `BIN ${i.bin}`, tw, 22, 12, fs => `800 ${fs}px Orbitron, ui-monospace, monospace`); g.fillText(`BIN ${i.bin.toUpperCase()}`, tx, H - 46); }
+  g.font = '700 18px ui-monospace, Menlo, monospace';
+  g.fillText(i.sku, tx, H - 16);
+  return labelInk(canvas);
+}
+// The bin label: the bin's code, big, and nothing that changes.
+async function drawBinLabel(canvas, bin) {
+  const { g, H, tx, tw } = await labelBase(canvas, binUrl(bin));
+  g.font = '800 20px Orbitron, ui-monospace, monospace'; g.fillText('BIN', tx, 46);
+  const code = String(bin).toUpperCase(), fs = fitFont(g, code, tw, 72, 14, f => `800 ${f}px Orbitron, ui-monospace, monospace`);
+  g.fillText(code, tx, 46 + 18 + fs * 0.8);
+  g.font = '700 17px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  wrapText(g, 'Scan to see what’s inside', tw, 2).forEach((line, k) => g.fillText(line, tx, H - 40 + k * 21));
+  return labelInk(canvas);
+}
+const drawAny = (c, t) => (t.binLabel ? drawBinLabel(c, t.bin) : drawLabel(c, t));
+async function labelCanvases(items) { return Promise.all(items.map(t => drawAny(document.createElement('canvas'), t))); }
 async function saveLabels(items) {
   for (const [k, c] of (await labelCanvases(items)).entries()) {
-    const a = document.createElement('a'); a.download = `${items[k].sku}-label.png`; a.href = c.toDataURL('image/png'); a.click();
+    const t = items[k], a = document.createElement('a');
+    a.download = t.binLabel ? `bin-${t.bin}-label.png` : `${t.sku}-label.png`; a.href = c.toDataURL('image/png'); a.click();
     await new Promise(r => setTimeout(r, 250));
   }
 }
@@ -1887,6 +1957,26 @@ async function printLabels(items, quiet) {
     await B1.print(await labelCanvases(items));
     toast(`Printed ${items.length} label${items.length === 1 ? '' : 's'}`);
   } catch (e) { toast(e.message, true); }
+}
+// ---------- the phone: a bin label's QR code opens this, what is in that bin ----------
+function binPage(arg) {
+  if (!D.inv) return noInv;
+  const bin = decodeURIComponent(arg || ''), here = live().filter(i => i.bin.toUpperCase() === bin.toUpperCase()).sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric:true }));
+  if (here.length === 1 && !location.hash.endsWith('/all')) {   // a bin of one part opens that part, unless its list was asked for
+    setTimeout(() => location.replace(`#scan/${encodeURIComponent(here[0].sku)}`)); }
+  setTimeout(() => { $('#bAgain')?.addEventListener('click', scanLabel); const c = $('#bQr'); if (c) qrInto(c, binUrl(bin)).catch(() => {}); });
+  return `<div class="phone">
+    <div class="row" style="justify-content:space-between"><button class="link" type="button" id="bAgain" style="font-size:16px;font-weight:400;min-height:44px">‹ Scan again</button><a class="lbl" href="#inventory" style="color:#7b8488;text-decoration:none">Inventory ›</a></div>
+    <div class="c1" style="padding:18px;display:flex;gap:14px;align-items:center"><div class="qr"><canvas id="bQr" width="33" height="33"></canvas></div>
+      <div class="col" style="gap:4px"><span class="lbl">Bin</span><span class="num" style="font-size:34px;line-height:1">${esc(bin.toUpperCase())}</span><span style="font-size:13px;color:#7b8488">${here.length ? `${here.length} part${here.length === 1 ? '' : 's'} in it` : 'Nothing in it yet'}</span></div></div>
+    ${here.length ? `<div class="c2" style="padding:0 16px">${here.map(i => { const l = lvl(i);
+      return `<a href="#scan/${encodeURIComponent(i.sku)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:8px 0;border-bottom:1px solid #1e2126;color:#fff;text-decoration:none">
+        <span class="col" style="gap:2px"><span style="font-size:16px;font-weight:600">${esc(i.name)}</span><span class="mono">${esc(i.sku)}</span></span>
+        <span style="white-space:nowrap">${isTool(i) ? `<span class="lbl" style="color:${LV[l]}">${esc(i.tool_state || 'On bench')}</span>` : `<span class="num" style="font-size:18px;color:${lvInk(l)}">${num(i.on_hand)}</span> <span class="lbl" style="font-size:10px">${uTag(i)}</span>`} ›</span></a>`; }).join('')}</div>`
+    : `<p class="c2" style="margin:0">Nothing is kept in ${esc(bin)} yet. <a href="#receive">Receive stock</a> and give the part this bin.</p>`}
+    <div style="flex:1"></div>
+    <span style="font-size:13px;color:#7b8488;text-align:center">Tap a part to take, add or count it.</span>
+  </div>`;
 }
 // The B1 over its USB-C cable from Chrome (Web Serial), the same packets Ghost Factory's Niimbot.swift sends.
 const B1 = {

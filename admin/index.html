@@ -162,6 +162,19 @@ ul.day li:last-child { border-bottom: 0; }
   .cal .e { font-size: 0; height: 4px; padding: 0; border: 0; border-radius: 2px; background: var(--line2); }
   .cal .e.note { background: var(--gold); } .cal .e.release { background: var(--cool); } .cal .e.done { background: var(--ok); } .cal .e.due { background: var(--warn); }
 }
+
+/* the inventory: a count is the sum of its movements, coloured against the part's minimum */
+.tile i b { font: inherit; }
+.qty { font: 700 13.5px/1 var(--readout); letter-spacing: .5px; }
+.qty.bad, .big.bad { color: var(--bad); } .qty.warn, .big.warn { color: var(--warn); }
+.qty u { text-decoration: none; font: 600 10px/1 var(--readout); color: var(--dim); margin-inline-start: 4px; }
+.big { font: 800 48px/1 var(--readout); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; white-space: normal; }
+.chip { font: 600 10.5px/1 var(--readout); letter-spacing: .5px; color: var(--dim); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 8px; white-space: nowrap; }
+td.num, th.num { text-align: end; }
+table input.cnt { width: 96px; padding: 6px 8px; border-radius: 8px; text-align: end; font: 700 13px/1 var(--readout); }
+.like { font-size: 12.5px; color: var(--dim); min-height: 18px; }
+.like a { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -188,7 +201,7 @@ ul.day li:last-child { border-bottom: 0; }
       <div class="who"><span id="whoEmail"></span><button class="btn sm" id="reload" type="button">Refresh</button><button class="btn sm" id="signOut" type="button">Sign out</button></div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
+      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#inventory">Inventory</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a>
     </nav>
   </header>
   <main id="view"></main>
@@ -285,12 +298,12 @@ async function load() {
       q(sb.from('licence_requests').select('*').order('created_at', { ascending:false }).limit(300)),
     ]);
     D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests });
-    D.board = await loadBoard();
+    [D.board, D.inv] = await Promise.all([loadBoard(), loadInv()]);
   } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
 }
 
 function prep(r) {
-  return { ...r, board:r.board || null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
+  return { ...r, board:r.board || null, inv:r.inv || null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])), gname:Object.fromEntries(r.garages.map(g => [g.gid, g.name])) };
 }
 
 // ---------- the views, by the address's #part ----------
@@ -298,12 +311,12 @@ window.addEventListener('hashchange', render);
 function render() {
   if (!D) return;
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
-  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : page)));
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : page === 'part' ? 'inventory' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar };
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part };
   v.innerHTML = (views[page] || overview)(arg);
   window.scrollTo(0, 0);
 }
@@ -327,6 +340,7 @@ function overview() {
     <a class="tile" href="#credits" style="text-decoration:none;color:inherit"><span>Credits held by garages</span><b>${credPro} <span class="dim" style="font-size:18px">/ ${credScr}</span></b><i>Pro / screen</i></a>
     <a class="tile" href="#licences" style="text-decoration:none;color:inherit"><span>Licence requests</span><b>${D.requests.filter(r => r.status === 'pending').length}</b><i>waiting for you</i></a>
     <div class="tile"><span>Next serials</span><b style="font-size:14px;line-height:1.7" class="mono">${next('gauge')}<br>${next('pro')}<br>${next('nano')}</b></div>
+    ${D.inv ? `<a class="tile" href="#inventory/low" style="text-decoration:none;color:inherit"><span>Parts below their minimum</span><b style="${D.inv.items.some(i => invLevel(i) === 'bad') ? 'color:var(--bad)' : ''}">${D.inv.items.filter(i => invLevel(i) === 'bad').length}</b><i>of ${D.inv.items.filter(i => !i.archived).length} in the inventory</i></a>` : ''}
     ${D.board ? `<a class="tile" href="#board/todo" style="text-decoration:none;color:inherit"><span>Board steps that need you</span><b style="color:var(--gold)">${D.board.steps.filter(s => s.state !== 'Done' && s.needs_you).length}</b><i>${D.board.items.filter(i => i.stage !== 'Done').length} workstreams under way</i></a>` : ''}
   </div>
   <section class="panel"><h2>Latest</h2>${events.length ? `<ol class="timeline">${events.map(e => `<li><time>${when(e.at)}</time><div class="what">${e.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing yet.</p>'}</section>`;
@@ -619,7 +633,7 @@ async function loadBoard() {
 const FIELDS = '#view input, #view textarea, #view select', FOCUSABLE = FIELDS + ', #view button';
 const fieldKey = el => el.id ? '#' + el.id : el.dataset.sf ? `s${el.closest('[data-step]')?.dataset.step}:${el.dataset.sf}`
   : el.dataset.nf ? `n${el.closest('[data-note]')?.dataset.note}:${el.dataset.nf}` : el.dataset.stepstate ? 'ss' + el.dataset.stepstate
-  : el.dataset.sdel ? 'sd' + el.dataset.sdel : el.dataset.ndel ? 'nd' + el.dataset.ndel : '';
+  : el.dataset.sdel ? 'sd' + el.dataset.sdel : el.dataset.ndel ? 'nd' + el.dataset.ndel : el.dataset.cnt ? 'c' + el.dataset.cnt : '';
 const drawnIndex = el => Math.max(0, [...el.options].findIndex(o => o.defaultSelected));
 const unsaved = el => (el.type === 'checkbox' ? el.checked !== el.defaultChecked
   : el.tagName === 'SELECT' ? el.selectedIndex !== drawnIndex(el) : el.value !== el.defaultValue);
@@ -949,6 +963,243 @@ function calendar(arg) {
         <div><button class="btn gold" id="cnAdd" type="button">Add to ${esc(sel)}</button></div></div></section>
     <section class="panel"><h2>Coming up</h2>${coming.length ? `<ol class="timeline">${coming.map(c => `<li><time>${esc(c.day)}</time><div class="what">${c.html}</div></li>`).join('')}</ol>` : '<p class="empty">Nothing planned yet. Add a note to a day, or a date to a step.</p>'}</section>
   </div>`;
+}
+
+// ---------- the inventory (migrations/20261109120000_inventory.sql): every part, where it is, every movement ----------
+const INV_CATS = ['Boards', 'Displays', 'Modules', 'Sensors', 'Components', 'Connectors', 'Cable & wire', 'Fasteners', 'Print & consumables', 'Packaging', 'Tools'];
+const INV_UNITS = { pcs:'Pieces', m:'Metres', kg:'Kilos', tool:'A tool (a state, not a count)' };
+const MOVE_KINDS = { received:'Received', used:'Used', counted:'Counted', scrapped:'Scrapped', returned:'Returned', adjusted:'Adjusted' };
+const TOOL_STATES = ['On bench', 'Lent', 'Broken', 'Gone'];
+async function loadInv() {
+  try {
+    const [items, boms, moves] = await Promise.all([all('inv_stock', 'id'), all('inv_boms', 'id'),
+      q(sb.from('inv_moves').select('*').order('at', { ascending:false }).limit(5000))]);
+    items.forEach(i => { i.on_hand = Number(i.on_hand); i.min_qty = Number(i.min_qty); });
+    return { items, boms, moves };
+  } catch (e) { toast(`Couldn’t load the inventory: ${e.message}`, true); return null; }
+}
+async function writeInv(p, msg, reset) {
+  const { data, error } = await p;
+  if (error) { toast(/inv_items_lcsc_key/.test(error.message) ? 'That LCSC number is already a part. Search for it.' : error.message, true); return null; }
+  (reset || []).forEach(sel => { const el = $(sel); if (el) resetField(el); });
+  D.inv = await loadInv(); if (msg) toast(msg); rerender();
+  return data || true;
+}
+const invLevel = i => (i.archived || i.unit === 'tool' || !(i.min_qty > 0) ? '' : i.on_hand < i.min_qty ? 'bad' : i.on_hand < i.min_qty * 1.2 ? 'warn' : '');
+const num = n => (Number.isInteger(+n) ? (+n).toLocaleString('en-US') : (+n).toLocaleString('en-US', { maximumFractionDigits:2 }));
+const delta = n => `<span class="qty ${n > 0 ? 'plus' : 'minus'}">${n > 0 ? '+' : '−'}${num(Math.abs(n))}</span>`;
+const unitTag = u => (u === 'm' ? 'M' : u === 'kg' ? 'KG' : '');
+const qtyHtml = i => (i.unit === 'tool' ? `<span class="qty${i.tool_state === 'Broken' || i.tool_state === 'Gone' ? ' bad' : i.tool_state === 'Lent' ? ' warn' : ''}" style="font-size:11px">${esc((i.tool_state || 'On bench').toUpperCase())}</span>`
+  : `<span class="qty ${invLevel(i)}">${num(i.on_hand)}</span>${unitTag(i.unit) ? `<u>${unitTag(i.unit)}</u>` : ''}`);
+const usesHtml = i => `<span class="chips">${(i.uses || []).map(u => `<span class="chip" title="${u.fitted_by === 'jlcpcb' ? 'fitted by JLCPCB' : 'fitted by us'}">${esc(u.bom.toUpperCase())} ${num(u.qty)}</span>`).join('')}</span>`;
+const noInv = '<h1>Inventory</h1><p class="panel">The inventory didn’t load. Try Refresh.</p>';
+
+let iView = { cat:'', text:'', low:false, archived:false, adding:false };
+function invRows() {
+  const t = iView.text.toLowerCase();
+  return D.inv.items.filter(i => (iView.archived || !i.archived) && (!iView.cat || i.category === iView.cat) && (!iView.low || invLevel(i) === 'bad')
+    && (!t || [i.sku, i.name, i.lcsc, i.mpn, i.bin, i.supplier, i.notes].some(x => String(x || '').toLowerCase().includes(t))))
+    .sort((a, b) => INV_CATS.indexOf(a.category) - INV_CATS.indexOf(b.category) || a.name.localeCompare(b.name, 'en', { numeric:true }));
+}
+function inventory(sub) {
+  if (!D.inv) return noInv;
+  if (sub === 'count') return invCount();
+  if (sub === 'low') { iView.low = true; iView.cat = ''; }
+  const live = D.inv.items.filter(i => !i.archived), rows = invRows();
+  const low = live.filter(i => invLevel(i) === 'bad'), near = live.filter(i => invLevel(i) === 'warn');
+  const tools = live.filter(i => i.unit === 'tool'), last = D.inv.moves[0];
+  const counted = new Set(D.inv.moves.filter(m => m.kind === 'counted').map(m => m.item_id));
+  setTimeout(() => {
+    const s = $('#iSearch'); if (s) { s.value = iView.text; s.addEventListener('input', () => { iView.text = s.value; const c = s.selectionStart; render(); const n = $('#iSearch'); n.focus(); n.setSelectionRange(c, c); }); }
+    $('#iCat')?.addEventListener('change', e => { iView.cat = e.target.value; render(); });
+    document.querySelectorAll('[data-il]').forEach(b => b.addEventListener('click', () => { iView.low = b.dataset.il === '1'; if (location.hash !== '#inventory') location.hash = '#inventory'; else render(); }));
+    $('#iArch')?.addEventListener('change', e => { iView.archived = e.target.checked; render(); });
+    $('#iNew')?.addEventListener('click', () => { iView.adding = !iView.adding; render(); if (iView.adding) $('#npName')?.focus(); });
+    bindNewPart();
+  });
+  return `<h1>Inventory</h1>
+  <div class="tiles">
+    <div class="tile"><span>Parts</span><b>${live.length}</b><i>${new Set(live.map(i => i.category)).size} categories · ${new Set(live.map(i => i.bin).filter(Boolean)).size} bins</i></div>
+    <a class="tile" href="#inventory/low" style="text-decoration:none;color:inherit"><span>Below their minimum</span><b style="${low.length ? 'color:var(--bad)' : ''}">${low.length}</b><i>${near.length} more within 20% of it</i></a>
+    <a class="tile" href="#inventory/count" style="text-decoration:none;color:inherit"><span>Counted so far</span><b>${counted.size}</b><i>of ${live.filter(i => i.unit !== 'tool').length} · Stocktake</i></a>
+    <div class="tile"><span>Tools</span><b>${tools.length}</b><i>${tools.filter(i => i.tool_state === 'Lent').length} lent · ${tools.filter(i => i.tool_state === 'Broken').length} broken</i></div>
+    <div class="tile"><span>Last movement</span><b style="font-size:14px;line-height:1.7">${last ? esc(day(last.at)) : '—'}</b><i>${last ? `${esc(MOVE_KINDS[last.kind])} by ${who(last.by)}` : 'nothing moved yet'}</i></div>
+  </div>
+  <div class="tools">
+    <input type="search" id="iSearch" placeholder="Name, value, LCSC number, sku, bin, supplier" aria-label="Search the inventory">
+    <select id="iCat" aria-label="Category">${opts(INV_CATS, iView.cat, 'All categories')}</select>
+    <div class="seg" role="group"><button type="button" data-il="0" aria-pressed="${!iView.low}">All</button><button type="button" data-il="1" aria-pressed="${iView.low}">Below minimum</button></div>
+    <label class="check"><input type="checkbox" id="iArch" ${iView.archived ? 'checked' : ''}> Archived too</label>
+    <a class="btn" href="#inventory/count" style="text-decoration:none;color:var(--ink)">Stocktake</a>
+    <button class="btn gold" id="iNew" type="button" aria-expanded="${iView.adding}">New part</button>
+  </div>
+  ${iView.adding ? newPartForm() : ''}
+  ${rows.length ? `<div class="tablewrap"><table><thead><tr><th>Sku</th><th>Part</th><th>Category</th><th>Bin</th><th class="num">On hand</th><th class="num">Min</th><th>Goes into</th></tr></thead><tbody>
+    ${rows.map(i => `<tr class="go" data-href="part/${i.id}"><td><a class="mono" href="#part/${i.id}" style="color:var(--dim)">${esc(i.sku)}</a></td>
+      <td class="wrap"><a href="#part/${i.id}" style="color:var(--ink);text-decoration:none;font-weight:600">${esc(i.name)}</a>${i.archived ? ' <span class="badge cancelled">ARCHIVED</span>' : ''}${i.lcsc || i.mpn ? `<br><span class="mono dim">${esc([i.lcsc, i.mpn && !i.name.startsWith(i.mpn) ? i.mpn : ''].filter(Boolean).join(' · '))}</span>` : ''}</td>
+      <td class="dim">${esc(i.category)}</td><td class="mono">${esc(i.bin) || '<span class="dim">—</span>'}</td>
+      <td class="num">${qtyHtml(i)}</td><td class="num dim">${i.unit === 'tool' || !i.min_qty ? '—' : num(i.min_qty)}</td><td>${usesHtml(i)}</td></tr>`).join('')}
+  </tbody></table></div>
+  <p class="dim" style="margin:0;font-size:12.5px">${rows.length} of ${live.length}. Red is below the minimum, amber within 20% of it. A number is the sum of the part’s movements, so it changes only by receiving, using, counting or scrapping.</p>`
+  : `<p class="panel empty">${D.inv.items.length ? 'Nothing matches.' : 'No parts yet. Bring in the boards’ parts lists (tools/inventory/README.md), or add a part.'}</p>`}`;
+}
+
+function newPartForm() {
+  return `<section class="panel" id="npForm"><h2>New part</h2><div class="form">
+    <label class="full">Name<input id="npName" placeholder="GX12 4-pin aviation socket, panel mount" autocomplete="off"></label>
+    <p class="like full" id="npLike" role="status"></p>
+    <label>Category<select id="npCat">${opts(INV_CATS, iView.cat || 'Components')}</select></label>
+    <label>Counted in<select id="npUnit">${Object.entries(INV_UNITS).map(([v, n]) => `<option value="${v}">${esc(n)}</option>`).join('')}</select></label>
+    <label>Bin<input id="npBin" placeholder="D1-09" list="npBins"><datalist id="npBins">${[...new Set(D.inv.items.map(i => i.bin).filter(Boolean))].sort().map(b => `<option value="${esc(b)}">`).join('')}</datalist></label>
+    <label>Warn below<input id="npMin" type="number" min="0" step="any" placeholder="0"></label>
+    <label>Received now<input id="npQty" type="number" min="0" step="any" placeholder="0"></label>
+    <label>Supplier<input id="npSupplier" placeholder="LCSC, AliExpress, Voltaat"></label>
+    <label>Price each<input id="npCost" type="number" min="0" step="any" placeholder="QAR"></label>
+    <label>LCSC number<input id="npLcsc" placeholder="C2932676" autocomplete="off"></label>
+    <label>Maker’s part number<input id="npMpn" placeholder="Optional"></label>
+    <label class="full">Shop link<input id="npUrl" type="url" placeholder="https://"></label>
+    <label class="full">Notes<input id="npNotes" placeholder="What it’s for, what to check when it arrives"></label>
+    <div class="tools full"><button class="btn gold" id="npAdd" type="button">Add part</button><button class="btn" id="npCancel" type="button">Cancel</button></div>
+  </div></section>`;
+}
+function bindNewPart() {
+  if (!$('#npForm')) return;
+  const like = () => {                         // a part that may already be here, before it's added twice
+    const n = $('#npName').value.trim().toLowerCase(), l = $('#npLcsc').value.trim().toUpperCase();
+    const words = n.split(/\s+/).filter(w => w.length > 2);
+    const hits = D.inv.items.filter(i => (l && i.lcsc === l) || (words.length && words.every(w => i.name.toLowerCase().includes(w)))).slice(0, 3);
+    $('#npLike').innerHTML = hits.length ? `Already here: ${hits.map(i => `<a href="#part/${i.id}">${esc(i.name)}</a> <span class="mono">${esc(i.sku)}</span>`).join(' · ')}` : '';
+  };
+  $('#npName').addEventListener('input', like); $('#npLcsc').addEventListener('input', like);
+  $('#npCancel').addEventListener('click', () => { iView.adding = false; render(); });
+  $('#npAdd').addEventListener('click', async e => {
+    const name = $('#npName').value.trim(), qty = Number($('#npQty').value || 0), unit = $('#npUnit').value;
+    if (!name) { toast('Give the part a name.', true); $('#npName').focus(); return; }
+    const lcsc = $('#npLcsc').value.trim().toUpperCase();
+    if (lcsc && !/^C\d+$/.test(lcsc)) { toast('An LCSC number is a C and digits, like C2932676.', true); return; }
+    e.target.disabled = true;
+    const { data, error } = await sb.from('inv_items').insert({ name, category:$('#npCat').value, unit, bin:$('#npBin').value.trim(), min_qty:Number($('#npMin').value || 0),
+      supplier:$('#npSupplier').value.trim(), unit_cost:$('#npCost').value === '' ? null : Number($('#npCost').value), lcsc:lcsc || null,
+      mpn:$('#npMpn').value.trim(), url:$('#npUrl').value.trim(), notes:$('#npNotes').value.trim() }).select('id, sku').single();
+    if (error) { e.target.disabled = false; toast(/inv_items_lcsc_key/.test(error.message) ? 'That LCSC number is already a part. Search for it.' : error.message, true); return; }
+    if (qty > 0 && unit !== 'tool') await sb.from('inv_moves').insert({ item_id:data.id, kind:'received', qty });
+    iView.adding = false;
+    D.inv = await loadInv(); toast(`Added ${data.sku}: ${name}${qty > 0 && unit !== 'tool' ? `, ${num(qty)} received` : ''}`);
+    location.hash = `#part/${data.id}`;
+  });
+}
+
+function part(id) {
+  if (!D.inv) return noInv;
+  const i = D.inv.items.find(x => String(x.id) === id);
+  if (!i) return '<p class="panel">No such part. <a href="#inventory">Back to the inventory</a></p>';
+  const tool = i.unit === 'tool';
+  let run = 0;
+  const moves = D.inv.moves.filter(m => m.item_id === i.id).reverse().map(m => ({ ...m, after:(run += Number(m.qty)) })).reverse();
+  setTimeout(() => {
+    const kind = $('#mKind');
+    const relabel = () => { $('#mQtyLabel').firstChild.textContent = kind.value === 'counted' ? 'Found in the bin' : kind.value === 'adjusted' ? 'Change (+ or −)' : 'How many'; };
+    kind?.addEventListener('change', relabel);
+    $('#mSave')?.addEventListener('click', async () => {
+      const k = kind.value, v = $('#mQty').value;
+      if (v === '' || isNaN(+v) || (k !== 'counted' && +v === 0) || (k === 'counted' && +v < 0)) { toast(k === 'counted' ? 'Type the number found in the bin.' : 'Type how many.', true); $('#mQty').focus(); return; }
+      const row = { item_id:i.id, kind:k, ref:$('#mRef').value.trim(), note:$('#mNote').value.trim() };
+      if (k === 'counted') row.count_to = +v; else row.qty = +v;
+      await writeInv(sb.from('inv_moves').insert(row), `${MOVE_KINDS[k]}: ${i.name}`, ['#mQty', '#mRef', '#mNote', '#mKind']);
+    });
+    $('#tSave')?.addEventListener('click', () => writeInv(sb.from('inv_items').update({ tool_state:$('#tState').value }).eq('id', i.id), `${i.name}: ${$('#tState').value}`));
+    $('#pSave')?.addEventListener('click', () => {
+      const name = $('#pName').value.trim(), lcsc = $('#pLcsc').value.trim().toUpperCase();
+      if (!name) { toast('A part needs a name.', true); return; }
+      if (lcsc && !/^C\d+$/.test(lcsc)) { toast('An LCSC number is a C and digits, like C2932676.', true); return; }
+      writeInv(sb.from('inv_items').update({ name, category:$('#pCat').value, unit:$('#pUnit').value, bin:$('#pBin').value.trim(), min_qty:Number($('#pMin').value || 0),
+        supplier:$('#pSupplier').value.trim(), unit_cost:$('#pCost').value === '' ? null : Number($('#pCost').value), currency:$('#pCur').value.trim() || 'QAR',
+        lcsc:lcsc || null, mpn:$('#pMpn').value.trim(), url:$('#pUrl').value.trim(), notes:$('#pNotes').value.trim(), archived:$('#pArch').checked }).eq('id', i.id), 'Saved');
+    });
+  });
+  const lv = invLevel(i);
+  return `<a class="back" href="#inventory">‹ Inventory${i.category ? ' · ' + esc(i.category) : ''}</a>
+  <div><h1 style="font-family:inherit;letter-spacing:0;font-size:22px">${esc(i.name)}</h1><p class="mono dim" style="margin:6px 0 0">${esc([i.sku, i.lcsc, i.mpn].filter(Boolean).join(' · '))}${i.archived ? ' · archived' : ''}</p></div>
+  <div class="two">
+    <section class="panel"><h2>${tool ? 'Where it is' : 'Stock'}</h2>
+      ${tool ? `<div class="form"><label>State<select id="tState">${opts(TOOL_STATES, i.tool_state || 'On bench')}</select></label><div><button class="btn gold" id="tSave" type="button">Save</button></div></div>`
+      : `<div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px"><span class="big ${lv}">${num(i.on_hand)}</span><span class="dim">${esc(INV_UNITS[i.unit].toLowerCase())}${i.min_qty ? ` · warn below ${num(i.min_qty)}` : ''}${i.bin ? ` · bin <span class="mono" style="color:var(--ink)">${esc(i.bin)}</span>` : ''}</span></div>
+      <div class="form">
+        <label>What happened<select id="mKind">${Object.entries(MOVE_KINDS).map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label>
+        <label id="mQtyLabel">How many<input id="mQty" type="number" step="any" inputmode="decimal"></label>
+        <label>Serial, order or build<input id="mRef" placeholder="GE-G-000006"></label>
+        <label>Note<input id="mNote" placeholder="Optional"></label>
+        <div><button class="btn gold" id="mSave" type="button">Save</button></div>
+      </div>`}
+      ${(i.uses || []).length ? `<h2 style="margin-top:18px">Goes into</h2><dl class="kv">${i.uses.map(u => `<dt>${esc(u.name)}</dt><dd>× ${num(u.qty)} <span class="dim">· ${u.fitted_by === 'jlcpcb' ? 'fitted by JLCPCB' : 'fitted by us'}</span></dd>`).join('')}</dl>
+      ${i.uses.some(u => u.fitted_by === 'jlcpcb') ? '<p class="dim" style="margin:10px 0 0;font-size:12.5px">What JLCPCB fits comes on the assembled board, so building one doesn’t take it from this shelf.</p>' : ''}` : ''}
+    </section>
+    <section class="panel"><h2>About it</h2><div class="form">
+      <label class="full">Name<input id="pName" value="${esc(i.name)}"></label>
+      <label>Category<select id="pCat">${opts(INV_CATS, i.category)}</select></label>
+      <label>Counted in<select id="pUnit">${Object.entries(INV_UNITS).map(([v, n]) => `<option value="${v}" ${v === i.unit ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+      <label>Bin<input id="pBin" value="${esc(i.bin)}"></label>
+      <label>Warn below<input id="pMin" type="number" min="0" step="any" value="${i.min_qty || ''}" placeholder="0"></label>
+      <label>Supplier<input id="pSupplier" value="${esc(i.supplier)}"></label>
+      <label>Price each<input id="pCost" type="number" min="0" step="any" value="${i.unit_cost ?? ''}"></label>
+      <label>Currency<input id="pCur" value="${esc(i.currency || 'QAR')}"></label>
+      <label>LCSC number<input id="pLcsc" value="${esc(i.lcsc || '')}"></label>
+      <label>Maker’s part number<input id="pMpn" value="${esc(i.mpn)}"></label>
+      <label class="full">Shop link<input id="pUrl" type="url" value="${esc(i.url)}"></label>
+      <label class="full">Notes<textarea id="pNotes">${esc(i.notes)}</textarea></label>
+      <label class="check full"><input type="checkbox" id="pArch" ${i.archived ? 'checked' : ''}> Archived: no longer bought or used (it keeps its history)</label>
+      <div class="tools full"><button class="btn gold" id="pSave" type="button">Save</button>${i.url ? `<a class="btn" href="${esc(i.url)}" target="_blank" rel="noopener" style="text-decoration:none">Open the shop</a>` : ''}</div>
+      <p class="by full" style="margin:0">${changedLine(i)}</p>
+    </div></section>
+  </div>
+  ${tool ? '' : `<section class="panel"><h2>Every movement</h2>${moves.length ? `<div class="tablewrap" style="border:0"><table><thead><tr><th>When</th><th>What</th><th class="num">Change</th><th class="num">After</th><th>Serial / order</th><th>Note</th><th>Who</th></tr></thead><tbody>
+    ${moves.map(m => `<tr><td class="dim">${when(m.at)}</td><td>${esc(MOVE_KINDS[m.kind])}${m.kind === 'counted' ? ` <span class="dim">· found ${num(m.count_to)}</span>` : ''}</td><td class="num">${+m.qty ? delta(+m.qty) : '<span class="dim">0</span>'}</td>
+      <td class="num qty">${num(m.after)}</td><td class="mono">${esc(m.ref)}</td><td class="wrap">${esc(m.note)}</td><td class="by">${who(m.by)}</td></tr>`).join('')}
+  </tbody></table></div>` : '<p class="empty">Nothing has moved yet. Receive some, or count what’s in the bin.</p>'}</section>`}`;
+}
+
+// A stocktake: type what each bin holds; only the rows typed in are saved, each as a count.
+let cView = { cat:'', bin:'', text:'' };
+function invCount() {
+  const t = cView.text.toLowerCase();
+  const rows = D.inv.items.filter(i => !i.archived && i.unit !== 'tool' && (!cView.cat || i.category === cView.cat) && (!cView.bin || i.bin === cView.bin)
+    && (!t || [i.sku, i.name, i.lcsc, i.bin].some(x => String(x || '').toLowerCase().includes(t))))
+    .sort((a, b) => (a.bin || '~').localeCompare(b.bin || '~', 'en', { numeric:true }) || a.name.localeCompare(b.name, 'en', { numeric:true }));
+  const lastCount = Object.fromEntries([...D.inv.moves].reverse().filter(m => m.kind === 'counted').map(m => [m.item_id, m.at]));
+  setTimeout(() => {
+    const s = $('#cSearch'); if (s) { s.value = cView.text; s.addEventListener('input', () => { cView.text = s.value; const c = s.selectionStart; rerender(); const n = $('#cSearch'); n.focus(); n.setSelectionRange(c, c); }); }
+    $('#cCat')?.addEventListener('change', e => { cView.cat = e.target.value; rerender(); });
+    $('#cBin')?.addEventListener('change', e => { cView.bin = e.target.value; rerender(); });
+    const typed = () => [...document.querySelectorAll('[data-cnt]')].filter(el => el.value !== '');
+    const sum = () => { const n = typed().length; $('#cSave').disabled = !n; $('#cSave').textContent = n ? `Save ${n} count${n === 1 ? '' : 's'}` : 'Save counts'; };
+    document.querySelectorAll('[data-cnt]').forEach(el => {
+      const show = () => { const i = D.inv.items.find(x => String(x.id) === el.dataset.cnt), d = el.value === '' ? null : +el.value - i.on_hand;
+        $(`#cd${i.id}`).innerHTML = d == null ? '' : d === 0 ? '<span class="dim">right</span>' : delta(d); sum(); };
+      el.addEventListener('input', show); if (el.value !== '') show();
+    });
+    sum();
+    $('#cSave').addEventListener('click', async e => {
+      const list = typed();
+      if (list.some(el => isNaN(+el.value) || +el.value < 0)) { toast('A count is 0 or more.', true); return; }
+      e.target.disabled = true;
+      const rows = list.map(el => ({ item_id:+el.dataset.cnt, kind:'counted', count_to:+el.value, note:'stocktake' }));
+      if (!await writeInv(sb.from('inv_moves').insert(rows), `Saved ${rows.length} count${rows.length === 1 ? '' : 's'}`, list.map(el => `[data-cnt="${el.dataset.cnt}"]`))) e.target.disabled = false;
+    });
+  });
+  const bins = [...new Set(D.inv.items.map(i => i.bin).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'en', { numeric:true }));
+  return `<a class="back" href="#inventory">‹ Inventory</a><h1>Stocktake</h1>
+  <p class="dim" style="margin:0">Go bin by bin and type what you find. Rows left empty aren’t touched; each one typed in is saved as a count, and the difference goes in its history.</p>
+  <div class="tools">
+    <input type="search" id="cSearch" placeholder="Name, LCSC number, sku, bin" aria-label="Search">
+    <select id="cCat" aria-label="Category">${opts(INV_CATS.filter(c => c !== 'Tools'), cView.cat, 'All categories')}</select>
+    <select id="cBin" aria-label="Bin">${opts(bins, cView.bin, 'All bins')}</select>
+    <button class="btn gold" id="cSave" type="button" disabled>Save counts</button>
+  </div>
+  ${rows.length ? `<div class="tablewrap"><table><thead><tr><th>Bin</th><th>Part</th><th class="num">Expected</th><th class="num">Found</th><th class="num">Difference</th><th>Last counted</th></tr></thead><tbody>
+    ${rows.map(i => `<tr><td class="mono">${esc(i.bin) || '<span class="dim">—</span>'}</td><td class="wrap"><a href="#part/${i.id}" style="color:var(--ink);text-decoration:none">${esc(i.name)}</a><br><span class="mono dim">${esc([i.sku, i.lcsc].filter(Boolean).join(' · '))}</span></td>
+      <td class="num">${qtyHtml(i)}</td><td class="num"><input class="cnt" data-cnt="${i.id}" type="number" min="0" step="any" inputmode="decimal" aria-label="Found: ${esc(i.name)}"></td>
+      <td class="num" id="cd${i.id}"></td><td class="dim">${lastCount[i.id] ? esc(day(lastCount[i.id])) : 'never'}</td></tr>`).join('')}
+  </tbody></table></div>` : '<p class="panel empty">Nothing to count here.</p>'}`;
 }
 
 // tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in

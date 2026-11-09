@@ -991,7 +991,7 @@ const delta = n => `<span class="qty ${n > 0 ? 'plus' : 'minus'}">${n > 0 ? '+' 
 const unitTag = u => (u === 'm' ? 'M' : u === 'kg' ? 'KG' : '');
 const qtyHtml = i => (i.unit === 'tool' ? `<span class="qty${i.tool_state === 'Broken' || i.tool_state === 'Gone' ? ' bad' : i.tool_state === 'Lent' ? ' warn' : ''}" style="font-size:11px">${esc((i.tool_state || 'On bench').toUpperCase())}</span>`
   : `<span class="qty ${invLevel(i)}">${num(i.on_hand)}</span>${unitTag(i.unit) ? `<u>${unitTag(i.unit)}</u>` : ''}`);
-const usesHtml = i => `<span class="chips">${(i.uses || []).map(u => `<span class="chip" title="${u.fitted_by === 'jlcpcb' ? 'fitted by JLCPCB' : 'fitted by us'}">${esc(u.bom.toUpperCase())} ${num(u.qty)}</span>`).join('')}</span>`;
+const usesHtml = i => `<span class="chips">${(i.uses || []).map(u => `<span class="chip">${esc(u.bom.toUpperCase())} ${num(u.qty)}</span>`).join('')}</span>`;
 const noInv = '<h1>Inventory</h1><p class="panel">The inventory didn’t load. Try Refresh.</p>';
 
 let iView = { cat:'', text:'', low:false, archived:false, adding:false };
@@ -1041,7 +1041,7 @@ function inventory(sub) {
       <td class="num">${qtyHtml(i)}</td><td class="num dim">${i.unit === 'tool' || !i.min_qty ? '—' : num(i.min_qty)}</td><td>${usesHtml(i)}</td></tr>`).join('')}
   </tbody></table></div>
   <p class="dim" style="margin:0;font-size:12.5px">${rows.length} of ${live.length}. Red is below the minimum, amber within 20% of it. A number is the sum of the part’s movements, so it changes only by receiving, using, counting or scrapping.</p>`
-  : `<p class="panel empty">${D.inv.items.length ? 'Nothing matches.' : 'No parts yet. Bring in the boards’ parts lists (tools/inventory/README.md), or add a part.'}</p>`}`;
+  : `<p class="panel empty">${D.inv.items.length ? 'Nothing matches.' : 'No parts yet. Add one with New part.'}</p>`}`;
 }
 
 function newPartForm() {
@@ -1131,8 +1131,7 @@ function part(id) {
         <label>Note<input id="mNote" placeholder="Optional"></label>
         <div><button class="btn gold" id="mSave" type="button">Save</button></div>
       </div>`}
-      ${(i.uses || []).length ? `<h2 style="margin-top:18px">Goes into</h2><dl class="kv">${i.uses.map(u => `<dt>${esc(u.name)}</dt><dd>× ${num(u.qty)} <span class="dim">· ${u.fitted_by === 'jlcpcb' ? 'fitted by JLCPCB' : 'fitted by us'}</span></dd>`).join('')}</dl>
-      ${i.uses.some(u => u.fitted_by === 'jlcpcb') ? '<p class="dim" style="margin:10px 0 0;font-size:12.5px">What JLCPCB fits comes on the assembled board, so building one doesn’t take it from this shelf.</p>' : ''}` : ''}
+      ${(i.uses || []).length ? `<h2 style="margin-top:18px">Goes into</h2><dl class="kv">${i.uses.map(u => `<dt>${esc(u.name)}</dt><dd>× ${num(u.qty)} a unit</dd>`).join('')}</dl>` : ''}
     </section>
     <section class="panel"><h2>About it</h2><div class="form">
       <label class="full">Name<input id="pName" value="${esc(i.name)}"></label>

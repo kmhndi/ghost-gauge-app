@@ -1510,7 +1510,7 @@ function invBuild() {
 }
 
 // ---------- Receive stock: a part on the list, or a new one, in one step ----------
-const R0 = () => ({ arg:undefined, text:'', pick:null, adding:false, qty:1, unit:'pcs', prods:{}, order:'', print:true, photo:null, photoUrl:'', extra:{}, more:false });
+const R0 = () => ({ arg:undefined, text:'', pick:null, adding:false, qty:1, unit:'pcs', prods:{}, order:'', print:true, photo:null, photoUrl:'', extra:{}, more:false, onOrder:false });
 let rView = R0();
 function receive(arg) {
   if (!D.inv) return noInv;
@@ -1529,7 +1529,7 @@ function receive(arg) {
   const hits = !it && rView.text.trim() ? live().filter(i => matches(i, rView.text) || (i.lcsc && i.lcsc === rView.text.trim().toUpperCase())).slice(0, 6) : [];
   setTimeout(bindReceive);
   return `<div class="col" style="gap:6px"><a class="back lbl" href="#inventory">‹ Inventory</a><h1 class="t">Receive stock</h1>
-    <p class="lede">Find the part. If it isn't in the list yet, add it here and receive it in the same step.</p></div>
+    <p class="lede">Find the part. If it isn't in the list yet, add it here and receive it in the same step, or add it as on order if it hasn't come yet.</p></div>
   <div class="col" style="gap:8px;max-width:880px">
     <div class="row"><label class="search lg">${SVG.search}<span class="sr">Find a part</span><input type="search" id="rSearch" value="${esc(rView.text)}" placeholder="Name, LCSC number, sku or bin" autocomplete="off"></label>
       <button class="ib" type="button" id="rScan" style="min-height:48px">${SVG.scan}<span>Scan a bag</span></button></div>
@@ -1589,11 +1589,16 @@ function receiveNew() {
 function receiveAside(it) {
   const unit = it ? it.unit : rView.unit, tag = (INV_UNITS[unit] || INV_UNITS.pcs).tag;
   const lines = it ? I().orders.filter(o => o.item_id === it.id && o.status === 'open' && o.left > 0) : [];
-  return `<aside class="col" aria-label="This delivery" style="flex:2 1 380px">
-    <div class="c1 col" style="padding:20px;gap:14px"><span class="lbl">This delivery</span>
+  const ordering = !it && unit !== 'tool' && rView.onOrder;
+  return `<aside class="col" aria-label="${ordering ? 'This order' : 'This delivery'}" style="flex:2 1 380px">
+    <div class="c1 col" style="padding:20px;gap:14px"><span class="lbl">${ordering ? 'This order' : 'This delivery'}</span>
+      ${!it && unit !== 'tool' ? `<div class="seg sm" role="group" aria-label="Has it arrived"><button class="segb" type="button" data-arrival="here" aria-pressed="${!ordering}">Arrived now</button><button class="segb" type="button" data-arrival="order" aria-pressed="${ordering}">Not here yet — on order</button></div>` : ''}
       ${unit === 'tool' ? '<span class="note">A tool arrives once: saving puts it on the bench.</span>' : `<div class="row" style="gap:14px;flex-wrap:nowrap"><button class="step" type="button" id="rDec" aria-label="One fewer">−</button>
-        <input class="bignum" id="rQty" inputmode="decimal" value="${esc(rView.qty)}" aria-label="How many arrived"><button class="step" type="button" id="rInc" aria-label="One more">+</button><span class="lbl">${tag}</span></div>`}
-      <label class="field"><span class="lbl">Against an order</span><select class="inp" id="rOrder"><option value="">No order — bought outright</option>${lines.map(o => `<option value="${o.id}" ${String(o.id) === rView.order ? 'selected' : ''}>${esc(o.ordered_on)} · ${esc(o.supplier || 'No supplier')} · ${num(o.left)} still to come${o.ref ? ` · ${esc(o.ref)}` : ''}</option>`).join('')}</select></label>
+        <input class="bignum" id="rQty" inputmode="decimal" value="${esc(rView.qty)}" aria-label="${ordering ? 'How many were ordered' : 'How many arrived'}"><button class="step" type="button" id="rInc" aria-label="One more">+</button><span class="lbl">${tag}</span></div>`}
+      ${ordering ? `<div class="grid2"><label class="field"><span class="lbl">Ordered on</span><input class="inp" id="rDay" type="date" value="${today()}"></label>
+        <label class="field"><span class="lbl">Order number</span><input class="inp" id="rRef" placeholder="Optional"></label></div>
+        <span class="note">The supplier and price come from “Where it came from”. Nothing goes on the shelf until it arrives; then its page offers Receive the ones on order.</span>`
+      : `<label class="field"><span class="lbl">Against an order</span><select class="inp" id="rOrder"><option value="">No order — bought outright</option>${lines.map(o => `<option value="${o.id}" ${String(o.id) === rView.order ? 'selected' : ''}>${esc(o.ordered_on)} · ${esc(o.supplier || 'No supplier')} · ${num(o.left)} still to come${o.ref ? ` · ${esc(o.ref)}` : ''}</option>`).join('')}</select></label>`}
       <label class="field"><span class="lbl">Note</span><input class="inp" id="rNote" placeholder="For the rev C case's back plate"></label>
     </div>
     <div class="c2 col" style="gap:10px"><span class="lbl">Bin label</span><div class="label"><canvas id="rLabel" width="384" height="240"></canvas></div>
@@ -1626,11 +1631,13 @@ function rSync() {
   const o = rView.order ? I().orders.find(x => String(x.id) === rView.order) : null;
   const sum = [];
   if (!it) sum.push(`Add ${esc(d.name)} as ${esc(d.sku)}${d.bin ? ` in bin ${esc(d.bin)}` : ', with no bin yet'}`);
-  sum.push(tool ? 'Put it on the bench' : `Record ${num(q)} ${esc(word)} received, today, by you${o ? `, against the ${esc(o.supplier || '')} order of ${esc(o.ordered_on)}` : ''}`);
+  const ordering = !it && !tool && rView.onOrder, sup = $('#rSupplier')?.value.trim();
+  if (ordering) sum.push(`Record an order of ${num(q)} ${esc(word)}${sup ? ` from ${esc(sup)}` : ''}, ordered ${esc($('#rDay')?.value || today())}; nothing goes on the shelf until it arrives`);
+  else sum.push(tool ? 'Put it on the bench' : `Record ${num(q)} ${esc(word)} received, today, by you${o ? `, against the ${esc(o.supplier || '')} order of ${esc(o.ordered_on)}` : ''}`);
   if (!it) sum.push(on.length ? `Add it to the build list of ${on.map(b => `${esc(b.name)} × ${esc(rView.prods[b.id] || 1)}`).join(', ')}` : 'Keep it off every build list (a spare)');
   if (rView.print) sum.push(B1.supported ? 'Print its bin label on the NIIMBOT' : 'Save its bin label as a picture');
   if ($('#rSum')) $('#rSum').innerHTML = sum.map(s => `<span style="font-size:14px;color:#c9d0d4">${s}</span>`).join('');
-  if ($('#rSave')) $('#rSave').textContent = it ? `Receive ${num(q)}` : tool ? 'Add the tool' : `Add part and receive ${num(q)}`;
+  if ($('#rSave')) $('#rSave').textContent = it ? `Receive ${num(q)}` : tool ? 'Add the tool' : ordering ? `Add part, ${num(q)} on order` : `Add part and receive ${num(q)}`;
   clearTimeout(rLabelT);
   rLabelT = setTimeout(() => { const c = $('#rLabel'); if (c) drawLabel(c, d).catch(() => {}); }, 150);
 }
@@ -1676,6 +1683,7 @@ function bindReceive() {
     b.addEventListener('click', flip); b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(e); } });
   });
   $('#rMore')?.addEventListener('toggle', e => { rView.more = e.target.open; });
+  document.querySelectorAll('[data-arrival]').forEach(b => b.addEventListener('click', () => { rRead(); rView.onOrder = b.dataset.arrival === 'order'; if (rView.onOrder) rView.more = true; redraw(); }));
   const step = d => { rRead(); rView.qty = Math.max(1, Math.round((+rView.qty || 0) + d)); const el = $('#rQty'); el.value = rView.qty; el.defaultValue = rView.qty; rSync(); };
   $('#rDec')?.addEventListener('click', () => step(-1)); $('#rInc')?.addEventListener('click', () => step(1));
   $('#rFill')?.addEventListener('click', rFill);
@@ -1692,7 +1700,8 @@ function bindReceive() {
 async function rSave(btn) {
   rRead();
   const it = rView.pick ? I().byId.get(rView.pick) : null, tool = (it ? it.unit : rView.unit) === 'tool', q = +rView.qty;
-  if (!tool && !(q > 0)) { toast('How many arrived?', true); $('#rQty')?.focus(); return; }
+  const ordering = !it && !tool && rView.onOrder;
+  if (!tool && !(q > 0)) { toast(ordering ? 'How many were ordered?' : 'How many arrived?', true); $('#rQty')?.focus(); return; }
   const note = $('#rNote').value.trim(), print = rView.print;
   if (print && B1.supported && !await B1.choose()) return;
   btn.disabled = true;
@@ -1713,7 +1722,11 @@ async function rSave(btn) {
       if (per.length) { const r = await sb.from('inv_bom_lines').insert(per.map(([bom_id, qty_per]) => ({ bom_id, item_id:id, qty_per, fitted_by:'us' }))); if (r.error) toast(r.error.message, true); }
       if (rView.photo) { const path = await uploadPhoto(id, rView.photo); if (path) await sb.from('inv_items').update({ photo:path }).eq('id', id); }
     }
-    if (!tool) {
+    if (ordering) {
+      const { data:o, error } = await sb.from('inv_orders').insert({ supplier:$('#rSupplier').value.trim(), ref:$('#rRef').value.trim(), note, ordered_on:$('#rDay').value || today() }).select('id').single();
+      const r = error ? { error } : await sb.from('inv_order_lines').insert({ order_id:o.id, item_id:id, qty:q, unit_cost:$('#rCost').value === '' ? null : Number($('#rCost').value), currency:$('#rCur').value });
+      if (r.error) { toast(`The part is in, but the order didn’t save: ${r.error.message}. Record it on its page.`, true); location.hash = `#part/${id}`; return; }
+    } else if (!tool) {
       const row = { item_id:id, kind:'received', qty:q, note };
       if (rView.order) row.order_line = +rView.order;
       const { error } = await sb.from('inv_moves').insert(row);
@@ -1721,7 +1734,7 @@ async function rSave(btn) {
     }
     D.inv = await loadInv();
     const saved = I().byId.get(id);
-    toast(it ? `Received ${num(q)}: ${name}` : `Added ${saved?.sku || ''}: ${name}${tool ? '' : `, ${num(q)} received`}`);
+    toast(it ? `Received ${num(q)}: ${name}` : `Added ${saved?.sku || ''}: ${name}${tool ? '' : ordering ? `, ${num(q)} on order` : `, ${num(q)} received`}`);
     if (print && saved) await printLabels([saved], true);
     rView = R0(); rView.arg = `done${Date.now()}`;
     location.hash = `#part/${id}`;

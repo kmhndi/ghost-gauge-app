@@ -1292,6 +1292,8 @@ const TOOL_STATES = ['On bench', 'Lent', 'Broken', 'Gone'];
 const INV_SITE = 'https://kmhndi.github.io/ghost-gauge-app/admin/';
 const PRODUCT_ORDER = { gauge:0, pro:1, nano:2 };
 const CUR_SIGN = { EUR:'€', USD:'$', GBP:'£' };
+// Totals are in QAR. The riyal is pegged to the dollar; the others are rough and only matter if a part is priced in them.
+const QAR_RATE = { QAR:1, USD:3.64, EUR:3.95, GBP:4.6, CNY:0.51 };
 const QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
 const JSQR_LIB = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
 const SVG = {
@@ -1678,14 +1680,27 @@ function bindPart(i) {
 
 // ---------- Can I build? A product × quantity against the shelf ----------
 let buView = { bom:'', qty:1, naming:false };
+// What one of a part costs, in QAR: its own price, or else the latest order line that has one.
+function partCost(it) {
+  const o = it.unit_cost != null ? it : I().orders.find(x => x.item_id === it.id && x.unit_cost != null);
+  if (!o) return null;
+  const cur = o.currency || 'QAR';
+  return { price:+o.unit_cost, cur, each:+o.unit_cost * (QAR_RATE[cur] ?? 1), rough:cur !== 'QAR' && cur !== 'USD' };
+}
+const qar = v => `${v.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 })} QAR`;
+const qarBig = v => `${v.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 })}<span style="font-size:.42em;margin-left:5px;letter-spacing:1px">QAR</span>`;
 function invBuild() {
   const boms = I().boms;
   if (!boms.some(b => b.id === buView.bom)) buView.bom = (boms.find(b => b.product === 'pro') || boms[0] || {}).id || '';
   const b = boms.find(x => x.id === buView.bom), q = buView.qty;
   const rows = b ? linesOf(b.id).map(l => {
     const it = l.item, tool = isTool(it), need = tool ? 1 : l.qty_per * q, have = tool ? (it.tool_state === 'On bench' ? 1 : 0) : avail(it);
-    return { it, l, tool, need, have, sh:Math.max(0, need - Math.max(0, have)) };
+    const sh = Math.max(0, need - Math.max(0, have)), pc = tool ? null : partCost(it);
+    return { it, l, tool, need, have, sh, pc, cost:pc ? pc.each * need : null, buy:pc ? pc.each * Math.max(0, sh - it.on_order) : 0 };
   }) : [];
+  const parts = rows.filter(r => !r.tool), unpriced = parts.filter(r => !r.pc).length, rough = parts.some(r => r.pc?.rough);
+  const perUnit = parts.reduce((t, r) => t + (r.pc ? r.pc.each * r.l.qty_per : 0), 0), toBuy = parts.reduce((t, r) => t + r.buy, 0);
+  const costNote = unpriced ? `${unpriced} part${unpriced === 1 ? '' : 's'} with no price` : rough ? 'some converted roughly' : 'every part priced';
   const can = b ? buildable(b.id) : null, shortN = rows.filter(r => r.sh > 0).length, covered = rows.filter(r => r.sh > 0 && r.it.on_order >= r.sh).length;
   const holds = I().holds.filter(h => h.status === 'held');
   const taken = new Set(boms.map(x => x.product).filter(Boolean));
@@ -1728,18 +1743,22 @@ function invBuild() {
     <div class="tile hero"><span class="lbl">Buildable now</span><span class="num" style="font-size:60px;line-height:1;color:${canCol}">${can == null ? '—' : num(can)}</span><small>${can == null ? 'nothing on its list yet' : can >= q ? `enough for all ${q}` : `of the ${q} asked for`}</small></div>
     <div class="tile"><span class="lbl">Lines short</span><span class="num" style="font-size:38px;color:${shortN ? LV.crit : '#fff'}">${shortN}</span><small>of ${rows.length} we fit by hand</small></div>
     <div class="tile"><span class="lbl">Arriving covers</span><span class="num lv-cool" style="font-size:38px">${covered}</span><small>short lines already on order</small></div>
+    <div class="tile cost"><span class="lbl">Parts cost for ${q}</span><span class="num" style="font-size:30px;white-space:nowrap">${parts.length ? qarBig(perUnit * q) : '—'}</span><small>${parts.length ? `${qar(perUnit)} a unit · ${costNote}` : 'nothing priced yet'}</small></div>
+    <div class="tile cost"><span class="lbl">Still to buy</span><span class="num ${toBuy ? 'lv-warn' : 'lv-off'}" style="font-size:30px;white-space:nowrap">${toBuy ? qarBig(toBuy) : '—'}</span><small>short and not on order yet</small></div>
   </div>
-  <div class="tw c1"><table class="stack" style="min-width:860px"><thead><tr><th>Part</th><th>Bin</th><th class="r">Per unit</th><th class="r">Need</th><th class="r">On hand</th><th class="r">On order</th><th class="r">Short</th></tr></thead><tbody>
+  <div class="tw c1"><table class="stack" style="min-width:1040px"><thead><tr><th>Part</th><th>Bin</th><th class="r">Per unit</th><th class="r">Need</th><th class="r">On hand</th><th class="r">On order</th><th class="r">Short</th><th class="r cost">Each</th><th class="r cost">Cost for ${q}</th></tr></thead><tbody>
   ${rows.map(r => { const u = r.it.unit, tag = u === 'm' ? ' M' : u === 'kg' ? ' KG' : '';
     return `<tr class="go" data-href="#part/${r.it.id}"><td><a class="pn" href="#part/${r.it.id}">${esc(r.it.name)}</a></td><td><span class="num" style="font-size:12px;color:#c9d0d4">${esc(r.it.bin) || '—'}</span></td>
     <td class="r"><span class="num" style="font-size:13px;color:#c9d0d4">${r.tool ? 'TOOL' : perStr(r.l.qty_per, u)}</span></td><td class="r"><span class="num" style="font-size:14px">${r.tool ? '1' : num(r.need) + tag}</span></td>
     <td class="r"><span class="num" style="font-size:14px">${r.tool ? esc((r.it.tool_state || 'On bench').toUpperCase()) : num(r.it.on_hand) + tag}</span>${r.it.reserved ? `<br><span class="lbl" style="font-size:9px">${num(r.it.reserved)} held</span>` : ''}</td>
     <td class="r"><span class="num ${r.it.on_order ? 'lv-cool' : 'lv-off'}" style="font-size:14px">${r.it.on_order ? num(r.it.on_order) : '—'}</span></td>
-    <td class="r"><span class="num ${r.sh > 0 ? 'lv-crit' : 'lv-off'}" style="font-size:14px">${r.sh > 0 ? num(r.sh) + tag : '—'}</span></td></tr>`; }).join('')
-    || `<tr><td colspan="7" style="text-align:center;padding:28px;color:#7b8488">Nothing on the ${esc(b.name)} build list yet. Open a part and add it under Goes into.</td></tr>`}
-  </tbody></table></div>
+    <td class="r"><span class="num ${r.sh > 0 ? 'lv-crit' : 'lv-off'}" style="font-size:14px">${r.sh > 0 ? num(r.sh) + tag : '—'}</span></td>
+    <td class="r cost"><span class="num" style="font-size:13px;color:#c9d0d4">${r.tool ? 'TOOL' : r.pc ? priceStr(r.pc.price, r.pc.cur) : '—'}</span></td>
+    <td class="r cost"><span class="num ${r.cost == null ? 'lv-off' : ''}" style="font-size:14px">${r.cost == null ? '—' : qar(r.cost)}</span></td></tr>`; }).join('')
+    || `<tr><td colspan="9" style="text-align:center;padding:28px;color:#7b8488">Nothing on the ${esc(b.name)} build list yet. Open a part and add it under Goes into.</td></tr>`}
+  </tbody>${parts.length ? `<tfoot class="cost"><tr><td colspan="8"><span class="lbl">Total for ${q} · ${costNote}</span></td><td class="r"><span class="num" style="font-size:16px">${qar(perUnit * q)}</span></td></tr></tfoot>` : ''}</table></div>
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
-    <p class="note" style="max-width:760px">The parts JLCPCB solders on come with the assembled board, so they are not counted again here. Reserve puts these parts aside for the build, so a second plan can't count them twice.${b.product ? ` When Ghost Factory passes a ${esc(PRODUCT[b.product])}, it takes one unit’s list out of stock and one off the oldest hold.` : ''}</p>
+    <p class="note" style="max-width:760px"><span class="cost">Costs are the parts we fit by hand, at each part’s price or its latest order’s, in QAR (dollars at the peg of 3.64). </span>The parts JLCPCB solders on come with the assembled board, so they are not counted again here. Reserve puts these parts aside for the build, so a second plan can't count them twice.${b.product ? ` When Ghost Factory passes a ${esc(PRODUCT[b.product])}, it takes one unit’s list out of stock and one off the oldest hold.` : ''}</p>
     <div class="row"><input class="inp" id="buNote" placeholder="What it’s for (optional)" style="width:220px"><button class="ib" type="button" id="buCopy">Copy shopping list</button><button class="ib gold" type="button" id="buHold" ${rows.length ? '' : 'disabled'}>Reserve for ${q}</button></div>
   </div>`}
   ${b ? `<div class="row" style="justify-content:space-between"><span class="note">Assembling at the bench? Scan the ${esc(b.name)} product label on a phone, or <a href="#assemble/${encodeURIComponent(b.id)}">open its pick list here</a>.</span></div>` : ''}

@@ -73,6 +73,21 @@
         "product": "pro",
         "notes": "The Ghost Gauge Pro's first firmware: the bench build (an ESP32 with no screen), for Ghost Studio's USB link and Pro credits.",
         "published": "2026-10-14"
+      },
+      "boards": {
+        "2": {
+          "beta": {
+            "version": "1.0.70",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.70-b2.bin",
+            "bytes": 1771656,
+            "sha256": "0591b3d7b346bd5a1623e0d00f7e9b06304b29305eab150e7236a814f7bfa9d9",
+            "minApp": "1.11",
+            "hw": 2,
+            "product": "pro",
+            "notes": "",
+            "published": "2026-11-12"
+          }
+        }
       }
     },
     "gauge": {

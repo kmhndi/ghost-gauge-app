@@ -77,14 +77,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.71",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.71-b2.bin",
-            "bytes": 1774760,
-            "sha256": "b72187eb0673b35cbee269fbade7ecf193447031bf133471d8547e4aa443e2f3",
+            "version": "1.0.72",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.72-b2.bin",
+            "bytes": 1775160,
+            "sha256": "5d3b9e6d5059860171c63bc3a36e5e7e0d9500ab064c4c262e98f8a8081a25f6",
             "minApp": "1.11",
             "hw": 2,
             "product": "pro",
-            "notes": "A garage's screens can reach a Pro without Studio's cable: the iPhone app carries the package the garage sent to the",
+            "notes": "The Pro shows 2WD, 4WD or LOCK: its screens' drive reading was never given a value, so it always read --.",
             "published": "2026-11-12"
           }
         }

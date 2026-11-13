@@ -77,14 +77,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.75",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.75-b2.bin",
+            "version": "1.0.76",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.76-b2.bin",
             "bytes": 1818344,
-            "sha256": "3f277fb0ab9d71d9dc68e4a3879f64baf26c528a12839d06ab4b0464fa34feb8",
+            "sha256": "b2fbcdfdd29542ac159d9380e3b7e1c6ac06d712455e29c7b7dd7564815b5432",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "Smooth startup animations (three slow ones removed). The Pro's own GPS and the belt sensor. One WiFi password per gauge, kept for good. A failed WiFi update goes back to Bluetooth by itself.",
+            "notes": "1.0.75 with a new number, to try the update over WiFi.",
             "published": "2026-11-13"
           }
         }

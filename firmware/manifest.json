@@ -77,14 +77,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.76",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.76-b2.bin",
-            "bytes": 1818344,
-            "sha256": "b2fbcdfdd29542ac159d9380e3b7e1c6ac06d712455e29c7b7dd7564815b5432",
+            "version": "1.0.79",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.79-b2.bin",
+            "bytes": 1824088,
+            "sha256": "58e1d538ce0140bb295018a389aca4468d96f41af79e2f73aa104b054fe7d4cb",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "1.0.75 with a new number, to try the update over WiFi.",
+            "notes": "The belt reading no longer shows a stray 85, and rpm and speed rest at 0 with the engine off.",
             "published": "2026-11-13"
           }
         }

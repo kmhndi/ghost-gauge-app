@@ -77,15 +77,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.72",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.72-b2.bin",
-            "bytes": 1775160,
-            "sha256": "5d3b9e6d5059860171c63bc3a36e5e7e0d9500ab064c4c262e98f8a8081a25f6",
-            "minApp": "1.11",
+            "version": "1.0.73",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.73-b2.bin",
+            "bytes": 1822200,
+            "sha256": "0d7f45d3c8ee82d528bdd79da3b92db9a61a22aeb9f7b13cb3dcc11bfccb260f",
+            "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The Pro shows 2WD, 4WD or LOCK: its screens' drive reading was never given a value, so it always read --.",
-            "published": "2026-11-12"
+            "notes": "Smoother startup animations. The Pro's own GPS: speed, compass, clock, mini map and GPS runs. The belt sensor. A GPS satellites part for the screens.",
+            "published": "2026-11-13"
           }
         }
       }

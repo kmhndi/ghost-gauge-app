@@ -77,14 +77,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.73",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.73-b2.bin",
-            "bytes": 1822200,
-            "sha256": "0d7f45d3c8ee82d528bdd79da3b92db9a61a22aeb9f7b13cb3dcc11bfccb260f",
+            "version": "1.0.74",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.74-b2.bin",
+            "bytes": 1822328,
+            "sha256": "1b3b6f416972d7b8fcdfc210767cc500e5d86db115b309b02b2a4ee84c352b3b",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "Smoother startup animations. The Pro's own GPS: speed, compass, clock, mini map and GPS runs. The belt sensor. A GPS satellites part for the screens.",
+            "notes": "Smoother startup animations. The Pro's own GPS: speed, compass, clock, mini map and GPS runs. The belt sensor. A GPS satellites part. A failed WiFi update goes back to Bluetooth by itself.",
             "published": "2026-11-13"
           }
         }

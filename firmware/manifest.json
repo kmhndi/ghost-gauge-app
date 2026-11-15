@@ -88,15 +88,15 @@
             "published": "2026-11-13"
           },
           "stable": {
-            "version": "1.0.80",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.80-b2.bin",
-            "bytes": 1822728,
-            "sha256": "bc5345aae08c084e6b385e28ff35a713962baeb82e5fc38e2840c7e2c4c4d495",
+            "version": "1.0.83",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.83-b2.bin",
+            "bytes": 1828952,
+            "sha256": "d1a272ae6349c6fa0c81da7f159d67428b86ebc93af558423bf332fd8d829813",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The status LED is lit while the screen is on, as it should be.",
-            "published": "2026-11-15"
+            "notes": "Firmware updates are steadier: the gauge picks a quieter WiFi channel, and goes back to Bluetooth after 20 s if an update fails.",
+            "published": "2026-11-16"
           }
         }
       }

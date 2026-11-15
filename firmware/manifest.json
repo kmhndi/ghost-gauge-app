@@ -88,14 +88,14 @@
             "published": "2026-11-13"
           },
           "stable": {
-            "version": "1.0.79",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.79-b2.bin",
-            "bytes": 1824088,
-            "sha256": "58e1d538ce0140bb295018a389aca4468d96f41af79e2f73aa104b054fe7d4cb",
+            "version": "1.0.80",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.80-b2.bin",
+            "bytes": 1822728,
+            "sha256": "bc5345aae08c084e6b385e28ff35a713962baeb82e5fc38e2840c7e2c4c4d495",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "Flashed to board N\u00ba1 over USB, where the owner saw both rest at 0, and published to the Pro board's beta the",
+            "notes": "The status LED is lit while the screen is on, as it should be.",
             "published": "2026-11-15"
           }
         }

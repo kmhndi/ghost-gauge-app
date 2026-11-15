@@ -66,15 +66,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.79",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.79-b2.bin",
-            "bytes": 1824088,
-            "sha256": "58e1d538ce0140bb295018a389aca4468d96f41af79e2f73aa104b054fe7d4cb",
+            "version": "1.0.84",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.84-b2.bin",
+            "bytes": 1828952,
+            "sha256": "64d8b765cc1778f821977ddba58a17d4a4e4607ce669fc10761a5cf63f451639",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The belt reading no longer shows a stray 85, and rpm and speed rest at 0 with the engine off.",
-            "published": "2026-11-13"
+            "notes": "A 1.0.83 with a new number, on the Pro board's beta, to try the WiFi update from the iPhone on board N\u00ba1 (GE-P-000002) now that every product picks its own WiFi channel.",
+            "published": "2026-11-16"
           },
           "stable": {
             "version": "1.0.83",

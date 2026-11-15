@@ -38,15 +38,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.67",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.67-b2.bin",
-            "bytes": 1127880,
-            "sha256": "fc40713f67d42a862c5aee0dde530dd0556b80510d1c15d7ecfc07a87f7fbb23",
+            "version": "1.0.83",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.83-b2.bin",
+            "bytes": 1137400,
+            "sha256": "95e25f7ee134e7dbc525cf4aed531692fef995aa8436ae1776fc6ff39ef483ce",
             "minApp": "1.11",
             "hw": 2,
             "product": "nano",
-            "notes": "",
-            "published": "2026-11-05"
+            "notes": "Firmware updates are steadier: the gauge picks a quieter WiFi channel, and goes back to Bluetooth after 20 s if an update fails.",
+            "published": "2026-11-16"
           },
           "beta": {
             "version": "1.0.62",

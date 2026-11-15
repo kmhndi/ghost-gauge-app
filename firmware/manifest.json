@@ -105,15 +105,15 @@
       "boards": {
         "2": {
           "stable": {
-            "version": "1.0.67",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.67-b2.bin",
-            "bytes": 1475976,
-            "sha256": "0b0ab05819c6dcd47e2fd05edbf156416503657f5bb56d499cee839c9c3c8530",
+            "version": "1.0.83",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.83-b2.bin",
+            "bytes": 1490136,
+            "sha256": "6ef314a99388f7f66ae087796611a5acedf7c32199d716bae404bf698a1e91ab",
             "minApp": "1.11",
             "hw": 2,
             "product": "gauge",
-            "notes": "",
-            "published": "2026-11-05"
+            "notes": "Firmware updates are steadier: the gauge picks a quieter WiFi channel, and goes back to Bluetooth after 20 s if an update fails.",
+            "published": "2026-11-16"
           }
         }
       }

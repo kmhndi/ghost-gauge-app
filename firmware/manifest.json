@@ -77,14 +77,14 @@
             "published": "2026-11-16"
           },
           "stable": {
-            "version": "1.0.85",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.85-b2.bin",
+            "version": "1.0.86",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.86-b2.bin",
             "bytes": 1830680,
-            "sha256": "8e954f716601d64412b73a5a7a3b7991e9c5f34ca1e4d3ff113134e0e73d946c",
+            "sha256": "108a0082cdf42bd2733d677dbe84c4211f33e916d18f63d0be8dac7c768c8187",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The Pro's WiFi always on channel 11.",
+            "notes": "A 1.0.85 with a new number, on the Pro board's stable channel, so a Pro on 1.0.85 has an update to take from the iPhone.",
             "published": "2026-11-17"
           }
         }

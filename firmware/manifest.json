@@ -77,15 +77,15 @@
             "published": "2026-11-16"
           },
           "stable": {
-            "version": "1.0.83",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.83-b2.bin",
-            "bytes": 1828952,
-            "sha256": "d1a272ae6349c6fa0c81da7f159d67428b86ebc93af558423bf332fd8d829813",
+            "version": "1.0.85",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.85-b2.bin",
+            "bytes": 1830680,
+            "sha256": "8e954f716601d64412b73a5a7a3b7991e9c5f34ca1e4d3ff113134e0e73d946c",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "Firmware updates are steadier: the gauge picks a quieter WiFi channel, and goes back to Bluetooth after 20 s if an update fails.",
-            "published": "2026-11-16"
+            "notes": "The Pro's WiFi always on channel 11.",
+            "published": "2026-11-17"
           }
         }
       }

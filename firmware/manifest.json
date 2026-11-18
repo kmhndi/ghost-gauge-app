@@ -66,14 +66,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.92",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.92-b2.bin",
+            "version": "1.0.93",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.93-b2.bin",
             "bytes": 1835992,
-            "sha256": "80cd936b2847cb48e9fac8d15b137ab40a58a781cb3303fb93c99d0a3beb1f63",
+            "sha256": "7fd7f30e85ffccf4b42d1fa7aeadccf6b3d346e01fd8bc0d98eafc0e46ddd5d2",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "A 1.0.91 with a new number, on the Pro board's beta, so Pro board N\u00ba1 (on 1.0.91) has an update to take from the iPhone app over Bluetooth.",
+            "notes": "The app sees a Pro's screens straight after it restarts.",
             "published": "2026-11-19"
           },
           "stable": {

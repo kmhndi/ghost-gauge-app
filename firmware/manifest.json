@@ -66,15 +66,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.87",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.87-b2.bin",
-            "bytes": 1832360,
-            "sha256": "7b09f9882dc11cc0fbc4233633e88e53f489917ec3da65725ce3d781ecd4ebb0",
+            "version": "1.0.89",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.89-b2.bin",
+            "bytes": 1833064,
+            "sha256": "b5b10994e83fd3e3fda01d85d3a228ddfb1c7be14afeef4c5859da50c2b002ff",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The Pro reads the fuel level off its own FUEL holes, and Studio 0.10.4 stops calling it \"not sent\" on a Can-Am.",
-            "published": "2026-11-17"
+            "notes": "A 1.0.88 with a new number, on the Pro board's beta, so Pro board N\u00ba1 (GE-P-000002, on 1.0.88 over USB) has an update to take from the iPhone, to try its WiFi now that `RADIO RECAL` has made it calibrate its radio again.",
+            "published": "2026-11-18"
           },
           "stable": {
             "version": "1.0.86",

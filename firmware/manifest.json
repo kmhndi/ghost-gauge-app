@@ -66,15 +66,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.91",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.91-b2.bin",
+            "version": "1.0.92",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.92-b2.bin",
             "bytes": 1835992,
-            "sha256": "80a005df69446ea03eec54e173ea7d178f408a0745ed53743539bc19dba3e17a",
+            "sha256": "80cd936b2847cb48e9fac8d15b137ab40a58a781cb3303fb93c99d0a3beb1f63",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "Compressed uploads over Bluetooth, a Pro's screens over Bluetooth, and no WiFi on the Pro.",
-            "published": "2026-11-18"
+            "notes": "A 1.0.91 with a new number, on the Pro board's beta, so Pro board N\u00ba1 (on 1.0.91) has an update to take from the iPhone app over Bluetooth.",
+            "published": "2026-11-19"
           },
           "stable": {
             "version": "1.0.86",

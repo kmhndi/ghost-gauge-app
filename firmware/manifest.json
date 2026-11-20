@@ -66,14 +66,14 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.95",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.95-b2.bin",
-            "bytes": 1836200,
-            "sha256": "9a891a1a7bc620716b1fecb2892f4941706c47c8e2d4b7bb6ee61c85532ee83d",
+            "version": "1.0.96",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.96-b2.bin",
+            "bytes": 1836216,
+            "sha256": "b130b51d1267bffb7ddb5f25993fc7e6780a57fd8720d8a2f16438bfca2c76a1",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The Pro's fuel gauge no longer flickers.",
+            "notes": "The Pro shows 2WD, 4WD and the lock mode on an X3.",
             "published": "2026-11-20"
           },
           "stable": {

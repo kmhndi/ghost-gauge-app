@@ -77,14 +77,14 @@
             "published": "2026-11-19"
           },
           "stable": {
-            "version": "1.0.93",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.93-b2.bin",
-            "bytes": 1835992,
-            "sha256": "7fd7f30e85ffccf4b42d1fa7aeadccf6b3d346e01fd8bc0d98eafc0e46ddd5d2",
+            "version": "1.0.94",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.94-b2.bin",
+            "bytes": 1836152,
+            "sha256": "b620e49ce0358918c22b63dba7f64c8d1630518bb23614086c7c448f69d35e69",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The app sees a Pro's screens straight after it restarts.",
+            "notes": "The CAN self-test passes on a Pro with its wires on and JP1 open.",
             "published": "2026-11-20"
           }
         }

@@ -77,15 +77,15 @@
             "published": "2026-11-19"
           },
           "stable": {
-            "version": "1.0.86",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.86-b2.bin",
-            "bytes": 1830680,
-            "sha256": "108a0082cdf42bd2733d677dbe84c4211f33e916d18f63d0be8dac7c768c8187",
+            "version": "1.0.93",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.93-b2.bin",
+            "bytes": 1835992,
+            "sha256": "7fd7f30e85ffccf4b42d1fa7aeadccf6b3d346e01fd8bc0d98eafc0e46ddd5d2",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "A 1.0.85 with a new number, on the Pro board's stable channel, so a Pro on 1.0.85 has an update to take from the iPhone.",
-            "published": "2026-11-17"
+            "notes": "The app sees a Pro's screens straight after it restarts.",
+            "published": "2026-11-20"
           }
         }
       }

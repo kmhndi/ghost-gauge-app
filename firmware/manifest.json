@@ -66,15 +66,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.93",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.93-b2.bin",
-            "bytes": 1835992,
-            "sha256": "7fd7f30e85ffccf4b42d1fa7aeadccf6b3d346e01fd8bc0d98eafc0e46ddd5d2",
+            "version": "1.0.95",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.95-b2.bin",
+            "bytes": 1836200,
+            "sha256": "9a891a1a7bc620716b1fecb2892f4941706c47c8e2d4b7bb6ee61c85532ee83d",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The app sees a Pro's screens straight after it restarts.",
-            "published": "2026-11-19"
+            "notes": "The Pro's fuel gauge no longer flickers.",
+            "published": "2026-11-20"
           },
           "stable": {
             "version": "1.0.94",

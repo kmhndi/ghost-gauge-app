@@ -66,15 +66,15 @@
       "boards": {
         "2": {
           "beta": {
-            "version": "1.0.96",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.96-b2.bin",
-            "bytes": 1836216,
-            "sha256": "b130b51d1267bffb7ddb5f25993fc7e6780a57fd8720d8a2f16438bfca2c76a1",
+            "version": "1.0.97",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.97-b2.bin",
+            "bytes": 1836552,
+            "sha256": "2b00593410aa08576b0eba97128451c14f16dee62a0c919c28b5711cfe9bc029",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The Pro shows 2WD, 4WD and the lock mode on an X3.",
-            "published": "2026-11-20"
+            "notes": "A Pro on a Maverick R's diagnostic port, with the stock cluster hidden behind the dash, shows the fuel and the engine mode.",
+            "published": "2026-11-23"
           },
           "stable": {
             "version": "1.0.94",

@@ -77,15 +77,15 @@
             "published": "2026-11-23"
           },
           "stable": {
-            "version": "1.0.94",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.94-b2.bin",
-            "bytes": 1836152,
-            "sha256": "b620e49ce0358918c22b63dba7f64c8d1630518bb23614086c7c448f69d35e69",
+            "version": "1.0.97",
+            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.97-b2.bin",
+            "bytes": 1836552,
+            "sha256": "2b00593410aa08576b0eba97128451c14f16dee62a0c919c28b5711cfe9bc029",
             "minApp": "1.16",
             "hw": 2,
             "product": "pro",
-            "notes": "The CAN self-test passes on a Pro with its wires on and JP1 open.",
-            "published": "2026-11-20"
+            "notes": "A Pro on a Maverick R's diagnostic port, with the stock cluster hidden behind the dash, shows the fuel and the engine mode.",
+            "published": "2026-11-26"
           }
         }
       }

@@ -305,6 +305,50 @@ main.inv { max-width: 1432px; gap: 18px; color: #fff; font: 14px/1.4 -apple-syst
 .inv .qr canvas { width: 100%; height: 100%; image-rendering: pixelated; }
 .inv .lv-crit { color: #ff4338 !important; } .inv .lv-warn { color: #ff9e2c !important; } .inv .lv-ok { color: #35d07f !important; } .inv .lv-cool { color: #3ba9f5 !important; } .inv .lv-off { color: #3a4048 !important; }
 .inv .panelform { background: #0c0d0f; border: 1px solid #2a2f36; border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+/* money: the books */
+.mnav { display: flex; gap: 6px; flex-wrap: wrap; }
+.mnav a { color: var(--dim); text-decoration: none; padding: 7px 12px; border: 1px solid var(--line2); border-radius: 10px; font-weight: 600; font-size: 13px; }
+.mnav a[aria-current] { color: #111; background: var(--gold); border-color: var(--gold); }
+.mnav a[aria-current] .count { background: #111; color: var(--gold); }
+#view .num { font-variant-numeric: tabular-nums; }
+#view a.btn { text-decoration: none; color: var(--ink); } #view a.btn.gold { color: #111; }
+#view td.r, #view th.r { text-align: right; }
+.mbar { display: flex; height: 12px; border-radius: 4px; overflow: hidden; background: var(--line); }
+.mbar i { display: block; height: 100%; }
+.msw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+.mdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.msub { display: block; color: var(--dim); font-size: 12px; }
+tr.mgone td { opacity: .5; }
+.mchips { display: flex; gap: 6px; flex-wrap: wrap; }
+.mchip { border: 1px solid var(--line2); border-radius: 9px; padding: 7px 11px; font-size: 13px; font-weight: 600; color: var(--dim); cursor: pointer; display: inline-flex; position: relative; }
+.mchip input, .mcard input[type=radio] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.mchip.on { background: var(--gold); border-color: var(--gold); color: #111; }
+.mchip:focus-within, .mcard:focus-within { outline: 2px solid var(--cool); outline-offset: 2px; }
+.mpick { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.mcard { border: 1px solid var(--line2); border-radius: 12px; padding: 12px 14px; cursor: pointer; color: var(--ink); position: relative; display: grid; }
+.mcard small { display: block; color: var(--dim); font-size: 12px; }
+.mcard.on { border-color: var(--gold); background: var(--panel2); }
+.mfs { border: 0; padding: 0; margin: 0; min-width: 0; }
+.mfs legend { color: var(--dim); font-size: 12.5px; padding: 0; margin-bottom: 8px; }
+.mform { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 960px) { .mform { grid-template-columns: minmax(0, 1fr) 340px; } }
+.mline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.mline small { grid-column: 1 / -1; color: var(--dim); font-size: 12.5px; }
+.h2s { cursor: pointer; font: 700 11px/1 var(--readout); letter-spacing: 2.5px; color: var(--dim); text-transform: uppercase; }
+.mlead { font-size: 12.5px; margin: 0 0 12px; }
+table.mrep td { padding: 7px 10px; border-bottom: 1px solid #1c2026; }
+table.mrep td.ind { padding-left: 22px; }
+table.mrep tr.mhead td { color: var(--dim); font: 700 10.5px/1 var(--readout); letter-spacing: 2px; padding-top: 16px; border-bottom: 0; }
+table.mrep tr.msum td { font-weight: 600; border-top: 1px solid var(--line2); }
+table.mrep tr.mtot td { font: 800 14px/1.3 var(--readout); border-top: 2px solid var(--line2); border-bottom: 0; padding-top: 12px; }
+.mloss { color: var(--warn); }
+@media print {
+  body.mprint > *:not(#app) { display: none !important; }
+  body.mprint #app { display: block !important; }
+  body.mprint header.top, body.mprint .noprint, body.mprint .mnav, body.mprint .ro-hide, body.mprint #view > .tools:first-child .tools { display: none !important; }
+  body.mprint, body.mprint * { color: #000 !important; background: transparent !important; border-color: #bbb !important; }
+  body.mprint .panel { break-inside: avoid; }
+}
 /* labels on A4: 24 a page, 50 × 30 mm, at true size */
 #a4 { display: none; }
 @media print {
@@ -393,7 +437,7 @@ main.inv { max-width: 1432px; gap: 18px; color: #fff; font: 14px/1.4 -apple-syst
       <div class="who"><span id="whoEmail"></span><button class="btn sm" id="reload" type="button">Refresh</button><button class="btn sm" id="signOut" type="button">Sign out</button></div>
     </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#inventory">Inventory</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a><a href="#team" hidden>Team</a>
+      <a href="#overview">Overview</a><a href="#board">Board</a><a href="#calendar">Calendar</a><a href="#inventory">Inventory</a><a href="#units">Units</a><a href="#garages">Garages</a><a href="#credits">Credits</a><a href="#pros">Pros</a><a href="#licences">Licences</a><a href="#money">Money</a><a href="#team" hidden>Team</a>
     </nav>
   </header>
   <main id="view"></main>
@@ -475,12 +519,12 @@ async function show(session) {
 
 // ---------- the team: what the signed-in person may see and do (my_access(), migrations/20261109220000_team.sql) ----------
 // Only for showing the right things: the database checks every read and write itself.
-const AREAS = [['board', 'Board and calendar'], ['inventory', 'Inventory'], ['units', 'Units'], ['garages', 'Garages'], ['credits', 'Credits and payments'], ['pros', 'Pros'], ['licences', 'Licences']];
+const AREAS = [['board', 'Board and calendar'], ['inventory', 'Inventory'], ['units', 'Units'], ['garages', 'Garages'], ['credits', 'Credits and payments'], ['pros', 'Pros'], ['licences', 'Licences'], ['money', 'Money']];
 const ACTS = [['costs', 'See what parts cost', 'Prices on parts and orders in the inventory'], ['grant', 'Give or take credits', 'On a garage’s page'],
   ['prices', 'Change prices', 'The credit packs Studio sells'], ['cancel', 'Cancel a Pro serial', 'A wrong serial, within 7 days'], ['licence', 'Answer and revoke licences', 'Issue, refuse, revoke and restore']];
 const PAGE_AREA = { units:'units', unit:'units', garages:'garages', garage:'garages', credits:'credits', pros:'pros', licences:'licences',
-  board:'board', item:'board', calendar:'board', inventory:'inventory', part:'inventory', receive:'inventory', scan:'inventory', bin:'inventory', assemble:'inventory', team:'team' };
-const TAB_AREA = { board:'board', calendar:'board', inventory:'inventory', units:'units', garages:'garages', credits:'credits', pros:'pros', licences:'licences', team:'team' };
+  board:'board', item:'board', calendar:'board', inventory:'inventory', part:'inventory', receive:'inventory', scan:'inventory', bin:'inventory', assemble:'inventory', team:'team', money:'money', mentry:'money' };
+const TAB_AREA = { board:'board', calendar:'board', inventory:'inventory', units:'units', garages:'garages', credits:'credits', pros:'pros', licences:'licences', money:'money', team:'team' };
 let ACCESS = null;
 const isOwner = () => !!ACCESS?.owner;
 const level = a => (isOwner() ? 'edit' : a === 'team' ? '' : ACCESS?.perms?.[a] || '');
@@ -514,12 +558,13 @@ async function load() {
       q(sb.rpc('team_garage_names')),
     ]);
     D = prep({ units, history, garages, licences, ledger, pros, prices, payments, counters, requests, names });
-    [D.board, D.inv, D.team] = await Promise.all([canSee('board') ? loadBoard() : null, canSee('inventory') ? loadInv() : null, isOwner() ? loadTeam() : null]);
+    [D.board, D.inv, D.team, D.money] = await Promise.all([canSee('board') ? loadBoard() : null, canSee('inventory') ? loadInv() : null, isOwner() ? loadTeam() : null,
+      canSee('money') ? loadMoney() : null]);
   } catch (e) { toast(`Couldn’t load: ${e.message}`, true); }
 }
 
 function prep(r) {
-  return { ...r, board:r.board || null, inv:r.inv ? invPrep(r.inv) : null, team:r.team || null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])),
+  return { ...r, board:r.board || null, inv:r.inv ? invPrep(r.inv) : null, team:r.team || null, money:r.money ? moneyPrep(r.money) : null, requests:r.requests || [], counters:Object.fromEntries(r.counters.map(c => [c.name, Number(c.value)])),
     gname:{ ...(r.names || {}), ...Object.fromEntries(r.garages.map(g => [g.gid, g.name])) } };
 }
 
@@ -528,18 +573,19 @@ window.addEventListener('hashchange', render);
 function render() {
   if (!D) return;
   const [page, arg] = decodeURIComponent(location.hash.slice(1) || 'overview').split('/');
-  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : ['part', 'receive', 'scan', 'bin', 'assemble'].includes(page) ? 'inventory' : page)));
+  document.querySelectorAll('nav.tabs a').forEach(a => a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + (page === 'unit' ? 'units' : page === 'garage' ? 'garages' : page === 'item' ? 'board' : page === 'mentry' ? 'money' : ['part', 'receive', 'scan', 'bin', 'assemble'].includes(page) ? 'inventory' : page)));
   document.querySelectorAll('nav.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   const waiting = D.requests.filter(r => r.status === 'pending').length;
   $('nav.tabs a[href="#licences"]').innerHTML = `Licences${waiting ? ` <span class="count">${waiting}</span>` : ''}`;
   const v = $('#view');
-  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage, assemble, team };
+  const views = { overview, units, unit, garages, garage, credits, pros, licences, board, item, calendar, inventory, part, receive, scan, bin:binPage, assemble, team, money:moneyTab, mentry };
   const inv = ['inventory', 'part', 'receive', 'scan', 'bin', 'assemble'].includes(page);
   document.body.classList.toggle('invpage', inv); v.classList.toggle('inv', inv);
   const area = PAGE_AREA[page], ro = !!area && !canEdit(area);
   v.classList.toggle('ro', ro);
   v.innerHTML = area && !canSee(area) ? `<p class="panel">This part of the page isn’t open to you. Ask the owner if you need it. <a href="#overview">Overview</a></p>`
     : ro && ['receive', 'assemble'].includes(page) ? `<p class="panel">You can look at the inventory but not change it. <a href="#inventory">Back to the inventory</a></p>`
+    : ro && page === 'money' && ['out', 'in', 'partner', 'repay', 'journal'].includes(arg) ? `<p class="panel">You can look at the money but not record any. <a href="#money">Back to Money</a></p>`
     : (views[page] || overview)(arg);
   if (ro) {                                    // view only: the fields that would save show what's there, nothing more
     v.querySelectorAll('.form input, .form select, .form textarea, [data-licnote], [data-stepstate], [data-sf], [data-nf], [data-cnt], [data-tick], [data-setstage]').forEach(el => { el.disabled = true; });
@@ -841,7 +887,8 @@ async function loadTeam() {
 }
 const LOG_WHAT = { units:'unit', unit_history:'unit history', garages:'garage', ledger:'credits', prices:'price', pros:'Pro', licences:'licence',
   licence_requests:'licence request', board_items:'workstream', board_steps:'step', board_notes:'calendar note', inv_items:'part', inv_moves:'stock',
-  inv_boms:'build list', inv_bom_lines:'build list', inv_orders:'order', inv_order_lines:'order line', inv_holds:'hold', inv_assemblies:'assembly', admins:'team member' };
+  inv_boms:'build list', inv_bom_lines:'build list', inv_orders:'order', inv_order_lines:'order line', inv_holds:'hold', inv_assemblies:'assembly', admins:'team member',
+  money_entries:'money entry', money_settings:'agreement', money_partners:'partner', money_months:'bank month' };
 const AREA_NAME = { ...Object.fromEntries(AREAS), team:'Team' };
 let tView = { who:'' };
 function team(sel) {
@@ -2496,6 +2543,644 @@ function invCount() {
       <td class="r num" id="cd${i.id}" style="font-size:14px"></td><td class="soft">${lastCount[i.id] ? esc(day(lastCount[i.id])) : 'never'}</td></tr>`).join('')
       || '<tr><td colspan="6" style="text-align:center;padding:28px;color:#7b8488">Nothing to count here.</td></tr>'}
   </tbody></table></div>`;
+}
+
+// ---------- money: the books (migrations/20261126120000_money.sql, README "Money") ----------
+// Every entry and its lines, fetched whole: years of a small company's books are a few thousand rows. The page only shows
+// them and works out the reports; each form is one database function, which checks the entry, writes its lines and refuses
+// one that doesn't balance. Nothing is ever changed: a mistake is undone with a correction.
+const MKIND = { out:'Money out', in:'Money in', partner_in:'Partner put in', repay:'Repaid to a partner', draw:'Taken out by a partner', journal:'Between accounts', correction:'Correction' };
+const MCUR = ['QAR', 'USD', 'EUR', 'GBP', 'CNY'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const PCOL = ['var(--gold)', 'var(--cool)', 'var(--ok)', 'var(--warn)'];
+const M = () => D.money;
+const qa = v => (+v || 0).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const qa0 = v => Math.round(+v || 0).toLocaleString('en-US');
+const ymName = ym => `${MONTHS[+ym.slice(5, 7) - 1]} ${ym.slice(0, 4)}`;
+const ymShort = ym => MONTHS[+ym.slice(5, 7) - 1].slice(0, 3);
+const ymAdd = (ym, n) => { const d = new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7) - 1 + n, 1)); return d.toISOString().slice(0, 7); };
+const ymEnd = ym => new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7), 0)).toISOString().slice(0, 10);
+const mLive = e => e.kind !== 'correction' && !e.undone;
+const mAcct = c => M().acct.get(c) || { code:c, name:c, kind:'', type:'' };
+const mBal = c => M().bal[c] || 0;
+const mKindSum = k => M().accounts.filter(a => a.kind === k).reduce((n, a) => n + mBal(a.code), 0);
+const mOf = k => M().accounts.filter(a => a.kind === k && a.active);
+const pIdx = id => Math.max(0, M().partners.findIndex(p => p.id === id));
+const pName = id => M().partners.find(p => p.id === id)?.name || id || '';
+const pAcct = (id, kind) => M().accounts.find(a => a.partner === id && a.kind === kind)?.code;
+const agreed = () => !!M().settings.agreed_on;
+const toAgree = '<span class="badge soon">TO AGREE</span>';
+
+async function loadMoney() {
+  try {
+    const [accounts, partners, settings, entries, lines, months] = await Promise.all([
+      q(sb.from('money_accounts').select('*').order('code')), q(sb.from('money_partners').select('*').order('sort')),
+      q(sb.from('money_settings').select('*').maybeSingle()), all('money_entries', 'id'), all('money_lines', 'id'), q(sb.from('money_months').select('*'))]);
+    return moneyPrep({ accounts, partners, settings, entries, lines, months });
+  } catch (e) { toast(`Couldn’t load the money: ${e.message}`, true); return null; }
+}
+function moneyPrep(m) {
+  m.acct = new Map(m.accounts.map(a => [a.code, a]));
+  m.entries.forEach(e => { e.id = Number(e.id); e.amount = +e.amount; e.amount_orig = +e.amount_orig; e.rate = +e.rate; e.lines = []; e.undone = null; });
+  m.byId = new Map(m.entries.map(e => [e.id, e]));
+  m.bal = {};
+  m.lines.forEach(l => { l.amount = +l.amount; const e = m.byId.get(Number(l.entry_id)); if (e) { e.lines.push(l); l.on_date = e.on_date; } m.bal[l.account] = (m.bal[l.account] || 0) + l.amount; });
+  m.entries.forEach(e => { e.cash = e.lines.filter(l => m.acct.get(l.account)?.kind === 'cash').reduce((n, l) => n + l.amount, 0); });
+  m.entries.forEach(e => { if (e.corrects) { const o = m.byId.get(Number(e.corrects)); if (o) o.undone = e; } });
+  m.entries.sort((a, b) => b.on_date.localeCompare(a.on_date) || b.id - a.id);
+  m.settings = m.settings || {};
+  m.months = (m.months || []).map(x => ({ ...x, statement:+x.statement, books:+x.books, ym:String(x.month).slice(0, 7) }));
+  return m;
+}
+async function writeMoney(p, msg) {
+  const { data, error } = await p;
+  if (error) { toast(error.message, true); return null; }
+  D.money = await loadMoney(); if (msg) toast(msg);
+  return data ?? true;
+}
+
+// what an entry is about, as the lists say it
+function mCategory(e) {
+  const nonCash = e.lines.filter(l => mAcct(l.account).kind !== 'cash');
+  if (e.kind === 'correction') { const o = M().byId.get(Number(e.corrects)); return o ? mCategory(o) : ''; }
+  if (e.kind === 'journal') { const dr = e.lines.find(l => l.amount > 0), cr = e.lines.find(l => l.amount < 0); return `${mAcct(dr?.account).name} ← ${mAcct(cr?.account).name}`; }
+  if (e.kind === 'out') return mAcct(e.lines.find(l => l.amount > 0)?.account).name;
+  if (e.kind === 'in') return mAcct(e.lines.find(l => l.amount < 0)?.account).name;
+  return mAcct((nonCash[0] || e.lines[0])?.account).name;
+}
+function mWho(e) {               // who paid, or where the money went
+  const src = e.kind === 'correction' ? M().byId.get(Number(e.corrects)) || e : e;
+  const cashL = src.lines.find(l => mAcct(l.account).kind === 'cash');
+  if (src.kind === 'out' && src.partner) return { dot:PCOL[pIdx(src.partner)], text:`${esc(pName(src.partner))}’s card`, sub:src.lines.some(l => mAcct(l.account).kind === 'capital') ? 'counted as capital' : `owed to ${esc(pName(src.partner))}` };
+  if (src.kind === 'journal') return { dot:'', text:'<span class="dim">no cash moved</span>' };
+  if (!cashL) return { dot:'', text:'' };
+  return { dot:'var(--dim)', text:`${cashL.amount > 0 ? 'into ' : ''}${esc(mAcct(cashL.account).name)}` };
+}
+function mAmountCell(e) {
+  if (e.cash > 0) return `<span class="plus">+${qa(e.cash)}</span>`;
+  if (e.cash < 0) return `−${qa(-e.cash)}`;
+  return `<span class="dim">${e.kind === 'correction' ? '±' : ''}${qa(e.amount)}</span>`;
+}
+const mReceipt = e => (e.receipt ? `<span class="badge active">${esc((e.receipt.split('.').pop() || 'file').toUpperCase().slice(0, 4))}</span>`
+  : ['out', 'in', 'partner_in', 'repay', 'draw'].includes(e.kind) && mLive(e) ? '<span class="badge soon">MISSING</span>' : '<span class="dim">—</span>');
+const needsReceipt = e => mLive(e) && !e.receipt && ['out', 'in', 'partner_in'].includes(e.kind);
+
+function mPartner(p) {
+  const cap = pAcct(p.id, 'capital'), loan = pAcct(p.id, 'loan'), draw = pAcct(p.id, 'drawings');
+  const ls = M().lines;
+  const capital = -ls.filter(l => l.account === cap).reduce((n, l) => n + l.amount, 0);
+  const lent = -ls.filter(l => l.account === loan && l.amount < 0).reduce((n, l) => n + l.amount, 0);
+  const repaid = ls.filter(l => l.account === loan && l.amount > 0).reduce((n, l) => n + l.amount, 0);
+  const drawn = ls.filter(l => l.account === draw).reduce((n, l) => n + l.amount, 0);
+  return { p, capital, lent, repaid, owed:lent - repaid, drawn, putIn:capital + lent };
+}
+// running costs a month (wear and cost of units sold left out: they move no cash), over the last three months that had any
+function mBurn() {
+  const now = today().slice(0, 7), costs = {};
+  M().lines.forEach(l => { const a = mAcct(l.account); if (a.kind === 'expense' && a.code !== '6600' && l.on_date) costs[l.on_date.slice(0, 7)] = (costs[l.on_date.slice(0, 7)] || 0) + l.amount; });
+  let ms = [1, 2, 3].map(n => ymAdd(now, -n)).filter(m => costs[m]);
+  if (!ms.length && costs[now]) ms = [now];
+  return ms.length ? ms.reduce((n, m) => n + costs[m], 0) / ms.length : 0;
+}
+// the months of a cash account from its first entry to the last one that has ended, each with what the books said at its end
+function mBankMonths(code) {
+  const ls = M().lines.filter(l => l.account === code && l.on_date).sort((a, b) => a.on_date.localeCompare(b.on_date));
+  if (!ls.length) return [];
+  const out = [], last = ymAdd(today().slice(0, 7), -1);
+  for (let ym = ls[0].on_date.slice(0, 7); ym <= last; ym = ymAdd(ym, 1)) {
+    const books = ls.filter(l => l.on_date <= ymEnd(ym)).reduce((n, l) => n + l.amount, 0);
+    const m = M().months.find(x => x.account === code && x.ym === ym);
+    out.push({ ym, books, m, ok:!!m && Math.abs(m.statement - books) < 0.005 });
+  }
+  return out;
+}
+function mWearDue() {               // last month's equipment wear, if there is equipment and it isn't recorded
+  const cost = mBal('1500'), worn = -mBal('1510'), months = M().settings.wear_months || 36;
+  const ym = ymAdd(today().slice(0, 7), -1), ref = `wear-${ym}`;
+  if (cost <= 0 || worn >= cost - 0.005) return null;
+  const first = M().lines.filter(l => l.account === '1500' && l.on_date).map(l => l.on_date).sort()[0];
+  if (!first || first.slice(0, 7) > ym) return null;
+  if (M().entries.some(e => e.ref === ref && mLive(e))) return null;
+  return { ym, ref, amount:Math.min(Math.round(cost / months * 100) / 100, Math.round((cost - worn) * 100) / 100) };
+}
+
+function mHead(sub) {
+  const subs = [['', 'Overview'], ['tx', 'Transactions'], ['partners', 'Partners'], ['reports', 'Reports'], ['checks', 'Receipts and bank']];
+  const missing = M().entries.filter(needsReceipt).length;
+  return `<div class="tools" style="justify-content:space-between;align-items:flex-end">
+      <div><h1>Money</h1><div class="dim" style="font-size:13px">Everything Ghost Electronics has put in, spent and earned, in QAR.</div></div>
+      <div class="tools ro-hide"><a class="btn gold" href="#money/out">Money out</a><a class="btn" href="#money/in">Money in</a><a class="btn" href="#money/partner">Partner put in</a><a class="btn" href="#money/repay">Pay a partner</a><a class="btn" href="#money/journal">Between accounts</a></div>
+    </div>
+    <nav class="mnav" aria-label="Money">${subs.map(([k, n]) => `<a href="#money${k ? '/' + k : ''}" ${sub === k ? 'aria-current="page"' : ''}>${n}${k === 'checks' && missing ? ` <span class="count">${missing}</span>` : ''}</a>`).join('')}</nav>`;
+}
+
+function moneyTab(sub) {
+  if (!M()) return '<h1>Money</h1><p class="panel">The money didn’t load. Try Refresh.</p>';
+  const views = { tx:moneyTx, partners:moneyPartners, reports:moneyReports, checks:moneyChecks, out:() => moneyForm('out'), in:() => moneyForm('in'),
+    partner:() => moneyForm('partner'), repay:() => moneyForm('repay'), journal:() => moneyForm('journal') };
+  if (views[sub]) return views[sub]();
+  const E = M().entries, now = today().slice(0, 7);
+  const cash = mKindSum('cash'), stock = mKindSum('stock');
+  const parts = M().partners.map(mPartner), putIn = parts.reduce((n, x) => n + x.putIn, 0), capital = parts.reduce((n, x) => n + x.capital, 0), owed = parts.reduce((n, x) => n + x.owed, 0);
+  const thisMonth = E.filter(e => mLive(e) && e.kind === 'out' && e.on_date.startsWith(now));
+  const spent = thisMonth.reduce((n, e) => n + e.amount, 0);
+  const kept = thisMonth.reduce((n, e) => n + e.lines.filter(l => ['stock', 'equipment'].includes(mAcct(l.account).kind) && l.amount > 0).reduce((s, l) => s + l.amount, 0), 0);
+  const burn = mBurn(), runway = burn > 0 ? cash / burn : null;
+  const bank = mBankMonths('1000'), lastOk = [...bank].reverse().find(b => b.ok);
+  let invValue = null;
+  const costed = D.inv && allowed('costs') ? D.inv.items.filter(i => !i.archived && i.unit !== 'tool' && i.unit_cost != null && i.on_hand > 0) : [];
+  if (costed.length) invValue = costed.reduce((n, i) => n + i.on_hand * i.unit_cost * (QAR_RATE[i.currency] || 1), 0);
+  // where the money went: every money-out by what it bought
+  const went = {};
+  E.filter(e => mLive(e) && e.kind === 'out').forEach(e => { const l = e.lines.find(x => x.amount > 0); if (l) went[l.account] = (went[l.account] || 0) + l.amount; });
+  const wentRows = Object.entries(went).sort((a, b) => b[1] - a[1]), wentAll = wentRows.reduce((n, [, v]) => n + v, 0);
+  const isKept = c => ['stock', 'equipment'].includes(mAcct(c).kind);
+  const maxPut = Math.max(1, ...parts.map(x => x.putIn));
+  const todo = [];
+  const miss = E.filter(needsReceipt).length;
+  if (miss) todo.push([`${miss} ${miss === 1 ? 'entry has' : 'entries have'} no receipt`, '#money/checks', 'Add receipts']);
+  const unmatched = bank.filter(b => !b.ok);
+  if (unmatched.length) todo.push([`${unmatched.length === 1 ? ymName(unmatched[0].ym) + ' isn’t' : unmatched.length + ' months aren’t'} matched to the bank statement`, '#money/checks', 'Match']);
+  parts.filter(x => x.owed > 0.005).forEach(x => todo.push([`The company owes ${esc(x.p.name)} ${qa(x.owed)}`, '#money/repay', 'Repay']));
+  if (!agreed()) todo.push(['The partners’ agreement isn’t settled yet', '#money/partners', 'Agreement']);
+  const wear = mWearDue();
+  if (wear) todo.push([`Equipment wear for ${ymName(wear.ym)} isn’t recorded (${qa(wear.amount)})`, '#money/reports', 'Record it']);
+  return `${mHead('')}
+  <div class="tiles">
+    <div class="tile"><span>Cash</span><b>${qa0(cash)}</b><i>${bank.length ? lastOk ? `bank matched to ${ymName(lastOk.ym)}` : 'bank not matched yet' : 'nothing recorded yet'}</i></div>
+    <div class="tile"><span>Put in by partners</span><b>${qa0(putIn)}</b><i>${qa0(capital)} capital · ${qa0(owed)} owed back</i></div>
+    <div class="tile"><span>Spent in ${MONTHS[+now.slice(5) - 1]}</span><b>${qa0(spent)}</b><i>${kept ? `${qa0(kept)} of it became stock or equipment` : 'all of it running costs'}</i></div>
+    <div class="tile"><span>Running costs a month</span><b>${qa0(burn)}</b><i>average of the last 3 months</i></div>
+    <div class="tile"><span>Runway</span><b style="color:${runway != null && runway < 6 ? 'var(--warn)' : 'inherit'}">${runway == null ? '—' : runway.toFixed(1)}<small style="font-size:12px;color:var(--dim);margin-left:6px">MONTHS</small></b><i>cash ÷ running costs</i></div>
+    <div class="tile"><span>Stock in the books</span><b>${qa0(stock)}</b><i>${invValue == null ? 'what was paid for stock still on the shelf' : `Inventory counts ${qa0(invValue)}`}</i></div>
+  </div>
+  <div class="two">
+    <section class="panel"><div class="tools" style="justify-content:space-between"><h2>Partners</h2><a href="#money/partners" style="font-size:13px">Partners →</a></div>
+      <div class="grid" style="gap:16px">${parts.map((x, k) => `<div class="grid" style="gap:6px">
+        <div class="tools" style="justify-content:space-between"><b style="font-weight:600">${esc(x.p.name)}</b><span class="num">${qa(x.putIn)}${putIn ? ` <span class="dim">· ${(x.putIn / putIn * 100).toFixed(1)} %</span>` : ''}</span></div>
+        <div class="mbar"><i style="width:${x.capital / maxPut * 100}%;background:${PCOL[k]}"></i><i style="width:${x.owed / maxPut * 100}%;background:${PCOL[k]};opacity:.45"></i></div>
+        <div class="dim" style="font-size:12.5px">Capital ${qa(x.capital)} · owed back ${qa(x.owed)}${x.drawn ? ` · taken out ${qa(x.drawn)}` : ''}</div></div>`).join('')}
+      <div class="prow2" style="padding-bottom:0"><span class="dim" style="font-size:12.5px">Solid: capital, which buys ownership. Light: money the company owes back.</span>
+        <span style="font-size:12.5px">Agreed split ${M().partners.every(p => p.share != null) ? `<b>${M().partners.map(p => +p.share).join(' / ')}</b>` : ''} ${agreed() ? '' : toAgree}</span></div></div>
+    </section>
+    <section class="panel"><div class="tools" style="justify-content:space-between"><h2>Where the ${qa0(wentAll)} went</h2><span class="dim" style="font-size:12.5px">every money out</span></div>
+      ${wentRows.length ? `<div class="mbar" style="height:14px;gap:2px;margin-bottom:10px">${wentRows.map(([c, v]) => `<i style="width:${v / wentAll * 100}%;background:${isKept(c) ? 'var(--cool)' : 'var(--warn)'}"></i>`).join('')}</div>
+      <table><tbody>${wentRows.map(([c, v]) => `<tr><td><span class="msw" style="background:${isKept(c) ? 'var(--cool)' : 'var(--warn)'}"></span>${esc(mAcct(c).name)}</td><td class="dim">${isKept(c) ? 'kept' : 'spent'}</td><td class="r num">${qa(v)}</td></tr>`).join('')}</tbody></table>`
+      : '<p class="empty">Nothing paid out yet.</p>'}
+    </section>
+  </div>
+  <div class="two">
+    <section class="panel"><h2>Needs you</h2>
+      ${todo.length ? todo.map(([t, h, b], k) => `<div class="prow2" ${k ? '' : 'style="border-top:0;padding-top:0"'}><span>${t}</span><a class="btn sm" href="${h}">${b}</a></div>`).join('') : '<p class="empty">Nothing. Every receipt is in and the bank is matched.</p>'}
+    </section>
+    <section class="panel"><div class="tools" style="justify-content:space-between"><h2>Latest</h2><a href="#money/tx" style="font-size:13px">All transactions →</a></div>
+      ${E.length ? `<table><tbody>${E.slice(0, 7).map(e => `<tr class="go" data-href="#mentry/${e.id}"><td class="dim">${esc(e.on_date.slice(5))}</td><td class="wrap">${esc(e.title)}</td><td class="dim">${mWho(e).text}</td><td class="r num">${mAmountCell(e)}</td></tr>`).join('')}</tbody></table>`
+      : `<p class="empty">Nothing recorded yet. Start with what each partner has put in, then every payment so far, with the day it was made.</p>`}
+    </section>
+  </div>`;
+}
+
+// ---------- transactions ----------
+let mView = { text:'', kind:'', acct:'', who:'', month:'' };
+const MSEG = [['', 'All'], ['in', 'In'], ['out', 'Out'], ['partners', 'Partners'], ['other', 'Other']];
+function mFiltered() {
+  const t = mView.text.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return M().entries.filter(e => {
+    const k = e.kind === 'correction' ? M().byId.get(Number(e.corrects))?.kind : e.kind;
+    if (mView.kind === 'in' && k !== 'in') return false;
+    if (mView.kind === 'out' && k !== 'out') return false;
+    if (mView.kind === 'partners' && !['partner_in', 'repay', 'draw'].includes(k)) return false;
+    if (mView.kind === 'other' && k !== 'journal') return false;
+    if (mView.month && !e.on_date.startsWith(mView.month)) return false;
+    if (mView.acct && !e.lines.some(l => l.account === mView.acct)) return false;
+    if (mView.who && !(mView.who === e.partner || e.lines.some(l => l.account === mView.who))) return false;
+    const hay = [e.title, e.vendor, e.ref, e.note, mCategory(e), e.id].join(' ').toLowerCase();
+    return t.every(w => hay.includes(w));
+  });
+}
+function moneyTx() {
+  const rows = mFiltered(), months = [...new Set(M().entries.map(e => e.on_date.slice(0, 7)))];
+  const used = [...new Set(M().lines.map(l => l.account))].sort().map(mAcct).filter(a => !['cash', 'loan', 'capital', 'drawings'].includes(a.kind));
+  const ins = rows.filter(e => mLive(e) && e.cash > 0).reduce((n, e) => n + e.cash, 0), outs = rows.filter(e => mLive(e) && e.cash < 0).reduce((n, e) => n - e.cash, 0);
+  setTimeout(() => {
+    $('#mSearch')?.addEventListener('input', e => { mView.text = e.target.value; redraw(); });
+    document.querySelectorAll('[data-mseg]').forEach(b => b.addEventListener('click', () => { mView.kind = b.dataset.mseg; redraw(); }));
+    [['#mAcct', 'acct'], ['#mWho', 'who'], ['#mMonth', 'month']].forEach(([s, k]) => $(s)?.addEventListener('change', e => { mView[k] = e.target.value; redraw(); }));
+    $('#mCsv')?.addEventListener('click', () => mCsv(rows, `ghost-money-${mView.month || 'all'}.csv`));
+  });
+  return `${mHead('tx')}
+  <div class="tools">
+    <input type="search" id="mSearch" placeholder="Search what, who, a serial or an invoice" value="${esc(mView.text)}" aria-label="Search">
+    <div class="seg" role="group" aria-label="Kind">${MSEG.map(([v, n]) => `<button type="button" data-mseg="${v}" aria-pressed="${mView.kind === v}">${n}</button>`).join('')}</div>
+    <select id="mAcct" aria-label="Category"><option value="">Every category</option>${used.map(a => `<option value="${a.code}" ${mView.acct === a.code ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</select>
+    <select id="mWho" aria-label="Paid by"><option value="">Anyone paid</option>${mOf('cash').map(a => `<option value="${a.code}" ${mView.who === a.code ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}
+      ${M().partners.map(p => `<option value="${p.id}" ${mView.who === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>
+    <select id="mMonth" aria-label="Month"><option value="">Every month</option>${months.map(m => `<option value="${m}" ${mView.month === m ? 'selected' : ''}>${ymName(m)}</option>`).join('')}</select>
+    <button class="btn" id="mCsv" type="button">Download CSV</button>
+  </div>
+  <div class="tools" style="gap:22px;font-size:13px"><span><span class="dim">In</span> <b class="plus num">+${qa(ins)}</b></span><span><span class="dim">Out</span> <b class="num">−${qa(outs)}</b></span>
+    <span><span class="dim">No receipt</span> <b style="color:var(--warn)">${rows.filter(needsReceipt).length}</b></span><span class="dim">${rows.length} of ${M().entries.length} entries</span></div>
+  ${rows.length ? `<div class="tablewrap"><table class="mtx"><thead><tr><th>Date</th><th>What</th><th>Category</th><th>Paid by</th><th class="r">Original</th><th class="r">QAR</th><th>Receipt</th><th>Linked to</th></tr></thead><tbody>
+    ${rows.slice(0, 500).map(e => { const w = mWho(e); return `<tr class="go ${mLive(e) ? '' : 'mgone'}" data-href="#mentry/${e.id}"><td class="dim">${esc(e.on_date)}</td>
+      <td class="wrap">${esc(e.title)}${e.kind === 'correction' ? ' <span class="badge">CORRECTION</span>' : e.undone ? ' <span class="badge cancelled">UNDONE</span>' : ''}${e.vendor ? `<small class="msub">${esc(e.vendor)}</small>` : ''}</td>
+      <td>${esc(mCategory(e))}</td><td>${w.dot ? `<span class="mdot" style="background:${w.dot}"></span>` : ''}${w.text}${w.sub ? `<small class="msub">${w.sub}</small>` : ''}</td>
+      <td class="r dim">${e.currency !== 'QAR' ? `${e.currency} ${qa(e.amount_orig)}` : '—'}</td><td class="r num">${mAmountCell(e)}</td><td>${mReceipt(e)}</td>
+      <td>${e.inv_order ? `<a href="#inventory/orders">Order ${e.inv_order}</a>` : e.ref ? `<span class="mono">${esc(e.ref)}</span>` : '<span class="dim">—</span>'}</td></tr>`; }).join('')}
+  </tbody></table></div>` : '<p class="panel empty">Nothing matches.</p>'}
+  <p class="dim" style="font-size:12.5px;margin:0">Foreign amounts are turned into QAR at the day’s rate and the original kept beside it. Nothing here can be changed or deleted: open an entry to undo it with a correction.</p>`;
+}
+function mCsv(entries, name) {
+  const cell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const out = [['date', 'entry', 'kind', 'what', 'vendor', 'account', 'account name', 'debit', 'credit', 'currency', 'original amount', 'rate', 'ref', 'receipt', 'note', 'undoes', 'by']];
+  [...entries].reverse().forEach(e => e.lines.forEach(l => out.push([e.on_date, e.id, e.kind, e.title, e.vendor, l.account, mAcct(l.account).name,
+    l.amount > 0 ? l.amount.toFixed(2) : '', l.amount < 0 ? (-l.amount).toFixed(2) : '', e.currency, e.amount_orig.toFixed(2), e.rate, e.ref, e.receipt ? 'yes' : '', e.note, e.corrects || '', e.by])));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + out.map(r => r.map(cell).join(',')).join('\n')], { type:'text/csv' }));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ---------- the forms ----------
+const mOrders = () => (D.inv ? [...new Map(D.inv.orders.map(o => [o.order_id, o])).values()] : []);
+function moneyForm(kind) {
+  const S = M().settings, cash = mOf('cash'), parts = M().partners;
+  const cats = kind === 'out' ? M().accounts.filter(a => a.active && ['stock', 'equipment', 'expense'].includes(a.kind) && a.code !== '6600')
+    : kind === 'in' ? M().accounts.filter(a => a.active && ['income', 'deferred'].includes(a.kind)) : [];
+  const owedOf = id => mPartner(parts.find(p => p.id === id)).owed;
+  const title = { out:'Money out', in:'Money in', partner:'A partner puts money in', repay:'Pay a partner', journal:'Between accounts' }[kind];
+  const chips = (name, list, cur) => `<div class="mchips">${list.map(a => `<label class="mchip"><input type="radio" name="${name}" value="${a.code}" ${a.code === cur ? 'checked' : ''}>${esc(a.name)}</label>`).join('')}</div>`;
+  const money3 = `<label>Amount<input id="fAmt" inputmode="decimal" placeholder="0.00" class="num" style="font-size:17px"></label>
+    <label>Currency<select id="fCur">${MCUR.map(c => `<option>${c}</option>`).join('')}</select></label>
+    <label id="fRateL" hidden>QAR for 1 <span id="fCurN"></span><input id="fRate" inputmode="decimal"></label>
+    <div><span class="dim" style="font-size:12.5px">In QAR</span><b class="num" id="fQar" style="display:block;font-size:22px;line-height:1.6">0.00</b></div>`;
+  const receipt = (label) => `<label>${label}<input type="file" id="fFile" accept="image/*,application/pdf"></label>`;
+  const common = `<label>Date<input type="date" id="fDate" value="${today()}" max="${today()}"></label>`;
+  let body = '';
+  if (kind === 'out') body = `<div class="form"><label class="full">What was it for<input id="fTitle" placeholder="Molex 33472-2001 plug ×4, for the Maverick R lead"></label>
+      <label>Who was paid<input id="fVendor" placeholder="LCSC"></label>${common}</div>
+    <div class="form">${money3}</div>
+    <fieldset class="mfs"><legend>What it bought</legend>${chips('fCat', cats, '')}
+      <p class="dim" style="font-size:12.5px;margin:8px 0 0">Stock and equipment are still the company’s: they aren’t a cost until sold or worn out.</p>
+      <label id="fOrderL" hidden style="margin-top:10px">Inventory order it paid for<select id="fOrder"><option value="">None</option>${mOrders().map(o => `<option value="${o.order_id}">Order ${o.order_id} · ${esc(o.supplier || 'no supplier')} · ${esc(o.ordered_on || '')}</option>`).join('')}</select></label></fieldset>
+    <fieldset class="mfs"><legend>Who paid</legend><div class="mpick">
+      ${cash.filter(a => a.code !== '1020').map((a, k) => `<label class="mcard"><input type="radio" name="fPaid" value="${a.code}" ${k ? '' : 'checked'}><span>${esc(a.name)}</span></label>`).join('')}
+      ${parts.map(p => `<label class="mcard"><input type="radio" name="fPaid" value="${p.id}"><span>${esc(p.name)}’s card<small>personal money</small></span></label>`).join('')}</div>
+      <div id="fSettle" hidden style="margin-top:12px"><p class="dim" style="margin:0 0 8px;font-size:12.5px"><span id="fSettleWho"></span> paid, so the company…</p><div class="mpick">
+        <label class="mcard"><input type="radio" name="fSet" value="loan" ${S.card_default !== 'capital' ? 'checked' : ''}><span>pays it back later<small>a loan: ownership doesn’t change</small></span></label>
+        <label class="mcard"><input type="radio" name="fSet" value="capital" ${S.card_default === 'capital' ? 'checked' : ''}><span>counts it as capital<small>adds to their share, never paid back</small></span></label></div>
+        ${agreed() ? '' : `<p class="dim" style="font-size:12.5px;margin:8px 0 0">${toAgree} The default is set on Partners once you agree it.</p>`}</div></fieldset>
+    <div class="form">${receipt('Receipt or invoice')}<label>Invoice number or serial<input id="fRef" placeholder="WM2611230041"></label><label class="full">Note<textarea id="fNote"></textarea></label></div>`;
+  if (kind === 'in') body = `<div class="form"><label class="full">What was it for<input id="fTitle" placeholder="Ghost Gauge Standard, GE-G-000006"></label>
+      <label>Who paid us<input id="fVendor" placeholder="Desert Motors"></label>${common}</div>
+    <div class="form">${money3}</div>
+    <fieldset class="mfs"><legend>What it was</legend>${chips('fCat', cats, '4000')}
+      <p class="dim" style="font-size:12.5px;margin:8px 0 0">Pro credits are owed to the garage as a service until they’re used, so they’re not income yet.</p></fieldset>
+    <div class="form"><label>Into<select id="fInto">${cash.map(a => `<option value="${a.code}">${esc(a.name)}</option>`).join('')}</select></label>
+      ${receipt('Our invoice or the payment slip')}<label>Invoice number or serial<input id="fRef"></label><label class="full">Note<textarea id="fNote"></textarea></label></div>`;
+  if (kind === 'partner') body = `<div class="form"><label>Partner<select id="fPartner">${parts.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label>${common}
+      <label>Into<select id="fInto">${cash.map(a => `<option value="${a.code}">${esc(a.name)}</option>`).join('')}</select></label></div>
+    <div class="form">${money3}</div>
+    <fieldset class="mfs"><legend>It counts as</legend><div class="mpick">
+      <label class="mcard"><input type="radio" name="fAs" value="capital" checked><span>Capital<small>buys their share of the company; not paid back</small></span></label>
+      <label class="mcard"><input type="radio" name="fAs" value="loan"><span>A loan<small>the company pays it back; ownership doesn’t change</small></span></label></div>
+      <p class="dim" id="fCapHint" style="font-size:12.5px;margin:8px 0 0"></p></fieldset>
+    <div class="form">${receipt('Transfer slip')}<label class="full">Note<textarea id="fNote"></textarea></label></div>`;
+  if (kind === 'repay') body = `<div class="form"><label>Partner<select id="fPartner">${parts.map(p => `<option value="${p.id}">${esc(p.name)} · owed ${qa(owedOf(p.id))}</option>`).join('')}</select></label>${common}
+      <label>From<select id="fFrom">${cash.map(a => `<option value="${a.code}">${esc(a.name)}</option>`).join('')}</select></label></div>
+    <fieldset class="mfs"><legend>It is</legend><div class="mpick">
+      <label class="mcard"><input type="radio" name="fAs" value="repay" checked><span>Paying back what the company owes<small>a loan or a personal card</small></span></label>
+      <label class="mcard"><input type="radio" name="fAs" value="draw"><span>Taking money out<small>profit or drawings: lowers their share’s value</small></span></label></div></fieldset>
+    <div class="form"><label>Amount, QAR<input id="fAmt" inputmode="decimal" class="num" style="font-size:17px"></label><input type="hidden" id="fCur" value="QAR">
+      ${receipt('Transfer slip')}<label class="full">Note<textarea id="fNote"></textarea></label></div>`;
+  if (kind === 'journal') {
+    const all = M().accounts.filter(a => a.active), sel = (id, cur) => `<select id="${id}">${all.map(a => `<option value="${a.code}" ${a.code === cur ? 'selected' : ''}>${a.code} · ${esc(a.name)}</option>`).join('')}</select>`;
+    body = `<p class="dim" style="margin:0">For what isn’t a payment: stock written off or used in units sold, equipment wear, cash moved between the bank and the till.</p>
+    <div class="tools">${[['Stock written off', '6000', '1300'], ['Stock used in units sold', '5000', '1300'], ['Equipment wear', '6600', '1510'], ['Bank to cash in hand', '1010', '1000']]
+      .map(([n, d, c]) => `<button type="button" class="btn sm" data-preset="${d}:${c}:${esc(n)}">${n}</button>`).join('')}</div>
+    <div class="form"><label class="full">What it is<input id="fTitle" placeholder="GE-P-000004 scrapped"></label>${common}<label>Amount, QAR<input id="fAmt" inputmode="decimal" class="num"></label><input type="hidden" id="fCur" value="QAR">
+      <label>Goes up (debit)${sel('fDr', '6000')}</label><label>Comes from (credit)${sel('fCr', '1300')}</label>
+      <label>Serial or reference<input id="fRef"></label><label class="full">Note<textarea id="fNote"></textarea></label></div>`;
+  }
+  setTimeout(() => mBindForm(kind));
+  return `<a class="back" href="#money">← Money</a><h1>${title}</h1>
+  <div class="mform"><form class="panel grid" style="gap:18px" id="mForm" onsubmit="return false">${body}
+      <div class="tools" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn gold" id="fSave" type="button">Save</button><a class="btn" href="#money">Cancel</a>
+        <span class="dim" style="font-size:12.5px;margin-left:auto">Once saved it can’t be changed. A mistake gets a correcting entry.</span></div></form>
+    <aside class="grid" style="gap:18px;align-content:start"><section class="panel"><h2>What this records</h2><div id="fRec"></div></section>
+      <details class="panel"><summary class="h2s">For the accountant</summary><div id="fJournal" style="margin-top:10px"></div></details></aside></div>`;
+}
+function mBindForm(kind) {
+  const v = s => $(s)?.value ?? '', r = n => document.querySelector(`[name="${n}"]:checked`)?.value || '';
+  const cur = () => v('#fCur') || 'QAR';
+  const rate = () => (cur() === 'QAR' ? 1 : parseFloat(v('#fRate')) || 0);
+  const qarOf = () => Math.round((parseFloat(v('#fAmt')) || 0) * rate() * 100) / 100;
+  function lines() {          // the same lines the database will write, to show before saving
+    const a = qarOf(), P = M().partners;
+    if (kind === 'out') { const paid = r('fPaid'), cat = r('fCat'), p = P.find(x => x.id === paid);
+      return [[cat, a], [p ? pAcct(p.id, r('fSet') === 'capital' ? 'capital' : 'loan') : paid, -a]]; }
+    if (kind === 'in') return [[v('#fInto'), a], [r('fCat'), -a]];
+    if (kind === 'partner') return [[v('#fInto'), a], [pAcct(v('#fPartner'), r('fAs')), -a]];
+    if (kind === 'repay') return [[pAcct(v('#fPartner'), r('fAs') === 'draw' ? 'drawings' : 'loan'), a], [v('#fFrom'), -a]];
+    return [[v('#fDr'), a], [v('#fCr'), -a]];
+  }
+  const SAY = { cash:['Money the company has', 'Money the company has'], stock:['Stock on the shelf: still the company’s money', 'Stock'], equipment:['Equipment: worn out over the months', 'Equipment'],
+    wear:['Equipment wear so far', 'Equipment wear so far'], loan:['Owed back to a partner', 'Owed back to a partner'], capital:['A partner’s capital', 'A partner’s capital'],
+    drawings:['Taken out by a partner', 'Taken out by a partner'], deferred:['Credits owed to garages as a service', 'Credits owed to garages'], income:['Earned', 'Earned'], cogs:['Cost of units sold', 'Cost of units sold'], expense:['A cost', 'A cost'] };
+  // how an account's own number moves: a debit raises what the company has or spent, a credit raises what it owes, was put in or earned
+  const up = (acct, amt) => (['asset', 'expense'].includes(mAcct(acct).type) ? amt : -amt) * (mAcct(acct).kind === 'wear' ? -1 : 1);
+  function sync() {
+    const c = cur();
+    if ($('#fRateL')) { $('#fRateL').hidden = c === 'QAR'; $('#fCurN').textContent = c; if (c !== 'QAR' && !v('#fRate')) $('#fRate').value = QAR_RATE[c] || ''; }
+    if ($('#fQar')) $('#fQar').textContent = qa(qarOf());
+    if (kind === 'out') {
+      const paid = r('fPaid'), p = M().partners.find(x => x.id === paid);
+      $('#fSettle').hidden = !p; if (p) $('#fSettleWho').textContent = p.name;
+      $('#fOrderL').hidden = mAcct(r('fCat')).kind !== 'stock' || !mOrders().length;
+    }
+    if (kind === 'partner') {
+      const x = mPartner(M().partners.find(p => p.id === v('#fPartner'))), S = M().settings;
+      $('#fCapHint').innerHTML = S.capital_each ? `${esc(x.p.name)} has put in ${qa(x.capital)} of the ${qa(S.capital_each)} capital agreed.${S.beyond_capital ? ` Past that it counts as ${S.beyond_capital === 'loan' ? 'a loan' : 'capital'}.` : ''}`
+        : `How much capital each puts in isn’t agreed yet. ${toAgree}`;
+    }
+    document.querySelectorAll('.mchip, .mcard').forEach(l => l.classList.toggle('on', !!l.querySelector('input:checked')));
+    const ls = lines().filter(([a]) => a), a = qarOf();
+    $('#fRec').innerHTML = ls.length < 2 || !a ? '<p class="dim" style="margin:0">Fill in the amount and pick the accounts.</p>'
+      : ls.map(([acct, amt], k) => `<div class="mline" ${k ? '' : 'style="border-top:0;padding-top:0"'}><span>${esc(mAcct(acct).name)}</span><b class="num">${up(acct, amt) > 0 ? '+' : '−'}${qa(Math.abs(amt))}</b>
+          <small>${esc((SAY[mAcct(acct).kind] || ['', ''])[0])}${up(acct, amt) > 0 ? ' goes up' : ' goes down'}</small></div>`).join('')
+        + (ls.every(([acct]) => mAcct(acct).kind !== 'cash') ? '<p class="dim" style="font-size:12.5px;margin:10px 0 0">No company cash moves.</p>' : '');
+    $('#fJournal').innerHTML = ls.length < 2 || !a ? '' : `<table><thead><tr><th>Account</th><th class="r">Debit</th><th class="r">Credit</th></tr></thead><tbody>
+      ${ls.map(([acct, amt]) => `<tr><td>${acct} ${esc(mAcct(acct).name)}</td><td class="r num">${amt > 0 ? qa(amt) : ''}</td><td class="r num">${amt < 0 ? qa(-amt) : ''}</td></tr>`).join('')}</tbody></table>
+      <p class="dim" style="font-size:12px;margin:8px 0 0">Every entry balances: the form writes both sides.</p>`;
+  }
+  $('#mForm').addEventListener('input', sync); $('#mForm').addEventListener('change', sync);
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { const [d, c, n] = b.dataset.preset.split(':'); $('#fDr').value = d; $('#fCr').value = c; if (!v('#fTitle')) $('#fTitle').value = n; sync(); }));
+  if (kind === 'repay') { const fill = () => { const o = mPartner(M().partners.find(p => p.id === v('#fPartner'))).owed; if (o > 0) $('#fAmt').value = o.toFixed(2); sync(); }; $('#fPartner').addEventListener('change', fill); fill(); }
+  sync();
+  $('#fSave').addEventListener('click', async e => {
+    const p = { date:v('#fDate'), amount:v('#fAmt'), currency:cur(), rate:cur() === 'QAR' ? 1 : v('#fRate'), title:v('#fTitle'), vendor:v('#fVendor'), ref:v('#fRef'), note:v('#fNote') };
+    let fn;
+    if (kind === 'out') { fn = 'money_out'; Object.assign(p, { category:r('fCat'), paid_by:r('fPaid'), settle:r('fSet'), inv_order:$('#fOrderL')?.hidden ? null : v('#fOrder') || null });
+      if (!p.category) return toast('Pick what it bought', true); }
+    if (kind === 'in') { fn = 'money_in'; Object.assign(p, { category:r('fCat'), into:v('#fInto') }); if (!p.category) return toast('Pick what it was', true); }
+    if (kind === 'partner') { fn = 'money_partner_in'; Object.assign(p, { partner:v('#fPartner'), as:r('fAs'), into:v('#fInto') }); }
+    if (kind === 'repay') { fn = 'money_repay'; Object.assign(p, { partner:v('#fPartner'), as:r('fAs'), from:v('#fFrom') }); }
+    if (kind === 'journal') { fn = 'money_journal'; Object.assign(p, { debit:v('#fDr'), credit:v('#fCr') }); }
+    const file = $('#fFile')?.files?.[0];
+    if (file && file.size > 15e6) return toast('That file is over 15 MB', true);
+    e.target.disabled = true;
+    const { data:id, error } = await sb.rpc(fn, { p });
+    if (error) { e.target.disabled = false; return toast(error.message, true); }
+    let note = 'Saved';
+    if (file) note = (await mUpload(id, file)) ? 'Saved with its receipt' : 'Saved, but the receipt didn’t upload: add it on the entry’s page';
+    D.money = await loadMoney(); toast(note);
+    location.hash = `#mentry/${id}`;
+  });
+}
+async function mUpload(id, file, path) {
+  const blob = file.type.startsWith('image/') ? await shrinkPhoto(file) : file;
+  const ext = file.type === 'application/pdf' ? 'pdf' : file.type.startsWith('image/') ? 'jpg' : (file.name.split('.').pop() || 'bin').replace(/[^A-Za-z0-9]/g, '').slice(0, 5);
+  const where = path || `receipts/${today().slice(0, 7)}/${id}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+  const { error } = await sb.storage.from('money-receipts').upload(where, blob, { contentType:blob.type || file.type || 'application/octet-stream' });
+  if (error) { toast(error.message, true); return null; }
+  if (path) return where;
+  const r = await sb.rpc('money_attach', { p_id:id, p_path:where });
+  if (r.error) { toast(r.error.message, true); return null; }
+  return where;
+}
+async function mOpenFile(path) {
+  const w = window.open('', '_blank');
+  const { data, error } = await sb.storage.from('money-receipts').createSignedUrl(path, 600);
+  if (error || !data?.signedUrl) { w?.close(); return toast(error?.message || 'Couldn’t open it', true); }
+  if (w) w.location = data.signedUrl; else location.href = data.signedUrl;
+}
+
+// ---------- one entry ----------
+function mentry(arg) {
+  if (!M()) return '<p class="panel">The money didn’t load. Try Refresh.</p>';
+  const e = M().byId.get(Number(arg));
+  if (!e) return `<p class="panel">No entry ${esc(arg)}. <a href="#money/tx">Transactions</a></p>`;
+  const o = e.corrects ? M().byId.get(Number(e.corrects)) : null;
+  setTimeout(() => {
+    $('#eUndo')?.addEventListener('click', async () => {
+      const why = prompt(`Undo “${e.title}”? A correction with the opposite lines is added on ${e.on_date}, and both stay in the books. Why?`);
+      if (why == null) return;
+      const id = await writeMoney(sb.rpc('money_reverse', { p_id:e.id, p_why:why }), 'Undone with a correction');
+      if (id) location.hash = `#mentry/${id}`;
+    });
+    $('#eFile')?.addEventListener('change', async ev => { const f = ev.target.files[0]; if (!f) return;
+      if (await mUpload(e.id, f)) { D.money = await loadMoney(); toast('Receipt added'); rerender(); } });
+    $('#eOpen')?.addEventListener('click', () => mOpenFile(e.receipt));
+  });
+  const w = mWho(e);
+  return `<a class="back" href="#money/tx">← Transactions</a>
+  <h1>${esc(e.title)}</h1>
+  <div class="two">
+    <section class="panel"><h2>${esc(MKIND[e.kind] || e.kind)} · entry ${e.id}</h2>
+      ${e.undone ? `<p class="msg bad" style="margin:0 0 12px">Undone by <a href="#mentry/${e.undone.id}">entry ${e.undone.id}</a>: ${esc(e.undone.note)}</p>` : ''}
+      ${o ? `<p class="msg" style="margin:0 0 12px">Undoes <a href="#mentry/${o.id}">entry ${o.id}, ${esc(o.title)}</a>.</p>` : ''}
+      <dl class="kv">
+        <dt>Date</dt><dd>${esc(e.on_date)}</dd>
+        <dt>Amount</dt><dd><b class="num">${qa(e.amount)} QAR</b>${e.currency !== 'QAR' ? ` <span class="dim">· ${qa(e.amount_orig)} ${esc(e.currency)} at ${e.rate}</span>` : ''}</dd>
+        ${e.vendor ? `<dt>${e.kind === 'in' ? 'Paid by' : 'Paid to'}</dt><dd>${esc(e.vendor)}</dd>` : ''}
+        <dt>Category</dt><dd>${esc(mCategory(e))}</dd>
+        ${w.text ? `<dt>Money</dt><dd>${w.text}${w.sub ? ` · ${w.sub}` : ''}</dd>` : ''}
+        ${e.inv_order ? `<dt>Inventory</dt><dd><a href="#inventory/orders">Order ${e.inv_order}</a></dd>` : ''}
+        ${e.ref ? `<dt>Reference</dt><dd class="mono">${esc(e.ref)}</dd>` : ''}
+        ${e.note && !o ? `<dt>Note</dt><dd style="white-space:pre-wrap">${esc(e.note)}</dd>` : ''}
+        ${o ? `<dt>Why</dt><dd>${esc(e.note)}</dd>` : ''}
+        <dt>Recorded</dt><dd>${when(e.created_at)} by ${who(e.by, false)}</dd>
+      </dl>
+      <div class="tools ro-hide" style="margin-top:16px">${!e.undone && canEdit('money') ? '<button class="btn danger" id="eUndo" type="button">Undo with a correction</button>' : ''}</div>
+    </section>
+    <section class="panel"><h2>Receipt</h2>
+      ${e.receipt ? `<p style="margin:0 0 12px">${mReceipt(e)} <span class="mono">${esc(e.receipt.split('/').pop())}</span></p><div class="tools"><button class="btn" id="eOpen" type="button">Open</button>
+          <label class="btn ro-hide">Replace<input type="file" id="eFile" accept="image/*,application/pdf" hidden></label></div>`
+        : `<p class="dim" style="margin:0 0 12px">${needsReceipt(e) ? 'No receipt yet. Without one the expense can’t be proved.' : 'None.'}</p>
+          <label class="btn gold ro-hide">Add a receipt<input type="file" id="eFile" accept="image/*,application/pdf" hidden></label>`}
+      <h2 style="margin-top:22px">Lines</h2>
+      <table><thead><tr><th>Account</th><th class="r">Debit</th><th class="r">Credit</th></tr></thead><tbody>
+        ${e.lines.map(l => `<tr><td><span class="mono">${l.account}</span> ${esc(mAcct(l.account).name)}</td><td class="r num">${l.amount > 0 ? qa(l.amount) : ''}</td><td class="r num">${l.amount < 0 ? qa(-l.amount) : ''}</td></tr>`).join('')}
+      </tbody></table>
+    </section>
+  </div>`;
+}
+
+// ---------- partners and their agreement ----------
+function moneyPartners() {
+  const S = M().settings, parts = M().partners.map(mPartner), total = parts.reduce((n, x) => n + x.putIn, 0);
+  const rows = M().entries.filter(e => e.partner);
+  const yn = (id, val, opts2) => `<select id="${id}"><option value="">Not agreed</option>${opts2.map(([v, n]) => `<option value="${v}" ${String(val) === v ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
+  setTimeout(() => {
+    $('#aSave')?.addEventListener('click', async e => {
+      const p = { capital_each:$('#aCap').value || null, beyond_capital:$('#aBeyond').value || null, card_default:$('#aCard').value, wear_months:+$('#aWear').value || 36,
+        loans_first:$('#aFirst').value === '' ? null : $('#aFirst').value === 'true', agreed_on:$('#aOn').value || null, shares:{}, names:{} };
+      M().partners.forEach(x => { p.shares[x.id] = $(`#aSh-${x.id}`).value === '' ? null : $(`#aSh-${x.id}`).value; p.names[x.id] = $(`#aNm-${x.id}`).value || x.name; });
+      const f = $('#aFile').files[0];
+      e.target.disabled = true;
+      if (f) { const path = await mUpload(0, f, `receipts/agreement/${today()}-${crypto.randomUUID().slice(0, 8)}.${f.type === 'application/pdf' ? 'pdf' : 'jpg'}`); if (path) p.agreement_file = path; }
+      const ok = await writeMoney(sb.rpc('money_settings_save', { p }), 'Saved');
+      e.target.disabled = false; if (ok) rerender();
+    });
+    $('#aOpen')?.addEventListener('click', () => mOpenFile(S.agreement_file));
+  });
+  return `${mHead('partners')}
+  <div class="two">${parts.map((x, k) => `<section class="panel" style="border-top:3px solid ${PCOL[k]}">
+      <div class="tools" style="justify-content:space-between"><h2 style="color:var(--ink)">${esc(x.p.name)}</h2><span class="dim" style="font-size:12.5px">${total ? (x.putIn / total * 100).toFixed(1) : '0.0'} % of all put in</span></div>
+      <div class="num" style="font-size:30px;font-weight:800">${qa(x.putIn)}<span class="dim" style="font-size:12px;margin-left:6px">QAR PUT IN</span></div>
+      <dl class="kv" style="margin-top:12px"><dt>Capital</dt><dd class="num">${qa(x.capital)}</dd><dt>Owed back by the company</dt><dd class="num" style="color:${PCOL[k]}">${qa(x.owed)}</dd>
+        <dt>Repaid so far</dt><dd class="num">${qa(x.repaid)}</dd><dt>Taken out</dt><dd class="num">${qa(x.drawn)}</dd><dt>Agreed share</dt><dd>${x.p.share != null ? `${+x.p.share} %` : toAgree}</dd></dl>
+      <div class="tools ro-hide" style="margin-top:14px"><a class="btn sm" href="#money/partner">Put in</a>${x.owed > 0.005 ? `<a class="btn sm" href="#money/repay">Repay ${qa(x.owed)}</a>` : ''}</div>
+    </section>`).join('')}</div>
+  <section class="panel"><div class="tools" style="justify-content:space-between"><h2>The agreement</h2>${agreed() ? `<span class="badge active">SIGNED ${esc(S.agreed_on)}</span>` : toAgree}</div>
+    <p class="dim" style="margin:0 0 14px;font-size:13px">Ownership follows what is written here, not who paid more. Leave a field on “Not agreed” until you both have.</p>
+    <div class="form">
+      ${M().partners.map(p => `<label>Name<input id="aNm-${p.id}" value="${esc(p.name)}"></label><label>${esc(p.name)}’s share, %<input id="aSh-${p.id}" inputmode="decimal" value="${p.share ?? ''}" placeholder="Not agreed"></label>`).join('')}
+      <label>Capital each partner puts in, QAR<input id="aCap" inputmode="decimal" value="${S.capital_each ?? ''}" placeholder="Not agreed"></label>
+      <label>Money put in past the capital counts as${yn('aBeyond', S.beyond_capital, [['loan', 'A loan, paid back'], ['capital', 'More capital']])}</label>
+      <label>A purchase on a personal card, unless the form says otherwise<select id="aCard"><option value="loan" ${S.card_default !== 'capital' ? 'selected' : ''}>A loan, paid back</option><option value="capital" ${S.card_default === 'capital' ? 'selected' : ''}>Capital</option></select></label>
+      <label>Loans are paid back before profit is shared${yn('aFirst', S.loans_first, [['true', 'Yes'], ['false', 'No']])}</label>
+      <label>Equipment wears out over, months<input id="aWear" type="number" min="1" max="240" value="${S.wear_months || 36}"></label>
+      <label>Signed on<input id="aOn" type="date" value="${S.agreed_on || ''}"></label>
+      <label>The signed agreement${S.agreement_file ? ' (replace)' : ''}<input type="file" id="aFile" accept="application/pdf,image/*"></label>
+    </div>
+    <div class="tools" style="margin-top:14px"><button class="btn gold ro-hide" id="aSave" type="button">Save the agreement</button>${S.agreement_file ? '<button class="btn" id="aOpen" type="button">Open the signed agreement</button>' : ''}
+      ${S.updated_by ? `<span class="dim" style="font-size:12.5px">Last changed ${when(S.updated_at)} by ${who(S.updated_by)}</span>` : ''}</div>
+  </section>
+  ${rows.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Partner</th><th>What</th><th class="r">Capital</th><th class="r">Owed back</th><th class="r">Taken out</th></tr></thead><tbody>
+    ${rows.map(e => { const c = e.lines.find(l => mAcct(l.account).kind === 'capital'), lo = e.lines.find(l => mAcct(l.account).kind === 'loan'), d = e.lines.find(l => mAcct(l.account).kind === 'drawings');
+      const cell = (l, neg) => (l ? `<span class="${(neg ? l.amount : -l.amount) > 0 ? 'plus' : ''}">${(neg ? l.amount : -l.amount) > 0 ? '+' : '−'}${qa(Math.abs(l.amount))}</span>` : '<span class="dim">—</span>');
+      return `<tr class="go ${mLive(e) ? '' : 'mgone'}" data-href="#mentry/${e.id}"><td class="dim">${esc(e.on_date)}</td><td><span class="mdot" style="background:${PCOL[pIdx(e.partner)]}"></span>${esc(pName(e.partner))}</td>
+        <td class="wrap">${esc(e.title)}</td><td class="r num">${cell(c)}</td><td class="r num">${cell(lo)}</td><td class="r num">${cell(d, true)}</td></tr>`; }).join('')}
+  </tbody></table></div>` : ''}`;
+}
+
+// ---------- reports ----------
+let mYear = '';
+function moneyReports() {
+  const years = [...new Set([today().slice(0, 4), ...M().entries.map(e => e.on_date.slice(0, 4))])].sort().reverse();
+  const Y = mYear && years.includes(mYear) ? mYear : years[0];
+  const asOf = Y === today().slice(0, 4) ? today() : `${Y}-12-31`;
+  const lastYm = asOf.slice(0, 7);
+  const yms = []; for (let m = `${Y}-01`; m <= lastYm; m = ymAdd(m, 1)) yms.push(m);
+  const usedYm = yms.filter(m => M().lines.some(l => l.on_date?.startsWith(m)));
+  const cols = usedYm.length ? yms.slice(yms.indexOf(usedYm[0])) : [lastYm];
+  const L = M().lines.filter(l => l.on_date);
+  const sumIn = (code, ym) => L.filter(l => l.account === code && l.on_date.startsWith(ym)).reduce((n, l) => n + l.amount, 0);
+  const pl = type => M().accounts.filter(a => a.type === type && L.some(l => l.account === a.code && l.on_date.startsWith(Y)));
+  const inc = pl('income'), cost = pl('expense');
+  const cogs = cost.filter(a => a.kind === 'cogs'), run = cost.filter(a => a.kind !== 'cogs');
+  const rowOf = (a, sign) => { const v = cols.map(m => sign * sumIn(a.code, m)); return { name:a.name, v, t:v.reduce((n, x) => n + x, 0) }; };
+  const sumRows = rs => cols.map((_, k) => rs.reduce((n, r) => n + r.v[k], 0));
+  const incR = inc.map(a => rowOf(a, -1)), cogsR = cogs.map(a => rowOf(a, 1)), runR = run.map(a => rowOf(a, 1));
+  const incT = sumRows(incR), cogsT = sumRows(cogsR), runT = sumRows(runR), gross = incT.map((x, k) => x - cogsT[k]), net = gross.map((x, k) => x - runT[k]);
+  const tot = a => a.reduce((n, x) => n + x, 0);
+  const nm = v => (Math.abs(v) < 0.005 ? '<span class="dim">0.00</span>' : v < 0 ? `<span class="mloss">−${qa(-v)}</span>` : qa(v));
+  const trow = (name, v, cls = '') => `<tr class="${cls}"><td class="${cls ? '' : 'ind'}">${esc(name)}</td>${v.map(x => `<td class="r num">${nm(x)}</td>`).join('')}<td class="r num">${nm(tot(v))}</td></tr>`;
+  const head = n => `<tr class="mhead"><td colspan="${cols.length + 2}">${n}</td></tr>`;
+  // balance sheet on asOf
+  const balAt = code => L.filter(l => l.account === code && l.on_date <= asOf).reduce((n, l) => n + l.amount, 0);
+  const assets = M().accounts.filter(a => a.type === 'asset').map(a => ({ a, v:balAt(a.code) })).filter(x => Math.abs(x.v) > 0.005);
+  const liab = M().accounts.filter(a => a.type === 'liability').map(a => ({ a, v:-balAt(a.code) })).filter(x => Math.abs(x.v) > 0.005 || x.a.kind === 'deferred');
+  const eq = M().accounts.filter(a => a.type === 'equity').map(a => ({ a, v:-balAt(a.code) })).filter(x => Math.abs(x.v) > 0.005);
+  const result = -M().accounts.filter(a => ['income', 'expense'].includes(a.type)).reduce((n, a) => n + balAt(a.code), 0);
+  const aT = assets.reduce((n, x) => n + x.v, 0), lT = liab.reduce((n, x) => n + x.v, 0), eT = eq.reduce((n, x) => n + x.v, 0) + result;
+  const balanced = Math.abs(aT - lT - eT) < 0.005;
+  // cash in the year, by what the other side of each entry was
+  const start = L.filter(l => mAcct(l.account).kind === 'cash' && l.on_date < `${Y}-01-01`).reduce((n, l) => n + l.amount, 0);
+  const flow = {}, FLOW = [['capital', 'Partners’ capital in'], ['loan_in', 'Partners’ loans in'], ['income', 'Sales and other income'], ['stock', 'Stock bought'], ['equipment', 'Equipment bought'],
+    ['expense', 'Running costs paid'], ['loan_out', 'Partners repaid'], ['drawings', 'Taken out by partners'], ['other', 'Other']];
+  M().entries.filter(e => e.on_date.startsWith(Y) && e.on_date <= asOf && Math.abs(e.cash) > 0.005).forEach(e => {
+    const other = e.lines.filter(l => mAcct(l.account).kind !== 'cash').sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))[0];
+    if (!other) return;            // between two cash accounts
+    let k = mAcct(other.account).kind;
+    if (k === 'loan') k = other.amount < 0 ? 'loan_in' : 'loan_out';
+    if (k === 'deferred') k = 'income'; if (k === 'cogs') k = 'expense'; if (!FLOW.some(f => f[0] === k)) k = 'other';
+    // a correction lands on the same line as what it undoes
+    if (e.kind === 'correction' && k === 'loan_out') k = 'loan_in'; else if (e.kind === 'correction' && k === 'loan_in') k = 'loan_out';
+    flow[k] = (flow[k] || 0) + e.cash;
+  });
+  const end = start + Object.values(flow).reduce((n, v) => n + v, 0);
+  const bank = mBankMonths('1000').filter(b => b.ym.startsWith(Y));
+  const wear = mWearDue(), S = M().settings;
+  setTimeout(() => {
+    $('#rYear')?.addEventListener('change', e => { mYear = e.target.value; redraw(); });
+    $('#rCsv')?.addEventListener('click', () => mCsv(M().entries.filter(e => e.on_date.startsWith(Y)), `ghost-money-${Y}-journal.csv`));
+    $('#rPrint')?.addEventListener('click', () => { document.body.classList.add('mprint'); window.print(); setTimeout(() => document.body.classList.remove('mprint'), 500); });
+    $('#rWear')?.addEventListener('click', async e => { e.target.disabled = true;
+      await writeMoney(sb.rpc('money_journal', { p:{ title:`Equipment wear, ${ymName(wear.ym)}`, amount:wear.amount, debit:'6600', credit:'1510', ref:wear.ref, date:ymEnd(wear.ym) } }), 'Wear recorded'); rerender(); });
+  });
+  return `${mHead('reports')}
+  <div class="tools noprint"><label style="display:flex;align-items:center;gap:8px;color:var(--ink)">Year <select id="rYear">${years.map(y => `<option ${y === Y ? 'selected' : ''}>${y}</option>`).join('')}</select></label>
+    <button class="btn" id="rCsv" type="button">Download for the accountant (CSV)</button><button class="btn" id="rPrint" type="button">Print or save as PDF</button></div>
+  <section class="panel"><h2>Profit and loss, ${Y}</h2><p class="dim mlead">What was earned, minus what it cost. Stock and equipment aren’t here until they’re sold or worn out.</p>
+    <div style="overflow-x:auto"><table class="mrep"><thead><tr><th></th>${cols.map(m => `<th class="r">${ymShort(m)}</th>`).join('')}<th class="r">${Y === today().slice(0, 4) ? 'So far' : 'Year'}</th></tr></thead><tbody>
+      ${head('EARNED')}${incR.length ? incR.map(r => trow(r.name, r.v)).join('') : trow('Nothing earned yet', cols.map(() => 0))}
+      ${cogsR.map(r => trow(r.name, r.v.map(x => -x))).join('')}
+      ${trow('Gross profit', gross, 'msum')}
+      ${head('RUNNING COSTS')}${runR.map(r => trow(r.name, r.v)).join('') || trow('None', cols.map(() => 0))}
+      ${trow('Running costs', runT, 'msum')}${trow('Profit or loss', net, 'mtot')}
+    </tbody></table></div></section>
+  <div class="two">
+    <section class="panel"><div class="tools" style="justify-content:space-between"><h2>Balance sheet</h2><span class="badge ${balanced ? 'active' : 'cancelled'}">${balanced ? 'BALANCES' : 'DOESN’T BALANCE'}</span></div>
+      <p class="dim mlead">On ${esc(asOf)}. What the company has always equals what it owes plus what the owners have in it.</p>
+      <table class="mrep"><tbody>
+        ${head('WHAT IT HAS')}${assets.map(x => `<tr><td class="ind">${esc(x.a.name)}</td><td class="r num">${nm(x.v)}</td></tr>`).join('') || '<tr><td class="ind dim">Nothing yet</td><td></td></tr>'}
+        <tr class="msum"><td>Total</td><td class="r num">${qa(aT)}</td></tr>
+        ${head('WHAT IT OWES')}${liab.map(x => `<tr><td class="ind">${esc(x.a.name)}</td><td class="r num">${nm(x.v)}</td></tr>`).join('')}
+        <tr class="msum"><td>Total</td><td class="r num">${qa(lT)}</td></tr>
+        ${head('THE OWNERS’ SHARE')}${eq.map(x => `<tr><td class="ind">${esc(x.a.name)}</td><td class="r num">${nm(x.v)}</td></tr>`).join('')}
+        <tr><td class="ind">${result >= 0 ? 'Profit' : 'Losses'} so far</td><td class="r num">${nm(result)}</td></tr>
+        <tr class="msum"><td>Total</td><td class="r num">${qa(eT)}</td></tr>
+        <tr class="mtot"><td style="font-size:12px">${qa(aT)} = ${qa(lT)} + ${qa(eT)}</td><td class="r ${balanced ? 'plus' : 'mloss'}">${balanced ? '✓' : '✗'}</td></tr>
+      </tbody></table>
+      ${wear ? `<div class="prow2 ro-hide" style="margin-top:12px"><span>Equipment wear for ${ymName(wear.ym)}: ${qa(wear.amount)}<small>${qa(mBal('1500'))} of equipment over ${S.wear_months || 36} months</small></span><button class="btn sm" id="rWear" type="button">Record it</button></div>` : ''}
+    </section>
+    <section class="panel"><h2>Cash, ${Y}</h2><p class="dim mlead">Profit and cash aren’t the same: buying stock empties the bank but isn’t a loss.</p>
+      <table class="mrep"><tbody>
+        <tr><td>At the start of ${Y}</td><td class="r num">${qa(start)}</td></tr>
+        ${FLOW.filter(([k]) => flow[k]).map(([k, n]) => `<tr><td class="ind">${n}</td><td class="r num">${flow[k] > 0 ? `<span class="plus">+${qa(flow[k])}</span>` : `−${qa(-flow[k])}`}</td></tr>`).join('') || '<tr><td class="ind dim">No cash moved</td><td></td></tr>'}
+        <tr class="mtot"><td>${asOf === today() ? 'Now' : 'At the end'}</td><td class="r num">${qa(end)}</td></tr>
+      </tbody></table>
+      ${(() => { const card = M().entries.filter(e => e.on_date.startsWith(Y) && e.kind === 'out' && e.partner).reduce((n, e) => n + (mLive(e) ? e.amount : 0), 0);
+        return card ? `<p class="dim mlead" style="margin:12px 0 0">Another ${qa(card)} was paid on partners’ own cards. It never went through the bank, so it’s on Partners.</p>` : ''; })()}
+      ${bank.length ? `<div class="tools" style="margin-top:12px;font-size:12.5px"><span class="dim">Bank matched:</span>${bank.map(b => `<span class="badge ${b.ok ? 'active' : 'soon'}">${ymShort(b.ym).toUpperCase()}</span>`).join('')}</div>` : ''}
+    </section>
+  </div>`;
+}
+
+// ---------- receipts and the bank ----------
+function moneyChecks() {
+  const miss = M().entries.filter(needsReceipt), cashAccts = mOf('cash').filter(a => M().lines.some(l => l.account === a.code));
+  setTimeout(() => {
+    document.querySelectorAll('[data-rfile]').forEach(inp => inp.addEventListener('change', async () => { const f = inp.files[0]; if (!f) return;
+      if (await mUpload(+inp.dataset.rfile, f)) { D.money = await loadMoney(); toast('Receipt added'); rerender(); } }));
+    $('#bSave')?.addEventListener('click', async e => {
+      const [acct, ym] = $('#bMonth').value.split('|');
+      const st = parseFloat($('#bStmt').value);
+      if (!Number.isFinite(st)) return toast('Type the statement’s closing balance', true);
+      e.target.disabled = true;
+      const r = await writeMoney(sb.rpc('money_match', { p_account:acct, p_month:`${ym}-01`, p_statement:st, p_note:$('#bNote').value }));
+      e.target.disabled = false;
+      if (r) { toast(Math.abs(r.difference) < 0.005 ? `${ymName(ym)} matches` : `${ymName(ym)} is ${qa(Math.abs(r.difference))} ${r.difference > 0 ? 'more on the statement' : 'less on the statement'} than in the books`, Math.abs(r.difference) >= 0.005); rerender(); }
+    });
+  });
+  const months = cashAccts.flatMap(a => mBankMonths(a.code).map(b => ({ ...b, a })));
+  return `${mHead('checks')}
+  <section class="panel"><h2>Receipts missing</h2>
+    ${miss.length ? `<table><tbody>${miss.map(e => `<tr><td class="dim">${esc(e.on_date)}</td><td class="wrap"><a href="#mentry/${e.id}">${esc(e.title)}</a>${e.vendor ? `<small class="msub">${esc(e.vendor)}</small>` : ''}</td>
+      <td class="r num">${qa(e.amount)}</td><td class="r ro-hide"><label class="btn sm">Add receipt<input type="file" data-rfile="${e.id}" accept="image/*,application/pdf" hidden></label></td></tr>`).join('')}</tbody></table>`
+      : '<p class="empty">Every entry has its receipt.</p>'}
+  </section>
+  <section class="panel"><h2>The bank, month by month</h2>
+    <p class="dim mlead">At the end of each month, type the closing balance from the bank statement. If it isn’t what the books say, something is missing or wrong.</p>
+    ${months.length ? `<div class="tablewrap"><table><thead><tr><th>Month</th><th>Account</th><th class="r">The books</th><th class="r">The statement</th><th class="r">Difference</th><th></th></tr></thead><tbody>
+      ${months.slice().reverse().map(b => `<tr><td>${ymName(b.ym)}</td><td>${esc(b.a.name)}</td><td class="r num">${qa(b.books)}</td><td class="r num">${b.m ? qa(b.m.statement) : '<span class="dim">—</span>'}</td>
+        <td class="r num">${b.m ? (b.ok ? '<span class="plus">0.00</span>' : `<span class="mloss">${qa(b.m.statement - b.books)}</span>`) : ''}</td>
+        <td>${b.ok ? '<span class="badge active">MATCHED</span>' : b.m ? '<span class="badge cancelled">DIFFERS</span>' : '<span class="badge soon">NOT YET</span>'}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="form ro-hide" style="margin-top:14px"><label>Month<select id="bMonth">${months.slice().reverse().map(b => `<option value="${b.a.code}|${b.ym}">${ymName(b.ym)} · ${esc(b.a.name)}</option>`).join('')}</select></label>
+      <label>Statement’s closing balance, QAR<input id="bStmt" inputmode="decimal"></label><label>Note<input id="bNote" placeholder="QNB statement 30 Nov"></label><div><button class="btn gold" id="bSave" type="button">Match</button></div></div>`
+      : '<p class="empty">A month can be matched once it has ended and the bank has entries in it.</p>'}
+  </section>`;
 }
 
 // tools/admin/preview.js puts sample data in a local copy of the page, to check its layout without signing in

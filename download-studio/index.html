@@ -2,131 +2,250 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ghost Studio</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Ghost Studio, the screen designer for the Ghost Gauge Pro: download for Mac and Windows.">
-<link rel="stylesheet" href="../_style.css">
+<meta name="theme-color" content="#000000">
+<style>body { margin: 0; }</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&display=swap">
 <style>
-/* The download page for garages. The buttons start on the release page and the script below points
-   them at the newest files, so publishing a new version (tools/studio/publish_studio.sh) never needs
-   an edit here. English and Arabic: [data-l] blocks, one shown at a time. */
+/* The download page for garages, sent to them by hand: no page on the site links here, and search
+   engines are asked to leave it out. The look is the home page's (index.html): the same colours,
+   Orbitron for headings and readouts, the system face for prose. The buttons start on the release
+   page and the script points them at the newest files, so publishing a new version
+   (tools/studio/publish_studio.sh) never needs an edit here. English and Arabic: [data-l] blocks,
+   one shown at a time. Orbitron has no Arabic, so Arabic headings take the system face. */
+:root {
+  color-scheme: dark;
+  --bg: #000000; --ink: #ffffff; --dim: #7b8488; --line: #181c21;
+  --tile: #111316; --edge: #1e2126; --gold: #ffc20e; --ok: #31d27b;
+  --warn: #ff9c29; --crit: #ff413a; --red-dim: #291410;
+  --readout: "Orbitron", "DIN Alternate", ui-monospace, monospace;
+  --prose: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --r-tile: 16px; --r-panel: 22px;
+}
+* { box-sizing: border-box; }
 [hidden] { display: none !important; }
-.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
-.top nav { margin: 0; padding: 0; border: 0; }
-.lang { font: 600 13px/1 inherit; font-family: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px; cursor: pointer; }
-.shot { width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--line); margin: 22px 0 6px; }
-.dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 26px 0 8px; }
-.btn { display: grid; gap: 4px; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; color: var(--ink); }
-.btn b { font-size: 17px; }
-.btn span { color: var(--dim); font-size: 13px; }
-.btn.main { background: var(--gold); border-color: var(--gold); color: #17130a; }
-.btn.main span { color: #4a3a08; }
-.btn:hover { border-color: #3d444e; }
-.btn.main:hover { filter: brightness(1.05); }
-.ver { color: var(--dim); font-size: 13px; margin-bottom: 0; }
-ol.steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 12px; margin-top: 14px; }
-ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 0; }
-ol.steps > li::before { content: counter(s); width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--gold); font-weight: 700; }
-ol.steps h3 { margin: 4px 0 6px; }
-ol.steps p { margin-bottom: 6px; color: var(--dim); }
-ol.steps p:last-child { margin-bottom: 0; }
-html[dir=rtl] ul { padding-left: 0; padding-right: 22px; }
-html[dir=rtl] .top nav a { margin-right: 0; margin-left: 18px; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--prose); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .ltr { direction: ltr; unicode-bidi: isolate; }
+
+/* the top strip */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--bg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.top .bar { padding-block: 14px 12px; }
+.brand { display: flex; align-items: center; gap: 12px; font: 700 13px/1 var(--readout); letter-spacing: 3px; text-transform: uppercase; white-space: nowrap; direction: ltr; }
+.brand svg { width: 26px; height: auto; flex: none; }
+.revs { flex: 1; display: grid; grid-template-columns: repeat(20, 1fr); gap: 4px; padding-bottom: 10px; direction: ltr; }
+.revs i { display: block; height: 6px; border-radius: 2px; background: var(--line); transition: background .15s ease-out; }
+.revs i:nth-child(n+17) { background: var(--red-dim); }
+.revs i.on { background: var(--ok); }
+.revs i.on:nth-child(n+14) { background: var(--warn); }
+.revs i.on:nth-child(n+17) { background: var(--crit); }
+.lang { appearance: none; padding: 10px 14px; border: 1px solid var(--edge); border-radius: 12px; background: var(--bg); color: var(--ink); font: 600 14px/1 var(--prose); cursor: pointer; }
+.lang:hover { border-color: var(--dim); }
+
+/* shared */
+main { display: flex; flex-direction: column; gap: clamp(56px, 8vw, 104px); padding-block: clamp(28px, 5vw, 56px) clamp(72px, 10vw, 120px); }
+.rows { display: flex; flex-direction: column; gap: 20px; }
+.txt { display: flex; flex-direction: column; gap: 10px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1, h2 { font-family: var(--readout); font-weight: 800; text-transform: uppercase; }
+h1 { font-size: clamp(34px, 8.4vw, 92px); line-height: .98; letter-spacing: .02em; }
+h2 { font-size: clamp(22px, 3.6vw, 36px); line-height: 1.1; letter-spacing: .04em; }
+h3 { font: 700 15px/1.3 var(--readout); letter-spacing: 1px; text-transform: uppercase; }
+.lede { margin: 0; color: var(--dim); font-size: clamp(16px, 2vw, 19px); max-width: 52ch; }
+.cap { margin: 0; font: 500 11px/1.5 var(--readout); letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); }
+.panel { border: 1px solid var(--edge); border-radius: var(--r-panel); overflow: hidden; background: #000; }
+.panel > img { width: 100%; }
+p { margin: 0; }
+b { font-weight: 600; color: var(--ink); }
+
+/* the download buttons: tiles, the visitor's own system in gold */
+.dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dlb { display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid var(--edge); border-radius: var(--r-tile); background: var(--tile); }
+.dlb:hover { border-color: var(--dim); }
+.dlb .big { font: 700 clamp(18px, 2.8vw, 28px)/1 var(--readout); letter-spacing: 1px; text-transform: uppercase; }
+.dlb.main { background: var(--gold); border-color: var(--gold); color: #000; }
+.dlb.main .cap { color: #4a3a08; }
+.dlb.main:hover { filter: brightness(1.05); }
+
+/* the steps and the notes after them */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.steps > li { counter-increment: s; display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid var(--edge); border-radius: var(--r-tile); background: var(--tile); min-width: 0; }
+.steps > li::before { content: counter(s, decimal-leading-zero); font: 800 30px/1 var(--readout); letter-spacing: 1px; color: var(--gold); }
+.steps p, .note p, .notes p { color: var(--dim); font-size: 15px; }
+.note { padding: 18px; border: 1px solid var(--edge); border-radius: var(--r-tile); display: flex; flex-direction: column; gap: 8px; }
+.notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.notes > div { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid var(--edge); border-radius: var(--r-tile); background: var(--tile); }
+@media (max-width: 820px) { .steps, .notes { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .dl { grid-template-columns: 1fr; } }
+
+/* Arabic: the system face for headings and captions, no tracking (it breaks the joins) */
+[data-l=ar] :is(h2, h3, .cap), .cap[data-l=ar] { font-family: var(--prose); letter-spacing: 0; text-transform: none; }
+[data-l=ar] h2 { font-weight: 700; }
+[data-l=ar] h3 { font-size: 17px; }
+[data-l=ar] .cap, .cap[data-l=ar] { font-size: 13px; }
+html[lang=ar] #ver { font-family: var(--prose); letter-spacing: 0; font-size: 13px; }
+
+/* footer */
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; padding-block: 28px 36px; color: var(--dim); font-size: 13px; }
+footer .brand { color: var(--ink); }
+footer .ar { font-size: 16px; color: var(--ink); }
+footer .legal { display: flex; gap: 18px; }
+footer .legal a:hover { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { .revs i { transition: none; } }
 </style>
 </head>
 <body>
-<main>
-<div class="top">
-  <nav><a href="../index.html">GHOST GAUGE</a><a href="../support.html">SUPPORT</a></nav>
-  <button class="lang" id="lang" type="button" lang="ar">العربية</button>
-</div>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="/" aria-label="Ghost Electronics">
+      <svg viewBox="0 0 220 260" fill="none" aria-hidden="true">
+        <path d="M25 240 55 200 83 240 111 200 139 240 167 200 195 240V105A85 85 0 0 0 25 105Z" stroke="#eceff4" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60.76 158.68A50 50 0 1 1 159.24 158.68" stroke="#3e4757" stroke-width="15" stroke-linecap="round"/>
+        <path d="M60.76 158.68A50 50 0 0 1 79.22 110.6" stroke="#52e5a6" stroke-width="15" stroke-linecap="round"/>
+        <path d="M110 150 139.55 112.18" stroke="#ff4b23" stroke-width="13" stroke-linecap="round"/>
+        <circle cx="110" cy="150" r="11.5" fill="#eceff4"/>
+      </svg>
+      Ghost Electronics
+    </a>
+    <button class="lang" id="lang" type="button" lang="ar">العربية</button>
+  </div>
+  <div class="wrap"><div class="revs" id="revs" aria-hidden="true"></div></div>
+</header>
 
-<section data-l="en">
-  <h1>Ghost Studio</h1>
-  <p class="lede">The screen designer for the Ghost Gauge Pro, for garages. Design your customers’ dash screens, try them on a simulated drive, and hand them an approval sheet to sign.</p>
-</section>
-<section data-l="ar" hidden>
-  <h1>Ghost Studio</h1>
-  <p class="lede">مصمّم الشاشات لعدّاد Ghost Gauge Pro، للورش. صمّم شاشات عملائك، وجرّبها على قيادة محاكاة، وسلّمهم ورقة موافقة للتوقيع.</p>
-</section>
+<main class="wrap">
 
-<img class="shot" src="studio.jpg" alt="Ghost Studio" width="1600" height="986">
+  <section class="rows">
+    <div class="txt">
+      <p class="cap" data-l="en">For garages</p><p class="cap" data-l="ar" hidden>للورش</p>
+      <h1>Ghost Studio</h1>
+      <p class="lede" data-l="en">The screen designer for the Ghost Gauge Pro. Design your customers’ dash screens, try them on a simulated drive, and install them on their Pro.</p>
+      <p class="lede" data-l="ar" hidden>مصمّم الشاشات لعدّاد Ghost Gauge Pro. صمّم شاشات عملائك، وجرّبها على قيادة محاكاة، وثبّتها على عدّادهم.</p>
+    </div>
+    <div class="panel">
+      <img src="studio.jpg" width="1600" height="986" alt="Ghost Studio with a screen open on the Pro's 800 by 480 canvas.">
+    </div>
+    <div class="dl">
+      <a class="dlb" id="mac" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
+        <span class="cap" data-l="en">Apple silicon and Intel</span><span class="cap" data-l="ar" hidden>Apple silicon و Intel</span>
+        <span class="big ltr">Mac</span>
+      </a>
+      <a class="dlb" id="win" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
+        <span class="cap" data-l="en">Windows 10 and 11, 64-bit and Arm</span><span class="cap" data-l="ar" hidden>Windows 10 و 11، <span class="ltr">64-bit</span> و Arm</span>
+        <span class="big ltr">Windows</span>
+      </a>
+    </div>
+    <p class="cap" id="ver"></p>
+  </section>
 
-<div class="dl">
-  <a class="btn" id="mac" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
-    <b data-l="en">Download for Mac</b><b data-l="ar" hidden>تنزيل لنظام Mac</b>
-    <span data-l="en">Apple silicon and Intel</span><span data-l="ar" hidden>Apple silicon و Intel</span>
-  </a>
-  <a class="btn" id="win" href="https://github.com/kmhndi/ghost-gauge-app/releases/tag/studio">
-    <b data-l="en">Download for Windows</b><b data-l="ar" hidden>تنزيل لنظام Windows</b>
-    <span data-l="en">Windows 10 and 11, 64-bit and Arm</span><span data-l="ar" hidden>Windows 10 و 11، <span class="ltr">64-bit</span> و Arm</span>
-  </a>
-</div>
-<p class="ver" id="ver"></p>
+  <section class="rows" data-l="en">
+    <h2>Getting started</h2>
+    <ol class="steps">
+      <li><h3>Install it</h3>
+        <p><b>Mac:</b> open the file you downloaded and drag Ghost Studio into Applications.</p>
+        <p><b>Windows:</b> run the installer. If Windows shows a blue “Windows protected your PC” box, click <b>More info</b>, then <b>Run anyway</b>.</p></li>
+      <li><h3>Request a licence</h3>
+        <p>Ghost Studio opens on “This laptop needs a licence”. Type your <b>Garage name</b> and <b>Phone number</b>, then click <b>Request a licence</b>.</p>
+        <p>It sends only this laptop’s code and its name.</p></li>
+      <li><h3>Wait for approval</h3>
+        <p>Studio shows “Pending approval from Ghost Electronics”. Once we approve, it opens by itself, ready to use.</p>
+        <p>You can close it meanwhile: the request stays.</p></li>
+    </ol>
+    <div class="note">
+      <h3>No internet on that laptop?</h3>
+      <p>Under <b>No internet on this laptop?</b> click <b>Copy the request</b> and send it to us on WhatsApp or by email. Open the licence file we send back with <b>Open the licence…</b>, or double-click it.</p>
+    </div>
+  </section>
 
-<section data-l="en">
-  <h2>Getting started</h2>
-  <ol class="steps">
-    <li><div><h3>Install it</h3>
-      <p><b>Mac:</b> open the file you downloaded and drag Ghost Studio into Applications.</p>
-      <p><b>Windows:</b> run the installer. Windows may show a blue “Windows protected your PC” box: click <b>More info</b>, then <b>Run anyway</b>.</p></div></li>
-    <li><div><h3>Send your request</h3>
-      <p>Ghost Studio opens on a page asking for a licence. Type your garage’s name, click <b>Copy the request</b> and send it to Ghost Electronics on WhatsApp or by email. It holds only your computer’s code, its name and your garage’s name.</p></div></li>
-    <li><div><h3>Open your licence</h3>
-      <p>You get a <span class="ltr">.ghostlicence</span> file back. Double-click it, and Ghost Studio opens ready to use. A licence works on that computer only.</p></div></li>
-  </ol>
-  <h2>After that</h2>
-  <ul>
-    <li>Ghost Studio updates itself: when a new version is out it downloads in the background and asks you to restart.</li>
-    <li>It works in English and Arabic; the button at the top switches.</li>
-    <li>Your customers’ projects are kept in <b>Documents › Ghost Studio › Customers</b>. Back that folder up with the rest of your work.</li>
-  </ul>
-</section>
+  <section class="rows" data-l="ar" hidden>
+    <h2>البدء</h2>
+    <ol class="steps">
+      <li><h3>ثبّته</h3>
+        <p><b class="ltr">Mac:</b> افتح الملف الذي نزّلته واسحب Ghost Studio إلى مجلد التطبيقات.</p>
+        <p><b class="ltr">Windows:</b> شغّل المثبّت. إذا ظهر مربع أزرق «Windows protected your PC» فانقر <b class="ltr">More info</b> ثم <b class="ltr">Run anyway</b>.</p></li>
+      <li><h3>اطلب ترخيصًا</h3>
+        <p>يفتح Ghost Studio على صفحة تطلب ترخيصًا لهذا الجهاز. اكتب <b>اسم الورشة</b> و<b>رقم الهاتف</b>، ثم انقر <b>طلب ترخيص</b>.</p>
+        <p>لا يُرسل إلا رمز هذا الجهاز واسمه.</p></li>
+      <li><h3>انتظر الموافقة</h3>
+        <p>يعرض Studio «بانتظار موافقة Ghost Electronics». بعد موافقتنا يُفتح تلقائيًا جاهزًا للاستخدام.</p>
+        <p>يمكنك إغلاقه في الأثناء، فالطلب يبقى.</p></li>
+    </ol>
+    <div class="note">
+      <h3>لا يوجد إنترنت على ذلك الجهاز؟</h3>
+      <p>تحت <b>لا يوجد إنترنت على هذا الجهاز؟</b> انقر <b>نسخ الطلب</b> وأرسله إلينا عبر واتساب أو البريد الإلكتروني. افتح ملف الترخيص الذي نرسله إليك بزر <b>فتح الترخيص…</b> أو انقر عليه مرتين.</p>
+    </div>
+  </section>
 
-<section data-l="ar" hidden>
-  <h2>البدء</h2>
-  <ol class="steps">
-    <li><div><h3>ثبّته</h3>
-      <p><b>Mac:</b> افتح الملف الذي نزّلته واسحب Ghost Studio إلى مجلد التطبيقات.</p>
-      <p><b>Windows:</b> شغّل المثبّت. قد يظهر مربع أزرق «Windows protected your PC»: انقر <b>More info</b> ثم <b>Run anyway</b>.</p></div></li>
-    <li><div><h3>أرسل طلبك</h3>
-      <p>يفتح Ghost Studio على صفحة تطلب ترخيصًا. اكتب اسم ورشتك، وانقر <b>نسخ الطلب</b>، وأرسله إلى Ghost Electronics عبر واتساب أو البريد الإلكتروني. يحتوي فقط على رمز جهازك واسمه واسم ورشتك.</p></div></li>
-    <li><div><h3>افتح ترخيصك</h3>
-      <p>يصلك ملف الترخيص. انقر عليه مرتين ليفتح Ghost Studio جاهزًا للاستخدام. يعمل الترخيص على ذلك الجهاز فقط.</p></div></li>
-  </ol>
-  <h2>بعد ذلك</h2>
-  <ul>
-    <li>يحدّث Ghost Studio نفسه: عند صدور إصدار جديد يُنزَّل في الخلفية ويطلب منك إعادة التشغيل.</li>
-    <li>يعمل بالعربية والإنجليزية؛ والزر في الأعلى يبدّل بينهما.</li>
-    <li>تُحفظ مشاريع عملائك في <b>المستندات › Ghost Studio › Customers</b>. انسخ هذا المجلد احتياطيًا مع بقية عملك.</li>
-  </ul>
-</section>
+  <section class="rows" data-l="en">
+    <h2>After that</h2>
+    <div class="notes">
+      <div><h3>Updates itself</h3><p>When a new version is out it downloads in the background and asks you to restart.</p></div>
+      <div><h3>English and Arabic</h3><p>The button at the top of Studio switches between them.</p></div>
+      <div><h3>Back up your work</h3><p>Your customers’ projects are in <b>Documents › Ghost Studio › Customers</b>. Back that folder up with the rest of your work.</p></div>
+    </div>
+  </section>
+
+  <section class="rows" data-l="ar" hidden>
+    <h2>بعد ذلك</h2>
+    <div class="notes">
+      <div><h3>يحدّث نفسه</h3><p>عند صدور إصدار جديد يُنزَّل في الخلفية ويطلب منك إعادة التشغيل.</p></div>
+      <div><h3>بالعربية والإنجليزية</h3><p>الزر في أعلى Studio يبدّل بينهما.</p></div>
+      <div><h3>احفظ نسخة من عملك</h3><p>مشاريع عملائك في <b>المستندات › Ghost Studio › Customers</b>. انسخ هذا المجلد احتياطيًا مع بقية عملك.</p></div>
+    </div>
+  </section>
+
+</main>
 
 <footer>
-  <span data-l="en">Ghost Studio is made by Ghost Electronics. It needs a licence for each computer it runs on.</span>
-  <span data-l="ar" hidden>Ghost Studio من صنع Ghost Electronics، ويحتاج إلى ترخيص لكل جهاز يعمل عليه.</span>
+  <div class="wrap">
+    <span class="brand">Ghost Electronics</span>
+    <span class="ar" lang="ar" dir="rtl">قوست إلكترونيكس</span>
+    <p data-l="en">Ghost Studio needs a licence for each computer it runs on.</p>
+    <p data-l="ar" hidden>يحتاج Ghost Studio إلى ترخيص لكل جهاز يعمل عليه.</p>
+    <nav class="legal" aria-label="More"><a href="/support.html">Support</a> <a href="/privacy.html">Privacy</a></nav>
+  </div>
 </footer>
-</main>
+
 <script>
 (() => {
+  // the rev blocks count the page, as on the home page
+  const revs = document.getElementById('revs');
+  for (let i = 0; i < 20; i++) revs.appendChild(document.createElement('i'));
+  let lit = -1;
+  const count = () => {
+    const room = document.documentElement.scrollHeight - innerHeight;
+    const n = room > 0 ? Math.max(3, Math.round(Math.min(1, scrollY / room) * 20)) : 3;
+    if (n === lit) return;
+    lit = n;
+    [...revs.children].forEach((b, i) => b.classList.toggle('on', i < n));
+  };
+  addEventListener('scroll', count, { passive: true });
+  addEventListener('resize', count);
+
   // the language: Arabic on an Arabic computer unless picked otherwise
   let lang = 'en';
   try { lang = localStorage.getItem('ghost-studio-site-lang') || ((navigator.language || '').startsWith('ar') ? 'ar' : 'en'); } catch {}
-  const btn = document.getElementById('lang');
+  const btn = document.getElementById('lang'), ver = document.getElementById('ver');
   const show = () => {
     document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.querySelectorAll('[data-l]').forEach(el => { el.hidden = el.dataset.l !== lang; });
     btn.textContent = lang === 'ar' ? 'English' : 'العربية'; btn.lang = lang === 'ar' ? 'en' : 'ar';
     document.title = lang === 'ar' ? 'Ghost Studio · تنزيل' : 'Ghost Studio';
     if (ver.dataset.v) ver.textContent = lang === 'ar' ? `الإصدار ${ver.dataset.v}` : `Version ${ver.dataset.v}`;
+    lit = -1; count();
   };
-  const ver = document.getElementById('ver');
   btn.addEventListener('click', () => { lang = lang === 'ar' ? 'en' : 'ar'; try { localStorage.setItem('ghost-studio-site-lang', lang); } catch {} show(); });
 
   // the visitor's own system first, in gold

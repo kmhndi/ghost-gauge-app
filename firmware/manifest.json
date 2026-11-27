@@ -2,7 +2,7 @@
   "schema": 1,
   "stable": {
     "version": "1.0.83",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.83.bin",
+    "url": "https://ghost.com.qa/firmware/ghost-gauge-1.0.83.bin",
     "bytes": 1574392,
     "sha256": "6550b9367e4d7c5113276a1d81e3ea994f05e90f328039e2cbcd7bee771e504b",
     "minApp": "1.6",
@@ -13,7 +13,7 @@
   },
   "beta": {
     "version": "1.0.48",
-    "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.48.bin",
+    "url": "https://ghost.com.qa/firmware/ghost-gauge-1.0.48.bin",
     "bytes": 1551864,
     "sha256": "a3275c4b2c9b2edb4c8f0e4c62811c4de672dada2266269fe2f59e7c1993041f",
     "minApp": "1.3",
@@ -28,7 +28,7 @@
         "2": {
           "stable": {
             "version": "1.0.83",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.83-b2.bin",
+            "url": "https://ghost.com.qa/firmware/ghost-gauge-nano-1.0.83-b2.bin",
             "bytes": 1137400,
             "sha256": "95e25f7ee134e7dbc525cf4aed531692fef995aa8436ae1776fc6ff39ef483ce",
             "minApp": "1.11",
@@ -39,7 +39,7 @@
           },
           "beta": {
             "version": "1.0.62",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-nano-1.0.62-b2.bin",
+            "url": "https://ghost.com.qa/firmware/ghost-gauge-nano-1.0.62-b2.bin",
             "bytes": 1126584,
             "sha256": "f36459b63b3c6c29f32d03869700aa2f041e59ef6e33949170e315f5265abf5f",
             "minApp": "1.11",
@@ -54,7 +54,7 @@
     "pro": {
       "stable": {
         "version": "1.0.48",
-        "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.48.bin",
+        "url": "https://ghost.com.qa/firmware/ghost-gauge-pro-1.0.48.bin",
         "bytes": 739512,
         "sha256": "95defbbdd6dbcf9ba7076af80643d60cec4c55effedf94d954005bd0d551386a",
         "minApp": "1.5",
@@ -67,7 +67,7 @@
         "2": {
           "beta": {
             "version": "1.0.97",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.97-b2.bin",
+            "url": "https://ghost.com.qa/firmware/ghost-gauge-pro-1.0.97-b2.bin",
             "bytes": 1836552,
             "sha256": "2b00593410aa08576b0eba97128451c14f16dee62a0c919c28b5711cfe9bc029",
             "minApp": "1.16",
@@ -78,7 +78,7 @@
           },
           "stable": {
             "version": "1.0.97",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-pro-1.0.97-b2.bin",
+            "url": "https://ghost.com.qa/firmware/ghost-gauge-pro-1.0.97-b2.bin",
             "bytes": 1836552,
             "sha256": "2b00593410aa08576b0eba97128451c14f16dee62a0c919c28b5711cfe9bc029",
             "minApp": "1.16",
@@ -95,7 +95,7 @@
         "2": {
           "stable": {
             "version": "1.0.83",
-            "url": "https://kmhndi.github.io/ghost-gauge-app/firmware/ghost-gauge-1.0.83-b2.bin",
+            "url": "https://ghost.com.qa/firmware/ghost-gauge-1.0.83-b2.bin",
             "bytes": 1490136,
             "sha256": "6ef314a99388f7f66ae087796611a5acedf7c32199d716bae404bf698a1e91ab",
             "minApp": "1.11",

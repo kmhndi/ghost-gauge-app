@@ -2,55 +2,335 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ghost Gauge</title>
-<link rel="stylesheet" href="_style.css">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ghost Electronics · Ghost Gauge Pro</title>
+<meta name="description" content="Ghost Gauge Pro: the 7-inch dash for your Can-Am, with real readings off the vehicle, built-in GPS and screens your garage designs.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Ghost Gauge Pro">
+<meta property="og:description" content="The 7-inch dash for your Can-Am.">
+<meta property="og:image" content="https://ghost.com.qa/media/pro-front.jpg">
+<meta property="og:url" content="https://ghost.com.qa/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 260' fill='none'><path d='M25 240 55 200 83 240 111 200 139 240 167 200 195 240V105A85 85 0 0 0 25 105Z' stroke='%23eceff4' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/><path d='M60.76 158.68A50 50 0 1 1 159.24 158.68' stroke='%233e4757' stroke-width='15' stroke-linecap='round'/><path d='M60.76 158.68A50 50 0 0 1 79.22 110.6' stroke='%2352e5a6' stroke-width='15' stroke-linecap='round'/><path d='M110 150 139.55 112.18' stroke='%23ff4b23' stroke-width='13' stroke-linecap='round'/><circle cx='110' cy='150' r='11.5' fill='%23eceff4'/></svg>">
+<style>body { margin: 0; }</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&display=swap">
+<style>
+/* Layout: rows, not a grid. Like the dash: a full-width strip, then the hero panel, then tiles.
+   One look, on purpose: black is the ground the readings float on. */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --ink: #ffffff;
+  --dim: #7b8488;
+  --line: #181c21;
+  --tile: #111316;
+  --edge: #1e2126;
+  --render: #131718;      /* the renders' own backdrop, so a render sits flush in its panel */
+  --gold: #ffc20e;
+  --ok: #31d27b;
+  --warn: #ff9c29;
+  --crit: #ff413a;
+  --red-dim: #291410;
+  --readout: "Orbitron", "DIN Alternate", ui-monospace, monospace;
+  --prose: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --r-block: 5px; --r-tile: 16px; --r-panel: 22px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--prose); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+img, video { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { max-width: 1120px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* ---- the top strip ---- */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--bg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.top .bar { padding-block: 14px 12px; }
+.brand { display: flex; align-items: center; gap: 12px; font: 700 13px/1 var(--readout); letter-spacing: 3px; text-transform: uppercase; white-space: nowrap; }
+.brand svg { width: 26px; height: auto; flex: none; }
+.nav { display: flex; gap: 22px; font: 500 11px/1 var(--readout); letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+.nav a:hover { color: var(--ink); }
+.revs { flex: 1; display: grid; grid-template-columns: repeat(20, 1fr); gap: 4px; padding-bottom: 10px; }
+.revs i { display: block; height: 6px; border-radius: 2px; background: var(--line); transition: background .15s ease-out; }
+.revs i:nth-child(n+17) { background: var(--red-dim); }
+.revs i.on { background: var(--ok); }
+.revs i.on:nth-child(n+14) { background: var(--warn); }
+.revs i.on:nth-child(n+17) { background: var(--crit); }
+
+/* ---- shared ---- */
+main { display: flex; flex-direction: column; gap: clamp(72px, 11vw, 136px); padding-block: clamp(28px, 5vw, 56px) clamp(72px, 10vw, 120px); }
+section { scroll-margin-top: 84px; min-width: 0; }
+.rows { display: flex; flex-direction: column; gap: 20px; }
+h1, h2 { font-family: var(--readout); font-weight: 800; text-transform: uppercase; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(34px, 8.4vw, 92px); line-height: .98; letter-spacing: .02em; }
+h2 { font-size: clamp(22px, 3.6vw, 36px); line-height: 1.1; letter-spacing: .04em; }
+.lede { margin: 0; color: var(--dim); font-size: clamp(16px, 2vw, 19px); max-width: 46ch; }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 32px; }
+.head > .txt { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.cap { margin: 0; font: 500 11px/1.5 var(--readout); letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); }
+.panel { border: 1px solid var(--edge); border-radius: var(--r-panel); overflow: hidden; background: var(--render); }
+.panel.glass { background: #000; }
+.panel > img, .panel > video { width: 100%; }
+
+/* ---- hero ---- */
+.dealer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; padding: 22px; border: 1px solid var(--edge); border-radius: var(--r-panel); background: var(--tile); }
+.dealer .who { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.dealer .logo { flex: none; width: clamp(64px, 9vw, 88px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; background: #fff; }
+.dealer .id { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.dealer b { font: 700 clamp(19px, 2.8vw, 28px)/1.1 var(--readout); letter-spacing: 1px; text-transform: uppercase; }
+.dealer .tel { font: 700 clamp(16px, 2.2vw, 20px)/1 var(--readout); letter-spacing: 1px; color: var(--dim); user-select: all; -webkit-user-select: all; }
+.acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { appearance: none; display: inline-flex; align-items: center; justify-content: center; padding: 13px 18px; border: 1px solid var(--edge); border-radius: 14px; background: var(--bg); color: var(--ink); font: 700 11px/1 var(--readout); letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+.btn:hover { border-color: var(--dim); }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: #000; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tile { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--edge); border-radius: var(--r-tile); background: var(--tile); min-width: 0; }
+.tile b { font: 700 clamp(15px, 2.6vw, 30px)/1 var(--readout); letter-spacing: 1px; white-space: nowrap; }
+@media (max-width: 720px) { .tiles { grid-template-columns: repeat(2, 1fr); } .nav { display: none; } }
+
+/* ---- screens ---- */
+.seg { display: inline-flex; padding: 4px; gap: 4px; border: 1px solid var(--edge); border-radius: 14px; background: var(--tile); }
+.seg button { appearance: none; border: 0; background: none; color: var(--dim); font: 700 11px/1 var(--readout); letter-spacing: 2px; text-transform: uppercase; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--gold); color: #000; }
+.thumbs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.thumbs button { appearance: none; padding: 0; background: #000; border: 1px solid var(--edge); border-radius: 10px; overflow: hidden; cursor: pointer; opacity: .55; transition: opacity .15s ease-out; }
+.thumbs button:hover { opacity: .85; }
+.thumbs button[aria-pressed="true"] { opacity: 1; border-color: var(--ink); }
+.thumbs img { width: 100%; }
+@media (max-width: 720px) { .thumbs { display: flex; overflow-x: auto; padding-bottom: 6px; } .thumbs button { flex: 0 0 104px; } }
+
+/* ---- app ---- */
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 5vw, 64px); align-items: center; }
+.split > .rows { gap: 14px; }
+.phones { display: flex; justify-content: center; align-items: flex-start; gap: clamp(12px, 3vw, 28px); }
+.phone { flex: 1 1 0; max-width: 270px; min-width: 0; border: 1px solid var(--edge); border-radius: clamp(22px, 4vw, 38px); overflow: hidden; background: #000; }
+.phone > * { width: 100%; }
+.phone:nth-child(2) { margin-top: clamp(24px, 6vw, 64px); }
+@media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
+
+/* ---- footer ---- */
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; padding-block: 28px 36px; color: var(--dim); font-size: 13px; }
+footer .brand { color: var(--ink); }
+footer .ar { font-size: 16px; color: var(--ink); }
+footer p { margin: 0; }
+footer .legal { display: flex; gap: 18px; }
+footer .legal a:hover { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .revs i, .thumbs button { transition: none; } }
+</style>
+
 </head>
 <body>
-<main>
-<nav>
-  <a href="index.html">GHOST GAUGE</a>
-  <a href="support.html">SUPPORT</a>
-  <a href="privacy.html">PRIVACY</a>
-</nav>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#pro" aria-label="Ghost Electronics">
+      <svg viewBox="0 0 220 260" fill="none" aria-hidden="true">
+        <path d="M25 240 55 200 83 240 111 200 139 240 167 200 195 240V105A85 85 0 0 0 25 105Z" stroke="#eceff4" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M60.76 158.68A50 50 0 1 1 159.24 158.68" stroke="#3e4757" stroke-width="15" stroke-linecap="round"/>
+        <path d="M60.76 158.68A50 50 0 0 1 79.22 110.6" stroke="#52e5a6" stroke-width="15" stroke-linecap="round"/>
+        <path d="M110 150 139.55 112.18" stroke="#ff4b23" stroke-width="13" stroke-linecap="round"/>
+        <circle cx="110" cy="150" r="11.5" fill="#eceff4"/>
+      </svg>
+      Ghost Electronics
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#distributors">Distributors</a>
+      <a href="#screens">Screens</a>
+      <a href="#app">App</a>
+      <a href="#studio">Studio</a>
+    </nav>
+  </div>
+  <div class="wrap"><div class="revs" id="revs" aria-hidden="true"></div></div>
+</header>
 
-<h1>Ghost Gauge</h1>
-<p class="lede">A dash cluster for the Can-Am Maverick X3, and the app that goes with it.</p>
+<main class="wrap">
 
-<div class="card">
-  <p>The gauge is a 320×240 panel that watches the things an X3 owner actually worries about —
-  belt temperature above all — and says so loudly enough to notice at speed. The app carries the
-  same readings to your phone, keeps them on the Lock Screen while it is in your pocket, records
-  every ride, and installs new firmware without a cable.</p>
-</div>
+  <section id="pro" class="rows">
+    <div class="head">
+      <div class="txt">
+        <h1>Ghost Gauge Pro</h1>
+        <p class="lede">The 7-inch dash for your Can-Am.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <img src="media/pro-front.jpg" width="1600" height="1000" alt="The Ghost Gauge Pro from the front: a dark case with a 7-inch screen, GHOST GAUGE PRO on its chin.">
+    </div>
+    <div class="tiles">
+      <div class="tile"><span class="cap">Screen</span><b>7 IN</b></div>
+      <div class="tile"><span class="cap">Pixels</span><b>800 × 480</b></div>
+      <div class="tile"><span class="cap">GPS</span><b>BUILT IN</b></div>
+      <div class="tile"><span class="cap">Maverick</span><b>X3 · R</b></div>
+    </div>
+  </section>
 
-<h2>On the gauge</h2>
-<ul>
-  <li>Five screens: Belt Watch, Quad Tile, Race Strip, Ring Meters and Telemetry.</li>
-  <li>A red frame blinks whenever any reading is past its limit.</li>
-  <li>Light and dark colour sets, switched by hand or following sunrise and sunset.</li>
-  <li>Five typefaces and five startup animations, all chosen from the phone.</li>
-</ul>
+  <section id="live" class="rows">
+    <div class="head">
+      <div class="txt">
+        <h2>Every number is real</h2>
+        <p class="lede">Read straight off your Can-Am. Nothing is simulated.</p>
+      </div>
+    </div>
+    <div class="panel glass">
+      <video id="pull" src="media/pro-pull.mp4" poster="media/pro-pull.jpg" width="800" height="480" muted loop playsinline preload="metadata" aria-label="The Pro's Race screen through a full pull: rpm, boost and speed climb until the engine is on its rev limiter and the rev blocks flash red."></video>
+    </div>
+    <p class="cap">A pull to the rev limiter, drawn by the Pro's own renderer</p>
+  </section>
 
-<h2>On the phone</h2>
-<ul>
-  <li>Live readings, with a chart of the last three minutes.</li>
-  <li>Alarm notifications when a reading turns critical — Time Sensitive, so they arrive through
-      a Focus.</li>
-  <li>The belt temperature on the Lock Screen and in the Dynamic Island while you ride.</li>
-  <li>Ride logging, with charts, peaks, time spent past each limit, and a map of where you went.</li>
-  <li>Every setting the gauge has, and firmware updates over the gauge's own Wi-Fi.</li>
-  <li>An iPad layout that puts the whole dash on one landscape screen.</li>
-</ul>
+  <section id="distributors" class="rows">
+    <div class="head">
+      <div class="txt">
+        <h2>Available now</h2>
+        <p class="lede">Through our distributors.</p>
+      </div>
+    </div>
+    <div class="dealer">
+      <div class="who">
+        <img class="logo" src="media/sand-toyz.jpg" width="150" height="150" alt="Sand Toyz Garage's logo">
+        <div class="id">
+          <b>Sand Toyz Garage</b>
+          <span class="tel" id="tel">+974 5522 2878</span>
+        </div>
+      </div>
+      <div class="acts">
+        <button type="button" class="btn" id="copy-tel">Copy number</button>
+        <a class="btn" href="https://www.instagram.com/stg_qtr/" target="_blank" rel="noopener">Instagram</a>
+        <a class="btn gold" href="https://maps.app.goo.gl/63kUNzSQf7GtzWau5" target="_blank" rel="noopener">Open in Maps</a>
+      </div>
+    </div>
+  </section>
 
-<h2>Trying it without a gauge</h2>
-<p>Turn on <strong>Demo mode</strong> in Settings › This iPhone and the app runs against a simulated
-gauge — readings, alarms, rides and all. It is the same simulation the project uses for testing.</p>
+  <section id="screens" class="rows">
+    <div class="head">
+      <div class="txt">
+        <h2>Screens</h2>
+        <p class="lede">Plain numbers, big enough to read at speed.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Show the screens">
+        <button type="button" id="st-cruise" data-state="cruise" aria-pressed="true">Night</button>
+        <button type="button" id="st-pull" data-state="pull" aria-pressed="false">Limit</button>
+        <button type="button" id="st-day" data-state="day" aria-pressed="false">Day</button>
+      </div>
+    </div>
+    <div class="panel glass">
+      <img id="screen" src="media/screens/strip-cruise.png" width="800" height="480" alt="The Strip screen on the Pro.">
+    </div>
+    <div class="thumbs" id="thumbs" role="group" aria-label="Pick a screen"></div>
+  </section>
+
+  <section id="app" class="split">
+    <div class="rows">
+      <h2>On your iPhone</h2>
+      <p class="lede">Live readings, rides, timed runs. Updates over Bluetooth.</p>
+      <p class="cap">Recorded from the app, with its simulated gauge</p>
+    </div>
+    <div class="phones">
+      <div class="phone">
+        <video id="dash" src="media/app-dash.mp4" poster="media/app-dash.jpg" width="586" height="1268" muted loop playsinline preload="metadata" aria-label="The Ghost Gauge app's live dash: rev blocks, rpm, boost, speed, gear, belt, coolant, intake air, oil and volts."></video>
+      </div>
+      <div class="phone">
+        <img src="media/app-screens.jpg" width="780" height="1688" loading="lazy" alt="The app's New screens page: three screens from a garage, and one button to install them on the Pro.">
+      </div>
+    </div>
+  </section>
+
+  <section id="studio" class="rows">
+    <div class="head">
+      <div class="txt">
+        <h2>Ghost Studio</h2>
+        <p class="lede">Your garage designs your screens. Your iPhone installs them.</p>
+      </div>
+    </div>
+    <div class="panel glass">
+      <img src="media/studio.jpg" width="1800" height="1126" loading="lazy" alt="Ghost Studio, the Pro's screen designer, with the PRO1 screen open: rev blocks, rpm, boost, speed, gear, belt, coolant, intake air, fuel and volts on the Pro's 800 by 480 canvas.">
+    </div>
+  </section>
+
+</main>
 
 <footer>
-  Ghost Gauge is an independent project and is not affiliated with, endorsed by or connected to
-  BRP, Can-Am or Apple.
+  <div class="wrap">
+    <span class="brand">Ghost Electronics</span>
+    <span class="ar" lang="ar" dir="rtl">قوست إلكترونيكس</span>
+    <p>Doha, Qatar</p>
+    <p>Not affiliated with BRP or Can-Am.</p>
+    <nav class="legal" aria-label="More"><a href="support.html">Support</a> <a href="privacy.html">Privacy</a></nav>
+  </div>
 </footer>
-</main>
-</body>
-</html>
+
+<script>
+(function () {
+  // The rev blocks count the page: twenty, green to 13, amber to 16, red after.
+  var revs = document.getElementById('revs');
+  for (var i = 0; i < 20; i++) revs.appendChild(document.createElement('i'));
+  var blocks = revs.children, lit = -1;
+  function count() {
+    var room = document.documentElement.scrollHeight - innerHeight;
+    var n = room > 0 ? Math.max(3, Math.round(Math.min(1, scrollY / room) * 20)) : 3;
+    if (n === lit) return;
+    lit = n;
+    for (var i = 0; i < 20; i++) blocks[i].classList.toggle('on', i < n);
+  }
+  addEventListener('scroll', count, { passive: true });
+  addEventListener('resize', count);
+  count();
+
+  // The screens: seven, each as the Pro draws it by night, at its limits and by day.
+  var names = { strip: 'Strip', cruise: 'Cruise', trail: 'Trail', glance: 'Glance', boost: 'Boost', six: 'Six', belt: 'Belt' };
+  var ids = Object.keys(names), state = 'cruise', pick = 'strip';
+  var big = document.getElementById('screen'), thumbs = document.getElementById('thumbs');
+  var src = function (id) { return 'media/screens/' + id + '-' + state + '.png'; };
+  ids.forEach(function (id) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.id = 'sc-' + id; b.dataset.id = id;
+    b.setAttribute('aria-label', names[id]);
+    var im = document.createElement('img');
+    im.width = 800; im.height = 480; im.alt = ''; im.loading = 'lazy';
+    b.appendChild(im);
+    b.addEventListener('click', function () { pick = id; show(); });
+    thumbs.appendChild(b);
+  });
+  function show() {
+    big.src = src(pick);
+    big.alt = 'The ' + names[pick] + ' screen on the Pro.';
+    Array.prototype.forEach.call(thumbs.children, function (b) {
+      b.firstChild.src = src(b.dataset.id);
+      b.setAttribute('aria-pressed', b.dataset.id === pick ? 'true' : 'false');
+    });
+    document.querySelectorAll('.seg button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.state === state ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () { state = b.dataset.state; show(); });
+  });
+  show();
+
+  // The distributor's number: copied where the viewer allows it, selected where it doesn't.
+  var copy = document.getElementById('copy-tel'), tel = document.getElementById('tel');
+  copy.addEventListener('click', function () {
+    var pickIt = function () { getSelection().selectAllChildren(tel); };
+    var said = function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy number'; }, 1600); };
+    try { navigator.clipboard.writeText('+97455222878').then(said, pickIt); } catch (e) { pickIt(); }
+  });
+
+  // The two recordings play by themselves, muted; with Reduce Motion they wait for a tap.
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  ['pull', 'dash'].forEach(function (id) {
+    var v = document.getElementById(id);
+    v.addEventListener('error', function () {       // no video here: its first frame stands in
+      var im = new Image();
+      im.src = v.poster; im.alt = v.getAttribute('aria-label'); im.width = v.width; im.height = v.height;
+      v.replaceWith(im);
+    });
+    if (still) { v.controls = true; return; }
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { v.controls = true; });
+  });
+})();
+</script>
+
+</body></html>
